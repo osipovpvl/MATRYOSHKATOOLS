@@ -256,7 +256,7 @@ function populateMetaData(id, value, length) {
   const lengthElement = document.getElementById(`${id}-length`);
 
   element.textContent = value || "N/A";
-  lengthElement.textContent = `Length: ${length}`;
+  lengthElement.textContent = `Символов: ${length}`;
 }
 
 // Function to populate microdata content

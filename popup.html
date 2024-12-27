@@ -199,7 +199,7 @@
 
 .search-button.yandex {
   color: #ffffff;
-  background-color: #1a73e8;
+  background-color: #ff3434;
 }
 
 .search-button.google {
@@ -269,6 +269,20 @@
     color: #ffffff;
     background-color: #1a73e8;
   }
+
+  .links-summary button:hover {
+    background-color: #ffdd00;
+}
+
+.links-protocols button:hover {
+    background-color: #ffdd00;
+}
+
+.links-attributes button:hover {
+    background-color: #ffdd00;
+}
+
+
 
   .google-button {
     color: #ffffff;
@@ -343,21 +357,21 @@
   <div id="container">
     <!-- Navigation Tabs -->
     <div id="tabs">
-      <button class="tab-button active" data-tab="seo">Основное</button>
-      <button class="tab-button" data-tab="microdata">Микро-разметка</button>
-      <button class="tab-button" data-tab="links-info">Ссылки</button>
-      <button class="tab-button" data-tab="images">Изображения</button>
-      <button class="tab-button" data-tab="page">Страница</button>
-      <button class="tab-button" data-tab="search">Поиск</button>
-      <button class="tab-button" data-tab="tools">Инструменты</button>
-      <button class="tab-button" data-tab="tools">Полезные сервисы</button>
-      <button class="tab-button" data-tab="about">Об инструменте</button>
+      <button class="tab-button active" data-tab="seo">ОСНОВНОЕ</button>
+      <button class="tab-button" data-tab="microdata">МИКРОРАЗМЕТКА</button>
+      <button class="tab-button" data-tab="links-info">ССЫЛКИ</button>
+      <button class="tab-button" data-tab="images">ИЗОБРАЖЕНИЯ</button>
+      <button class="tab-button" data-tab="page">СТРАНИЦА</button>
+      <button class="tab-button" data-tab="search">ПОИСК</button>
+      <button class="tab-button" data-tab="tools">ИНСТРУМЕНТЫ</button>
+      <button class="tab-button" data-tab="others">ПОЛЕЗНЫЕ СЕРВИСЫ</button>
+      <button class="tab-button" data-tab="about">ОБ ИНСТРУМЕНТЕ</button>
     </div>
 
     <!-- Tab Content -->
     <div id="tab-content">
       <div id="seo" class="tab active">
-        
+        <h1>Основная информация</h1>
         <div class="section-title">Метаданные:</div>
         <table>
           <tr>
@@ -414,7 +428,7 @@
         
         
 
-        <div class="section-title">Основная информация:</div>
+        <div class="section-title">Дополнительная информация:</div>
         <table>
           <tr>
             <td>Current URL</td>
@@ -460,7 +474,7 @@
 
       <!-- Microdata Tab -->
       <div id="microdata" class="tab">
-        <h1>Microdata</h1>
+        <h1>Анализ микроразметки</h1>
         <table>
           <tr>
             <td>Open Graph</td>
@@ -471,7 +485,7 @@
             <td id="twitter-cards">Загрузка...</td>
           </tr>
           <tr>
-            <td>Schema.org</td>
+            <td>JSON-LD</td>
             <td id="schema-org">Загрузка...</td>
           </tr>
           <tr>
@@ -487,7 +501,7 @@
 
       <!-- Page Tab -->
       <div id="page" class="tab">
-        <h1>Page Tools</h1>
+        <h1>Анализ страницы</h1>
         <div class="page-panel">
           <div class="page-item">
             <span>Highlight Noindex Elements</span>
@@ -545,7 +559,7 @@
       </div>
 
       <div id="search" class="tab">
-        <h1>Поиск</h1>
+        <h1>Анализ поиска</h1>
         <div class="search-panel">
           <div class="search-item">
             <span>Проверить индексацию в Яндексе</span>
@@ -586,13 +600,81 @@
 
       <!-- About Tab -->
       <div id="about" class="tab">
-        <h1>Об инструменте</h1>
-        <p>SEO Inspector v1.0</p>
-        <p>A browser extension for SEO analysis.</p>
+        <section id="about-seo-vision" style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f9f9f9; color: #333;">
+          <h1 style="text-align: center; font-size: 2rem; color: #4CAF50;">SEO Vision – ваш надежный помощник в мире SEO</h1>
+          
+          <p style="text-align: center; font-size: 1.1rem; margin-top: 10px;">
+            Удобное и функциональное расширение для браузера, созданное для оптимизации работы с веб-страницами и сокращения времени на выполнение рутинных задач.
+          </p>
+
+          <section style="margin-top: 30px;">
+            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Преимущества:</h2>
+            <p style="margin-bottom: 10px;">
+              Текст
+            </p>
+            <p style="margin-top: 15px;">
+              Текст
+            </p>
+          </section>
+        
+          <section style="margin-top: 30px;">
+            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Для чего?</h2>
+            <ul style="list-style: none; padding: 0;">
+              <li style="margin-bottom: 10px;">
+                ✅ Быстро анализировать мета-теги (title, description, keywords и др.).
+              </li>
+              <li style="margin-bottom: 10px;">
+                ✅ Проверять индексацию страниц и их соответствие техническим требованиям.
+              </li>
+              <li style="margin-bottom: 10px;">
+                ✅ Искать и устранять ошибки на сайте.
+              </li>
+              <li style="margin-bottom: 10px;">
+                ✅ Работать с данными поисковой выдачи.
+              </li>
+              <li style="margin-bottom: 10px;">
+                ✅ Переходить к полезным SEO-сервисам в один клик.
+              </li>
+              <li style="margin-bottom: 10px;">
+                ✅ Изучать ключевые запросы через Яндекс Вордстат.
+              </li>
+              <li style="margin-bottom: 10px;">
+                ✅ И многое другое! Полный список возможностей доступен на странице <strong>«Возможности»</strong>.
+              </li>
+            </ul>
+          </section>
+        
+          <section style="margin-top: 30px;">
+            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Для кого?</h2>
+            <p style="margin-bottom: 10px;">
+              SEO Vision создан для специалистов и команд, работающих с сайтами:
+            </p>
+            <ul style="list-style: none; padding: 0;">
+              <li style="margin-bottom: 10px;">📌 SEO-специалистов.</li>
+              <li style="margin-bottom: 10px;">📌 Веб-мастеров.</li>
+              <li style="margin-bottom: 10px;">📌 Маркетологов.</li>
+              <li style="margin-bottom: 10px;">📌 Разработчиков.</li>
+              <li style="margin-bottom: 10px;">📌 Контент-менеджеров.</li>
+              <li style="margin-bottom: 10px;">📌 Владельцев сайтов и менеджеров проектов.</li>
+            </ul>
+            <p style="margin-top: 15px;">
+              Расширение подходит всем, кто стремится сделать анализ сайта быстрее, эффективнее и удобнее!
+            </p>
+          </section>
+
+          <section style="margin-top: 30px;">
+            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Версия расширения:</h2>
+            <p style="margin-bottom: 10px;">
+              1.0 12.24
+            </p>
+          </section>
+        </section>
+
+        
       </div>
 
       <div id="links-info" class="tab">
-        <h1>Links Information</h1>
+        <h1>Анализ ссылок</h1>
         <div class="links-summary">
           <button class="filter-button" id="show-all-links">Все ссылки (<span id="total-links">0</span>)</button>
           <button class="filter-button" id="show-internal-links">Внутренние (<span id="internal-links">0</span>)</button>
@@ -626,7 +708,7 @@
       </div>
 
       <div id="images" class="tab">
-        <h1>Изображения</h1>
+        <h1>Анализ изображений</h1>
         <div id="image-summary">
           <button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
           <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
@@ -636,6 +718,11 @@
         <div id="image-details">
           <ul id="image-list"></ul>
         </div>
+      </div>
+
+      <div id="others" class="tab">
+        <h1>Полезные сервисы</h1>
+        <p>Инструменты для SEO анализа будут здесь.</p>
       </div>
 
       <div id="tools" class="tab">
