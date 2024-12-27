@@ -1,0 +1,20 @@
+
+{
+  "manifest_version": 3,
+  "name": "SEO Inspector",
+  "version": "1.0",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["<all_urls>","https://gogetlinks.net/*","https://checktrust.ru/*"],
+  "action": {
+  "default_popup": "popup.html",
+  "default_icon": "icon16.png",
+  "default_title": "SEO Inspector"
+},
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>","https://gogetlinks.net/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
+

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SEO Vision v1.0</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      width: 800px;
+      overflow: hidden;
+      background-color: #f9f9f9;
+    }
+
+    #container {
+      padding: 0;
+    }
+
+    /* Tabs navigation */
+    #tabs {
+      display: flex;
+      background-color: #ffdd00;
+      border-bottom: 2px solid #ddd;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 10px;
+      cursor: pointer;
+      background: #ffdd00;
+      color: rgb(0, 0, 0);
+      border: none;
+      text-align: center;
+      font-size: 0.9em;
+      transition: background 0.3s ease;
+    }
+
+    .tab-button:hover {
+      background: white;
+    }
+
+    .tab-button.active {
+      background: white;
+      color: black;
+      font-weight: bold;
+      border-top: 2px solid #ffdd00;
+    }
+
+    .tab {
+      display: none;
+      padding: 20px;
+    }
+
+    .tab.active {
+      display: block;
+    }
+
+    /* Main table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table th, table td {
+      text-align: left;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: #f2f2f2;
+      color: #333;
+    }
+
+    /* Section titles */
+    .section-title {
+      font-size: 1.3em;
+      margin: 20px 0 10px 0;
+      color: black;
+      border-left: 4px solid #ffdd00;
+      padding-left: 10px;
+    }
+
+    /* Footer styles */
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      padding: 10px 0;
+      background-color: #f1f1f1;
+      font-size: 0.9em;
+    }
+
+    #social a {
+      color: #ffdd00;
+      text-decoration: none;
+      margin: 0 8px;
+    }
+
+    #social a:hover {
+      text-decoration: underline;
+    }
+
+    #copy-status {
+      color: #4CAF50;
+      font-weight: bold;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    #image-summary {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+#image-summary button {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+#image-summary button:hover {
+    background-color: #ffdd00;
+}
+
+#image-details ul {
+    list-style: none;
+    padding: 0;
+}
+
+#image-details li {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#image-details img {
+    max-width: 50px;
+    max-height: 50px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#search {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background-color: #f4f7fc;
+}
+
+.search-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.search-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 10px 15px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-item span {
+  font-size: 14px;
+  color: #333;
+}
+
+.search-button {
+  background-color: #e6e9f1;
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  color: #555;
+  transition: background-color 0.2s ease;
+}
+
+.search-button.yandex {
+  color: #ffffff;
+  background-color: #1a73e8;
+}
+
+.search-button.google {
+  color: #ffffff;
+  background-color: #34a853;
+}
+
+.search-button:hover {
+  opacity: 0.9;
+}
+
+.search-info {
+  font-size: 14px;
+  color: #777;
+  margin-top: 20px;
+}
+#page {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f4f7fc;
+  }
+
+  .page-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .page-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px 15px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .page-item span {
+    font-size: 14px;
+    color: #333;
+  }
+
+  .page-button {
+    background-color: #e6e9f1;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+    transition: background-color 0.2s ease;
+  }
+
+  .action-button {
+    color: #ffffff;
+    background-color: #4caf50;
+  }
+
+  .link-button {
+    color: #ffffff;
+    background-color: #1a73e8;
+  }
+
+  .google-button {
+    color: #ffffff;
+    background-color: #34a853;
+  }
+
+  .page-button:hover {
+    opacity: 0.9;
+  }
+
+   #links-info {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+    background-color: #f4f7fc;
+  }
+
+  .filter-button {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+  }
+
+  .filter-button:hover {
+    background-color: #e0e0e0;
+  }
+
+  .links-summary, .links-protocols, .links-attributes, .links-check, .links-actions {
+    margin-bottom: 20px;
+  }
+
+  #links-details {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+
+  .link-detail {
+    padding: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .copy-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+  }
+
+  .copy-button i {
+    color: #000; /* Цвет иконки по умолчанию */
+    transition: color 0.3s;
+  }
+
+  .copy-button.copied i {
+    color: #28a745; /* Зеленый цвет при копировании */
+  }
+
+  </style>
+</head>
+<body>
+  <div id="container">
+    <!-- Navigation Tabs -->
+    <div id="tabs">
+      <button class="tab-button active" data-tab="seo">Основное</button>
+      <button class="tab-button" data-tab="microdata">Микро-разметка</button>
+      <button class="tab-button" data-tab="links-info">Ссылки</button>
+      <button class="tab-button" data-tab="images">Изображения</button>
+      <button class="tab-button" data-tab="page">Страница</button>
+      <button class="tab-button" data-tab="search">Поиск</button>
+      <button class="tab-button" data-tab="tools">Инструменты</button>
+      <button class="tab-button" data-tab="tools">Полезные сервисы</button>
+      <button class="tab-button" data-tab="about">Об инструменте</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="tab-content">
+      <div id="seo" class="tab active">
+        
+        <div class="section-title">Метаданные:</div>
+        <table>
+          <tr>
+            <th>Мета-теги</th>
+            <th>Значение</th>
+            <th></th>
+          </tr>
+          <tr>
+            <td>Title <div id="title-length" class="meta-length">-</div></td>
+            <td>
+              <div id="title">Загрузка...</div>
+            </td>
+            <td>
+              <button class="copy-button" data-target="title">
+                <i class="fas fa-clone"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Description <div id="description-length" class="meta-length">-</div></td>
+            <td>
+              <div id="description">Загрузка...</div>
+            </td>
+            <td>
+              <button class="copy-button" data-target="description">
+                <i class="fas fa-clone"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>H1 <div id="h1-length" class="meta-length">-</div></td>
+            <td>
+              <div id="h1">Загрузка...</div>
+            </td>
+            <td>
+              <button class="copy-button" data-target="h1">
+                <i class="fas fa-clone"></i>
+              </button>
+            </td>
+          </tr>
+          <tr>
+            <td>Keywords <div id="keywords-length" class="meta-length">-</div></td>
+            <td>
+              <div id="keywords">Загрузка...</div>
+            </td>
+            <td>
+              <button class="copy-button" data-target="keywords">
+                <i class="fas fa-clone"></i>
+              </button>
+            </td>
+          </tr>
+        </table>
+        
+        
+        
+
+        <div class="section-title">Основная информация:</div>
+        <table>
+          <tr>
+            <td>Current URL</td>
+            <td id="current-url">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Canonical</td>
+            <td id="canonical">Загрузка...</td>
+          </tr>
+          <!--<tr>
+            <td>Links Count</td>
+            <td id="links">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Images Count</td>
+            <td id="images-count">Загрузка...</td>
+          </tr>
+             -->
+          <tr>
+            <td>Meta Robots</td>
+            <td id="robots">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Language</td>
+            <td id="lang">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>IP Address</td>
+            <td id="site-ip">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Robots.txt</td>
+            <td id="robots-txt"><a href="#" target="_blank">Загрузка...</a></td>
+          </tr>
+          <tr>
+            <td>Sitemap.xml</td>
+            <td id="sitemap-xml"><a href="#" target="_blank">Загрузка...</a></td>
+          </tr>
+        </table>
+      </div>
+
+
+
+      <!-- Microdata Tab -->
+      <div id="microdata" class="tab">
+        <h1>Microdata</h1>
+        <table>
+          <tr>
+            <td>Open Graph</td>
+            <td id="open-graph">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Twitter Cards</td>
+            <td id="twitter-cards">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Schema.org</td>
+            <td id="schema-org">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>RDFa</td>
+            <td id="rdfa">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Microdata</td>
+            <td id="microdata-check">Загрузка...</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- Page Tab -->
+      <div id="page" class="tab">
+        <h1>Page Tools</h1>
+        <div class="page-panel">
+          <div class="page-item">
+            <span>Highlight Noindex Elements</span>
+            <button id="highlight-noindex" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Highlight Nofollow Links</span>
+            <button id="highlight-nofollow" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Show Alt Text for Images</span>
+            <button id="show-alt-text" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Highlight Headings</span>
+            <button id="highlight-headings" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Toggle JavaScript</span>
+            <button id="toggle-js" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Toggle CSS</span>
+            <button id="toggle-css" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Copy URL</span>
+            <button id="copy-url" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Send Revisit to Yandex</span>
+            <button id="send-revisit" class="page-button link-button">↗</button>
+          </div>
+          <div class="page-item">
+            <span>Check Server Response</span>
+            <button id="check-response" class="page-button link-button">↗</button>
+          </div>
+          <div class="page-item">
+            <span>Open Google Cache</span>
+            <button id="open-cache" class="page-button google-button">G</button>
+          </div>
+          <div class="page-item">
+            <span>Check Page Speed</span>
+            <button id="check-speed" class="page-button google-button">G</button>
+          </div>
+          <div class="page-item">
+            <span>Check Mobile Optimization</span>
+            <button id="check-mobile" class="page-button google-button">G</button>
+          </div>
+          <div class="page-item">
+            <span>Show Text Stats</span>
+            <button id="text-stats" class="page-button action-button">✔</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="search" class="tab">
+        <h1>Поиск</h1>
+        <div class="search-panel">
+          <div class="search-item">
+            <span>Проверить индексацию в Яндексе</span>
+            <button id="check-index-yandex" class="search-button yandex">Я</button>
+          </div>
+          <div class="search-item">
+            <span>Проверить индексацию в Google</span>
+            <button id="check-index-google" class="search-button google">G</button>
+          </div>
+          <div class="search-item">
+            <span>Поиск site:</span>
+            <button id="operator-site-yandex" class="search-button yandex">Я</button>
+            <button id="operator-site-google" class="search-button google">G</button>
+          </div>
+          <div class="search-item">
+            <span>Поиск url:</span>
+            <button id="operator-url-yandex" class="search-button yandex">Я</button>
+          </div>
+          <div class="search-item">
+            <span>Поиск host:</span>
+            <button id="operator-host-yandex" class="search-button yandex">Я</button>
+          </div>
+          <div class="search-item">
+            <span>Поиск дублей title:</span>
+            <button id="operator-title-yandex" class="search-button yandex">Я</button>
+          </div>
+          <div class="search-item">
+            <span>Искать на Яндекс.Картах</span>
+            <button id="search-yandex-maps" class="search-button yandex">Я</button>
+          </div>
+          <div class="search-item">
+            <span>Искать на Google.Картах</span>
+            <button id="search-google-maps" class="search-button google">G</button>
+          </div>
+          <p class="search-info">Контент для поиска будет здесь.</p>
+        </div>
+      </div>
+
+      <!-- About Tab -->
+      <div id="about" class="tab">
+        <h1>Об инструменте</h1>
+        <p>SEO Inspector v1.0</p>
+        <p>A browser extension for SEO analysis.</p>
+      </div>
+
+      <div id="links-info" class="tab">
+        <h1>Links Information</h1>
+        <div class="links-summary">
+          <button class="filter-button" id="show-all-links">Все ссылки (<span id="total-links">0</span>)</button>
+          <button class="filter-button" id="show-internal-links">Внутренние (<span id="internal-links">0</span>)</button>
+          <button class="filter-button" id="show-external-links">Внешние (<span id="external-links">0</span>)</button>
+        </div>
+      
+        <div class="links-protocols">
+          <button class="filter-button" id="show-https-links">HTTPS (<span id="https-links">0</span>)</button>
+          <button class="filter-button" id="show-http-links">HTTP (<span id="http-links">0</span>)</button>
+          <button class="filter-button" id="show-other-protocols">Другой (<span id="other-links">0</span>)</button>
+        </div>
+      
+        <div class="links-attributes">
+          <button class="filter-button" id="show-follow-links">follow (<span id="follow-links">0</span>)</button>
+          <button class="filter-button" id="show-nofollow-links">nofollow (<span id="nofollow-links">0</span>)</button>
+          <button class="filter-button" id="show-other-attributes">Другой (<span id="other-attributes">0</span>)</button>
+        </div>
+      
+        <div class="links-check">
+          <label for="delay">Проверить ссылки с задержкой</label>
+          <input type="number" id="delay" value="200" min="0"> мс
+          <button id="check-links-status">Проверить</button>
+        </div>
+      
+        <div class="links-actions">
+          <button id="export-links">Экспортировать</button>
+          <button id="copy-links">Копировать</button>
+        </div>
+      
+        <div id="links-details"></div>
+      </div>
+
+      <div id="images" class="tab">
+        <h1>Изображения</h1>
+        <div id="image-summary">
+          <button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
+          <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
+          <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button>
+          <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
+        </div>
+        <div id="image-details">
+          <ul id="image-list"></ul>
+        </div>
+      </div>
+
+      <div id="tools" class="tab">
+        <h1>Полезные инструменты</h1>
+        <p>Инструменты для SEO анализа будут здесь.</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 20px; background-color: #f4f4f4;">
+      <div id="social" style="margin-bottom: 10px;">
+        <a href="https://www.instagram.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #000000; text-decoration: none;">
+          <i class="fab fa-instagram" style="font-size: 24px;"></i>
+        </a>
+        <a href="https://github.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #333; text-decoration: none;">
+          <i class="fab fa-github" style="font-size: 24px;"></i>
+        </a>
+      </div>
+      <div style="color: #555;">&copy; 2024</div>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
