@@ -119,15 +119,37 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-
 function getImagesData() {
   const images = Array.from(document.images);
 
-  return images.map(img => ({
-    src: img.src,
-    alt: img.getAttribute("alt"),
-    hasAlt: img.hasAttribute("alt"),
-  }));
+  return images.map(img => {
+    const src = img.src || "";
+    const format = src.split('.').pop().split('?')[0].toUpperCase(); // Извлекаем формат изображения
+    let sizeInBytes = 0;
+
+    // Получаем вес изображения
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open("HEAD", src, false); // Синхронный запрос
+      xhr.send(null);
+
+      if (xhr.status === 200) {
+        sizeInBytes = parseInt(xhr.getResponseHeader("Content-Length"), 10) || 0;
+      }
+    } catch (error) {
+      console.warn(`Не удалось получить вес изображения: ${src}`, error);
+    }
+
+    return {
+      src: src,
+      alt: img.getAttribute("alt"),
+      hasAlt: img.hasAttribute("alt"),
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+      format: format || "Неизвестно",
+      sizeInKB: (sizeInBytes / 1024).toFixed(2) // Вес в КБ
+    };
+  });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -137,3 +159,127 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+
+function getMetricsData() {
+  const scripts = Array.from(document.scripts);
+  const metrics = {
+    yandexMetrika: [],
+    googleTagManager: [],
+    googleAnalytics: [],
+  };
+
+  scripts.forEach(script => {
+    const src = script.src || "";
+    const innerContent = script.innerHTML || "";
+
+    // Поиск Яндекс Метрики в src или innerHTML
+    if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(")) {
+      const matchSrc = src.match(/watch\/(\d+)/); // Поиск ID в URL
+      const matchYM = innerContent.match(/ym\((\d+),/); // Поиск ID в методе ym
+
+      if (matchSrc) metrics.yandexMetrika.push(matchSrc[1]);
+      if (matchYM) metrics.yandexMetrika.push(matchYM[1]);
+    }
+
+    // Поиск Google Tag Manager
+    if (src.includes("googletagmanager.com/gtm.js")) {
+      const match = src.match(/id=GTM-[A-Z0-9]+/);
+      if (match) metrics.googleTagManager.push(match[0].split("=")[1]);
+    }
+
+    // Поиск Google Analytics
+    if (src.includes("google-analytics.com/analytics.js") || src.includes("gtag/js") || innerContent.includes("ga(")) {
+      const match = src.match(/UA-\d+-\d+/) || src.match(/G-[A-Z0-9]+/) || innerContent.match(/['"]UA-\d+-\d+['"]/);
+      if (match) metrics.googleAnalytics.push(match[0].replace(/['"]/g, ""));
+    }
+  });
+
+  return metrics;
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "getMetrics") {
+    const metricsData = getMetricsData();
+    sendResponse(metricsData);
+  }
+});
+
+
+
+function getCMSData() {
+  const cmsData = {
+    name: "Неизвестно",
+  };
+
+  // Получаем HTML-код страницы
+  const htmlContent = document.documentElement.outerHTML.toLowerCase();
+
+  // Проверка по мета-тегу "generator"
+  const metaGenerator = document.querySelector('meta[name="generator"]');
+  if (metaGenerator) {
+    const generatorContent = metaGenerator.content.toLowerCase();
+    if (generatorContent.includes("wordpress")) {
+      return { name: "WordPress" };
+    } else if (generatorContent.includes("joomla")) {
+      return { name: "Joomla!" };
+    } else if (generatorContent.includes("drupal")) {
+      return { name: "Drupal" };
+    } else if (generatorContent.includes("opencart")) {
+      return { name: "OpenCart" };
+    } else if (generatorContent.includes("modx")) {
+      return { name: "MODX" };
+    } else if (generatorContent.includes("1c-bitrix") || generatorContent.includes("bitrix")) {
+      return { name: "1C-Битрикс" };
+    } else if (generatorContent.includes("tilda")) {
+      return { name: "Tilda" };
+    }
+  }
+
+  // Дополнительные проверки
+  if (htmlContent.includes("wp-content") || htmlContent.includes("wp-includes")) {
+    return { name: "WordPress" };
+  }
+  if (htmlContent.includes("joomla")) {
+    return { name: "Joomla!" };
+  }
+  if (htmlContent.includes("sites/all/themes") || htmlContent.includes("drupal")) {
+    return { name: "Drupal" };
+  }
+  if (htmlContent.includes("index.php?route=common/home") || htmlContent.includes("opencart")) {
+    return { name: "OpenCart" };
+  }
+  if (htmlContent.includes("modx") || htmlContent.includes("assets/templates")) {
+    return { name: "MODX" };
+  }
+  if (htmlContent.includes("bitrix/js/") || htmlContent.includes("bitrix/templates/")) {
+    return { name: "1C-Битрикс" };
+  }
+  if (
+    htmlContent.includes("tilda") ||
+    document.querySelector('[data-tilda-page-id]') ||
+    htmlContent.includes("tildacdn.com")
+  ) {
+    return { name: "Tilda" };
+  }
+
+  return cmsData;
+}
+
+function waitForPageLoad(callback) {
+  if (document.readyState === "complete") {
+    callback();
+  } else {
+    window.addEventListener("load", callback, { once: true });
+  }
+}
+
+// Слушатель для получения данных CMS
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "getCMS") {
+    waitForPageLoad(() => {
+      const cmsData = getCMSData();
+      sendResponse(cmsData);
+    });
+    return true; // Указываем асинхронный ответ
+  }
+});

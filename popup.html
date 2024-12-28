@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,7 +17,7 @@
       padding: 0;
       width: 800px;
       overflow: hidden;
-      background-color: #f9f9f9;
+      background-color: #ffffff;
     }
 
     #container {
@@ -24,7 +27,7 @@
     /* Tabs navigation */
     #tabs {
       display: flex;
-      background-color: #ffdd00;
+      background-color: #000000;
       border-bottom: 2px solid #ddd;
     }
 
@@ -32,7 +35,7 @@
       flex: 1;
       padding: 10px;
       cursor: pointer;
-      background: #ffdd00;
+      background: #ffffff;
       color: rgb(0, 0, 0);
       border: none;
       text-align: center;
@@ -41,19 +44,28 @@
     }
 
     .tab-button:hover {
-      background: white;
+      background: #f4f4f4;
     }
 
     .tab-button.active {
       background: white;
       color: black;
       font-weight: bold;
-      border-top: 2px solid #ffdd00;
+      border-top: 2px solid #000000;
     }
 
     .tab {
       display: none;
       padding: 20px;
+    }
+
+    .ttab {
+      display: none;
+      padding: 20px;
+    }
+
+    .ttab.active {
+      display: block;
     }
 
     .tab.active {
@@ -62,7 +74,7 @@
 
     /* Main table styles */
     table {
-      width: 100%;
+      width: 99%;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
@@ -83,7 +95,7 @@
       font-size: 1.3em;
       margin: 20px 0 10px 0;
       color: black;
-      border-left: 4px solid #ffdd00;
+      border-left: 4px solid #000000;
       padding-left: 10px;
     }
 
@@ -129,7 +141,8 @@
 }
 
 #image-summary button:hover {
-    background-color: #ffdd00;
+  color: white;
+    background-color: #000000;
 }
 
 #image-details ul {
@@ -156,7 +169,7 @@
 #search {
   font-family: Arial, sans-serif;
   padding: 20px;
-  background-color: #f4f7fc;
+  background-color: #ffffff;
 }
 
 .search-panel {
@@ -219,7 +232,7 @@
 #page {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background-color: #f4f7fc;
+    background-color: #ffffff;
   }
 
   .page-panel {
@@ -271,15 +284,18 @@
   }
 
   .links-summary button:hover {
-    background-color: #ffdd00;
+    color: white;
+    background-color: #000000;
 }
 
 .links-protocols button:hover {
-    background-color: #ffdd00;
+  color: white;
+  background-color: #000000;
 }
 
 .links-attributes button:hover {
-    background-color: #ffdd00;
+  color: white;
+  background-color: #000000;
 }
 
 
@@ -296,7 +312,7 @@
    #links-info {
     font-family: Arial, sans-serif;
     padding: 20px;
-    background-color: #f4f7fc;
+    background-color: #ffffff;
   }
 
   .filter-button {
@@ -351,6 +367,158 @@
     color: #28a745; /* Зеленый цвет при копировании */
   }
 
+  .headings-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .heading-count {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 12px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .heading-count span {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+
+    .heading-count strong {
+      color: #4CAF50;
+      font-size: 14px;
+    }
+
+    .heading-count:hover {
+      background-color: #f1f1f1;
+    }
+
+    #toggle-highlight-headings {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    #toggle-highlight-headings:hover {
+      background-color: #45a049;
+    }
+
+    .headings-output {
+      margin-top: 15px;
+    }
+
+    #headings-list {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+      font-size: 12px;
+    }
+
+    #headings-list li {
+      margin-bottom: 5px;
+    }
+
+    .structure-display {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #555;
+
+      .tabs {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  background-color: #e0e0e0;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+}
+
+.tab-button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Поиск */
+.search-bar {
+  margin: 10px 0;
+}
+
+#word-search {
+  width: 100%;
+  padding: 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+/* Таблица */
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+/* Пагинация */
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.button {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+    }
   </style>
 </head>
 <body>
@@ -358,9 +526,10 @@
     <!-- Navigation Tabs -->
     <div id="tabs">
       <button class="tab-button active" data-tab="seo">ОСНОВНОЕ</button>
-      <button class="tab-button" data-tab="microdata">МИКРОРАЗМЕТКА</button>
+      <button class="tab-button" data-tab="texts">ТЕКСТ</button>
       <button class="tab-button" data-tab="links-info">ССЫЛКИ</button>
       <button class="tab-button" data-tab="images">ИЗОБРАЖЕНИЯ</button>
+      <button class="tab-button" data-tab="microdata">МИКРОРАЗМЕТКА</button>
       <button class="tab-button" data-tab="page">СТРАНИЦА</button>
       <button class="tab-button" data-tab="search">ПОИСК</button>
       <button class="tab-button" data-tab="tools">ИНСТРУМЕНТЫ</button>
@@ -371,8 +540,8 @@
     <!-- Tab Content -->
     <div id="tab-content">
       <div id="seo" class="tab active">
-        <h1>Основная информация</h1>
-        <div class="section-title">Метаданные:</div>
+        <h1>ОСНОВНАЯ ИНФОРМАЦИЯ</h1>
+        <div class="section-title">МЕТАДАННЫЕ:</div>
         <table>
           <tr>
             <th>Мета-теги</th>
@@ -428,7 +597,7 @@
         
         
 
-        <div class="section-title">Дополнительная информация:</div>
+        <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:</div>
         <table>
           <tr>
             <td>Current URL</td>
@@ -467,6 +636,23 @@
             <td>Sitemap.xml</td>
             <td id="sitemap-xml"><a href="#" target="_blank">Загрузка...</a></td>
           </tr>
+          <tr>
+            <td>Яндекс Метрика</td>
+            <td id="yandex-metrika">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Google Tag Manager</td>
+            <td id="google-tag-manager">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Google Analytics</td>
+            <td id="google-analytics">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>CMS</td>
+            <td id="cms-data">Загрузка...</td>
+          </tr>
+                   
         </table>
       </div>
 
@@ -474,7 +660,7 @@
 
       <!-- Microdata Tab -->
       <div id="microdata" class="tab">
-        <h1>Анализ микроразметки</h1>
+        <h1>АНАЛИЗ МИКРОРАЗМЕТКИ</h1>
         <table>
           <tr>
             <td>Open Graph</td>
@@ -501,7 +687,7 @@
 
       <!-- Page Tab -->
       <div id="page" class="tab">
-        <h1>Анализ страницы</h1>
+        <h1>АНАЛИЗ СТРАНИЦЫ</h1>
         <div class="page-panel">
           <div class="page-item">
             <span>Highlight Noindex Elements</span>
@@ -559,7 +745,7 @@
       </div>
 
       <div id="search" class="tab">
-        <h1>Анализ поиска</h1>
+        <h1>АНАЛИЗ ПОИСКА</h1>
         <div class="search-panel">
           <div class="search-item">
             <span>Проверить индексацию в Яндексе</span>
@@ -674,7 +860,7 @@
       </div>
 
       <div id="links-info" class="tab">
-        <h1>Анализ ссылок</h1>
+        <h1>АНАЛИЗ ССЫЛОК</h1>
         <div class="links-summary">
           <button class="filter-button" id="show-all-links">Все ссылки (<span id="total-links">0</span>)</button>
           <button class="filter-button" id="show-internal-links">Внутренние (<span id="internal-links">0</span>)</button>
@@ -708,7 +894,7 @@
       </div>
 
       <div id="images" class="tab">
-        <h1>Анализ изображений</h1>
+        <h1>АНАЛИЗ ИЗОБРАЖЕНИЙ</h1>
         <div id="image-summary">
           <button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
           <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
@@ -716,17 +902,111 @@
           <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
         </div>
         <div id="image-details">
-          <ul id="image-list"></ul>
+          <ul id="image-list" style="list-style: none; padding: 0;"></ul>
         </div>
       </div>
 
+    
+      <div id="texts" class="ttab">
+        <h1>АНАЛИЗ ТЕКСТА</h1>
+      <div class="container">
+
+        <!-- Общая информация -->
+        <section class="text-info">
+          <div class="info-block">
+            <span>Длина текста:</span>
+            <strong id="text-length">0</strong>
+          </div>
+          <div class="info-block">
+            <span>Длина текста (без пробелов):</span>
+            <strong id="clean-text-length">0</strong>
+          </div>
+          <div class="info-block">
+            <span>Водность текста:</span>
+            <strong id="text-wateriness">0%</strong>
+          </div>
+          <div class="info-block">
+            <span>Тошнота текста:</span>
+            <strong id="text-spamminess">0%</strong>
+          </div>
+        </section>
+    
+        <div class="headings-summary">
+          <div class="heading-count" data-heading="H1">
+            <span>H1</span>
+            <strong id="h1-count">0</strong>
+          </div>
+          <div class="heading-count" data-heading="H2">
+            <span>H2</span>
+            <strong id="h2-count">0</strong>
+          </div>
+          <div class="heading-count" data-heading="H3">
+            <span>H3</span>
+            <strong id="h3-count">0</strong>
+          </div>
+          <div class="heading-count" data-heading="H4">
+            <span>H4</span>
+            <strong id="h4-count">0</strong>
+          </div>
+          <div class="heading-count" data-heading="H5">
+            <span>H5</span>
+            <strong id="h5-count">0</strong>
+          </div>
+          <div class="heading-count" data-heading="H6">
+            <span>H6</span>
+            <strong id="h6-count">0</strong>
+          </div>
+          <div class="heading-count" data-heading="all">
+            <span>H1-H6</span>
+            <strong id="all-headings-count">0</strong>
+          </div>
+        </div>
+        <button id="toggle-highlight-headings">Подсветить заголовки</button>
+        <div class="headings-output">
+          <ul id="headings-list"></ul>
+          <div id="structure-display" class="structure-display"></div>
+        </div>
+    
+        <!-- Анализ слов -->
+        <section class="word-analysis">
+          <div class="tabs">
+            <button class="tab-button texts active" data-tab="oneWord">1 слово</button>
+            <button class="tab-button texts" data-tab="twoWords">2 слова</button>
+            <button class="tab-button texts" data-tab="threeWords">3 слова</button>
+            <button class="tab-button texts" data-tab="linkWords">Слова в ссылках</button>
+          </div>
+          <div class="search-bar">
+            <input type="text" id="word-search" placeholder="Поиск слов..." />
+          </div>
+          <div class="table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Слово</th>
+                  <th>Количество</th>
+                </tr>
+              </thead>
+              <tbody id="word-list"></tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <button id="prev-page" class="button">Назад</button>
+            <span id="page-info">Страница 1 из 1</span>
+            <button id="next-page" class="button">Вперёд</button>
+          </div>
+          <button id="export-button" class="button">Экспорт CSV</button>
+        </section>
+      </div>
+    </div>
+    
       <div id="others" class="tab">
-        <h1>Полезные сервисы</h1>
+        <h1>ПОЛЕЗНЫЕ СЕРВИСЫ</h1>
         <p>Инструменты для SEO анализа будут здесь.</p>
       </div>
 
       <div id="tools" class="tab">
-        <h1>Полезные инструменты</h1>
+        <h1>ПОЛЕЗНЫЕ ИНСТРУМЕНТЫ</h1>
         <p>Инструменты для SEO анализа будут здесь.</p>
       </div>
     </div>
@@ -741,6 +1021,7 @@
           <i class="fab fa-github" style="font-size: 24px;"></i>
         </a>
       </div>
+      <div style="color: #555;">MATRYOSHKA TOOLS</div>
       <div style="color: #555;">&copy; 2024</div>
     </footer>
   </div>

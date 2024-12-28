@@ -1,0 +1,140 @@
+body {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    color: #333;
+  }
+  
+  .container {
+    width: 400px;
+    padding: 20px;
+    background-color: #f9f9f9;
+  }
+  
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  header h1 {
+    font-size: 18px;
+    color: #4CAF50;
+    margin: 0;
+  }
+  
+  .text-info,
+  .headings-info,
+  .word-analysis {
+    margin-bottom: 20px;
+  }
+  
+  .info-block {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+  }
+  
+  .headings-info h2,
+  .word-analysis h2 {
+    font-size: 16px;
+    color: #4CAF50;
+    margin-bottom: 10px;
+  }
+  
+  .headings-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .heading-count {
+    font-size: 14px;
+    background: #e8f5e9;
+    padding: 5px 10px;
+    border-radius: 5px;
+  }
+  
+  .button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+  
+  .button:hover {
+    background-color: #45a049;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .tab-button {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    background: #fff;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .tab-button.active {
+    background: #4CAF50;
+    color: white;
+    font-weight: bold;
+  }
+  
+  #word-search {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+  }
+  
+  table th,
+  table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  table th {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  .pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  #headings-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  #headings-list li {
+    font-size: 14px;
+    margin-bottom: 5px;
+    padding: 5px 10px;
+    background-color: #e8f5e9;
+    border-radius: 5px;
+  }
+  

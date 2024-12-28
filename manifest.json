@@ -1,7 +1,7 @@
 
 {
   "manifest_version": 3,
-  "name": "SEO VISION",
+  "name": "MATRYOSHKA TOOLS",
   "version": "1.0",
   "permissions": ["activeTab", "scripting"],
   "host_permissions": ["<all_urls>","https://gogetlinks.net/*","https://checktrust.ru/*"],
@@ -13,7 +13,7 @@
   "48": "icon48.png",
   "128": "icon128.png"
   },
-  "default_title": "SEO VISION"
+  "default_title": "MATRYOSHKA TOOLS"
 },
   "content_scripts": [
     {
@@ -22,4 +22,3 @@
     }
   ]
 }
-

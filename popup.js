@@ -561,7 +561,6 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchLinks();
 });
 
-
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
   const imageList = document.getElementById("image-list");
@@ -589,15 +588,44 @@ document.addEventListener("DOMContentLoaded", function () {
 
     filteredImages.forEach(img => {
       const li = document.createElement("li");
-      const imgPreview = document.createElement("img");
-      const altText = document.createElement("span");
+      li.style.display = "flex";
+      li.style.alignItems = "center";
+      li.style.marginBottom = "10px";
 
+      // Предпросмотр изображения
+      const imgPreview = document.createElement("img");
       imgPreview.src = img.src;
       imgPreview.alt = img.alt || "Нет атрибута alt";
+      imgPreview.style.maxWidth = "50px";
+      imgPreview.style.maxHeight = "50px";
+      imgPreview.style.marginRight = "10px";
+
+      // Информация об изображении
+      const infoContainer = document.createElement("div");
+      infoContainer.style.display = "flex";
+      infoContainer.style.flexDirection = "column";
+
+      const altText = document.createElement("span");
       altText.textContent = img.alt ? `Alt: "${img.alt}"` : "Alt отсутствует";
 
+      const formatText = document.createElement("span");
+      formatText.textContent = `Формат: ${img.format}`;
+
+      const sizeText = document.createElement("span");
+      sizeText.textContent = `Размер: ${img.width}x${img.height}px`;
+
+      const weightText = document.createElement("span");
+      weightText.textContent = `Вес: ${img.sizeInKB} КБ`;
+
+      // Добавляем информацию в контейнер
+      infoContainer.appendChild(altText);
+      infoContainer.appendChild(formatText);
+      infoContainer.appendChild(sizeText);
+      infoContainer.appendChild(weightText);
+
+      // Собираем всё в элемент списка
       li.appendChild(imgPreview);
-      li.appendChild(altText);
+      li.appendChild(infoContainer);
       imageList.appendChild(li);
     });
 
@@ -630,6 +658,8 @@ document.addEventListener("DOMContentLoaded", function () {
   fetchImages();
 });
 
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const copyButtons = document.querySelectorAll(".copy-button");
 
@@ -656,3 +686,431 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+
+function fetchMetrics() {
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "getMetrics" }, response => {
+      if (response) {
+        // Обновляем данные в таблице
+        document.getElementById("yandex-metrika").textContent = response.yandexMetrika.length
+          ? response.yandexMetrika.join(", ")
+          : "Не найдено";
+
+        document.getElementById("google-tag-manager").textContent = response.googleTagManager.length
+          ? response.googleTagManager.join(", ")
+          : "Не найдено";
+
+        document.getElementById("google-analytics").textContent = response.googleAnalytics.length
+          ? response.googleAnalytics.join(", ")
+          : "Не найдено";
+      } else {
+        console.error("Не удалось получить данные о метриках.");
+      }
+    });
+  });
+}
+
+// Вызываем при загрузке расширения
+document.addEventListener("DOMContentLoaded", () => {
+  fetchMetrics();
+});
+
+
+function fetchMetrics() {
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "getMetrics" }, response => {
+      if (response) {
+        // Обновляем данные в таблице
+        updateMetricStatus("yandex-metrika", response.yandexMetrika);
+        updateMetricStatus("google-tag-manager", response.googleTagManager);
+        updateMetricStatus("google-analytics", response.googleAnalytics);
+      } else {
+        console.error("Не удалось получить данные о метриках.");
+      }
+    });
+  });
+}
+
+function updateMetricStatus(elementId, data) {
+  const element = document.getElementById(elementId);
+  const icon = document.createElement("span");
+  icon.style.marginLeft = "10px";
+
+  if (data.length) {
+    element.textContent = data.join(", ");
+    icon.innerHTML = '<i class="fas fa-check-circle" style="color: green;"></i>';
+  } else {
+    element.textContent = "Не найдено";
+    icon.innerHTML = '<i class="fas fa-exclamation-circle" style="color: orange;"></i>';
+  }
+
+  element.appendChild(icon);
+}
+
+// Вызываем при загрузке расширения
+document.addEventListener("DOMContentLoaded", () => {
+  fetchMetrics();
+});
+
+
+function fetchCMSData() {
+  const cmsElement = document.getElementById("cms-data");
+  cmsElement.textContent = "Загрузка...";
+
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(
+      tabs[0].id,
+      { action: "getCMS" },
+      (response) => {
+        if (response && response.name) {
+          cmsElement.textContent = response.name;
+        } else {
+          cmsElement.textContent = "Неизвестно";
+        }
+      }
+    );
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  fetchCMSData();
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const headingsSummary = document.querySelector(".headings-summary");
+  const headingsList = document.getElementById("headings-list");
+  const structureDisplay = document.getElementById("structure-display");
+  const highlightButton = document.getElementById("toggle-highlight-headings");
+
+  // Флаг для отслеживания состояния подсветки
+  let isHighlightActive = false;
+
+  // Общение с содержимым страницы
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tabs[0].id },
+        func: extractHeadings,
+      },
+      (results) => {
+        if (results && results[0] && results[0].result) {
+          const { headingsCount, headingsData, headingsStructure } = results[0].result;
+
+          // Обновляем счетчики заголовков
+          Object.keys(headingsCount).forEach((key) => {
+            const element = document.getElementById(`${key.toLowerCase()}-count`);
+            if (element) element.textContent = headingsCount[key];
+          });
+
+          // Добавляем общий счет для H1-H6
+          const totalCount = Object.values(headingsCount).reduce((sum, count) => sum + count, 0);
+          const allCountElement = document.getElementById("all-headings-count");
+          if (allCountElement) allCountElement.textContent = totalCount;
+
+          // Сохраняем данные
+          window.headingsData = headingsData;
+          window.headingsStructure = headingsStructure;
+        }
+      }
+    );
+  });
+
+  // Отображение заголовков
+  function renderHeadings(type) {
+    const filtered = type === "all" ? window.headingsData : window.headingsData.filter((h) => h.tagName === type);
+    headingsList.innerHTML = filtered
+      .map((h) => `<li><b>${h.tagName}:</b> ${h.text}</li>`)
+      .join("");
+    structureDisplay.innerHTML = ""; // Очистка структуры
+  }
+
+  // Отображение структуры заголовков
+  function renderStructure() {
+    structureDisplay.innerHTML = window.headingsStructure
+      .map(
+        (h) =>
+          `<div style="margin-left: ${
+            h.tagName === "H2" ? "10px" : h.tagName === "H3" ? "20px" : h.tagName === "H4" ? "30px" : "0"
+          };"><b>${h.tagName}:</b> ${h.text}</div>`
+      )
+      .join("");
+    headingsList.innerHTML = ""; // Очистка списка
+  }
+
+  // Обработчик кликов по блокам
+  headingsSummary.addEventListener("click", (e) => {
+    const headingType = e.target.closest(".heading-count")?.dataset.heading;
+    if (headingType) {
+      if (headingType === "all") {
+        renderStructure(); // Показать всю структуру заголовков
+      } else {
+        renderHeadings(headingType); // Показать заголовки конкретного типа
+      }
+    }
+  });
+
+  // Кнопка подсветки
+  highlightButton.addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tabs[0].id },
+          func: toggleHighlightHeadings,
+          args: [isHighlightActive], // Передаем текущее состояние подсветки
+        },
+        () => {
+          // Переключаем состояние подсветки
+          isHighlightActive = !isHighlightActive;
+          highlightButton.textContent = isHighlightActive ? "Отключить подсветку" : "Включить подсветку";
+        }
+      );
+    });
+  });
+
+  // Функция для извлечения заголовков (выполняется на странице)
+  function extractHeadings() {
+    const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"));
+    const headingsCount = { H1: 0, H2: 0, H3: 0, H4: 0, H5: 0, H6: 0 };
+
+    const headingsData = headings.map((heading) => {
+      const tagName = heading.tagName;
+      headingsCount[tagName]++;
+      return { tagName, text: heading.textContent.trim() };
+    });
+
+    const headingsStructure = headings.map((heading) => ({
+      tagName: heading.tagName,
+      text: heading.textContent.trim(),
+    }));
+
+    return { headingsCount, headingsData, headingsStructure };
+  }
+
+  // Функция для включения/отключения подсветки заголовков (выполняется на странице)
+  function toggleHighlightHeadings(isActive) {
+    // Получаем все заголовки на странице
+    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+    if (isActive) {
+      // Если подсветка уже включена, убираем её
+      headings.forEach((heading) => {
+        heading.style.outline = ""; // Убираем стиль
+      });
+    } else {
+      // Если подсветка отключена, включаем её
+      headings.forEach((heading) => {
+        heading.style.outline = "2px dashed red"; // Добавляем стиль
+      });
+    }
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const tabs = document.querySelectorAll(".tab-button");
+  const wordList = document.getElementById("word-list");
+  const wordSearch = document.getElementById("word-search");
+  const prevPageBtn = document.getElementById("prev-page");
+  const nextPageBtn = document.getElementById("next-page");
+  const pageInfo = document.getElementById("page-info");
+  const exportButton = document.getElementById("export-button");
+
+  const textLengthEl = document.getElementById("text-length");
+  const cleanTextLengthEl = document.getElementById("clean-text-length");
+  const textWaterinessEl = document.getElementById("text-wateriness");
+  const textSpamminessEl = document.getElementById("text-spamminess");
+
+  let wordData = {
+    oneWord: [],
+    twoWords: [],
+    threeWords: [],
+    linkWords: [],
+  };
+  let currentTab = "oneWord"; // По умолчанию "1 слово"
+  let filteredData = [];
+  let currentPage = 1;
+  const rowsPerPage = 10;
+
+  // Переключение вкладок
+  tabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      tabs.forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      currentTab = tab.dataset.tab;
+
+      // Сброс страницы и поиска при переключении вкладки
+      wordSearch.value = "";
+      currentPage = 1;
+      updateTableData();
+    });
+  });
+
+  // Установка активной вкладки "1 слово" при загрузке
+  document.querySelector('[data-tab="oneWord"]').classList.add("active");
+
+  // Обновление таблицы
+  function updateTableData() {
+    filteredData = [...wordData[currentTab]]; // Копия данных
+    renderPage();
+  }
+
+  // Рендер одной страницы
+  function renderPage() {
+    filteredData.sort((a, b) => b.count - a.count); // Сортировка по количеству слов
+    const startIndex = (currentPage - 1) * rowsPerPage;
+    const endIndex = startIndex + rowsPerPage;
+    const pageData = filteredData.slice(startIndex, endIndex);
+
+    wordList.innerHTML = pageData
+      .map(
+        (item, index) => `
+        <tr>
+          <td>${startIndex + index + 1}</td>
+          <td>${item.word}</td>
+          <td>${item.count}</td>
+        </tr>`
+      )
+      .join("");
+
+    // Обновление информации о пагинации
+    pageInfo.textContent = `Страница ${currentPage} из ${Math.ceil(filteredData.length / rowsPerPage)}`;
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === Math.ceil(filteredData.length / rowsPerPage);
+  }
+
+  // Поиск
+  wordSearch.addEventListener("input", (e) => {
+    const filter = e.target.value.toLowerCase();
+    filteredData = wordData[currentTab].filter((item) => item.word.toLowerCase().includes(filter));
+    currentPage = 1; // Сброс на первую страницу при фильтрации
+    renderPage();
+  });
+
+  // Пагинация
+  prevPageBtn.addEventListener("click", () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderPage();
+    }
+  });
+
+  nextPageBtn.addEventListener("click", () => {
+    if (currentPage < Math.ceil(filteredData.length / rowsPerPage)) {
+      currentPage++;
+      renderPage();
+    }
+  });
+
+
+  exportButton.addEventListener("click", () => {
+    // Заголовки CSV
+    const csvHeader = ["#", "Слово", "Количество"];
+    // Формируем данные таблицы для экспорта
+    const csvRows = filteredData.map(
+      (item, index) => `${index + 1},${item.word},${item.count}`
+    );
+    // Объединяем заголовки и строки данных
+    const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
+  
+    // Добавляем BOM в начале файла для корректного отображения UTF-8
+    const bom = "\uFEFF"; // BOM для UTF-8
+    const csvWithBom = bom + csvContent;
+  
+    // Создаем объект URL для CSV
+    const blob = new Blob([csvWithBom], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+  
+    // Создаем ссылку для скачивания
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "word_analysis.csv");
+    document.body.appendChild(link);
+  
+    // Имитируем клик для загрузки файла
+    link.click();
+  
+    // Очищаем ссылку после скачивания
+    document.body.removeChild(link);
+  });
+  
+
+
+
+  // Запрос данных с текущей страницы
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tabs[0].id },
+        func: analyzeText, // Функция для анализа текста
+      },
+      (results) => {
+        const {
+          textLength,
+          cleanTextLength,
+          wateriness,
+          spamminess,
+          oneWord,
+          twoWords,
+          threeWords,
+          linkWords,
+        } = results[0].result;
+
+        // Заполнение данных блока text-info
+        textLengthEl.textContent = textLength;
+        cleanTextLengthEl.textContent = cleanTextLength;
+        textWaterinessEl.textContent = `${wateriness}%`;
+        textSpamminessEl.textContent = `${spamminess}%`;
+
+        // Заполнение данных по вкладкам
+        wordData.oneWord = oneWord;
+        wordData.twoWords = twoWords;
+        wordData.threeWords = threeWords;
+        wordData.linkWords = linkWords;
+
+        updateTableData();
+      }
+    );
+  });
+});
+
+// Функция анализа текста
+function analyzeText() {
+  const text = document.body.innerText;
+  const words = text.split(/\s+/);
+  const cleanTextLength = text.replace(/\s+/g, "").length;
+  const totalLength = text.length;
+
+  function calculateWateriness() {
+    const stopWords = ["и", "в", "на", "с", "по", "а"]; // Пример стоп-слов
+    const waterWordsCount = words.filter((word) => stopWords.includes(word.toLowerCase())).length;
+    return ((waterWordsCount / words.length) * 100).toFixed(2);
+  }
+
+  function calculateSpamminess(word, count) {
+    return ((count / words.length) * 100).toFixed(2);
+  }
+
+  function countPhrases(arr, n) {
+    const phrases = {};
+    for (let i = 0; i < arr.length - n + 1; i++) {
+      const phrase = arr.slice(i, i + n).join(" ");
+      phrases[phrase] = (phrases[phrase] || 0) + 1;
+    }
+    return Object.entries(phrases).map(([word, count]) => ({
+      word,
+      count,
+    }));
+  }
+
+  return {
+    textLength: totalLength,
+    cleanTextLength,
+    wateriness: calculateWateriness(),
+    spamminess: calculateSpamminess(words.join(" "), words.length),
+    oneWord: countPhrases(words, 1),
+    twoWords: countPhrases(words, 2),
+    threeWords: countPhrases(words, 3),
+    linkWords: countPhrases(Array.from(document.querySelectorAll("a")).map((a) => a.innerText), 1),
+  };
+}
