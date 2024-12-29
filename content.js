@@ -205,7 +205,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 
-
 function getCMSData() {
   const cmsData = {
     name: "Неизвестно",
@@ -221,7 +220,7 @@ function getCMSData() {
     if (generatorContent.includes("wordpress")) {
       return { name: "WordPress" };
     } else if (generatorContent.includes("joomla")) {
-      return { name: "Joomla!" };
+      return { name: "Joomla" };
     } else if (generatorContent.includes("drupal")) {
       return { name: "Drupal" };
     } else if (generatorContent.includes("opencart")) {
@@ -329,3 +328,4 @@ function getResponseCode() {
 // Вызываем функции для получения размера страницы и кода ответа
 getPageSize();
 getResponseCode();
+

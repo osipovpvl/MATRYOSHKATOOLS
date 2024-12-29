@@ -124,7 +124,7 @@
 #image-summary button {
     padding: 8px 12px;
     border: 1px solid #000000;
-    background-color: #f9f9f9;
+    background-color: #ffffff;
     color: black;
     cursor: pointer;
     border-radius: 5px;
@@ -333,7 +333,7 @@ a:hover {
 
 /* Кнопки экспорта и копирования */
 button {
-  background-color: #2ecc71;
+  background-color: #000000;
   color: white;
   padding: 8px 15px;
   border: none;
@@ -369,7 +369,7 @@ input[type="number"] {
 
   .filter-button {
     background-color: #ffffff;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #000000;
     border-radius: 8px;
     padding: 10px;
     margin: 5px;
@@ -465,17 +465,13 @@ input[type="number"] {
 
     #toggle-highlight-headings {
       width: 100%;
-      background-color: #4CAF50;
+      background-color: #000000;
       color: white;
       border: none;
       padding: 8px 10px;
       border-radius: 5px;
       font-size: 14px;
       cursor: pointer;
-    }
-
-    #toggle-highlight-headings:hover {
-      background-color: #45a049;
     }
 
     .headings-output {
@@ -654,6 +650,47 @@ a:hover {
 .status-icon.loading {
     background-color: gray;
 }
+
+#others {
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background-color: #ffffff;
+        border-radius: 8px;
+    }
+
+    h1 {
+        text-align: center;
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 20px;
+    }
+
+    .service-container {
+        display: flex;  /* Используем Flexbox для горизонтального расположения */
+        justify-content: space-between;  /* Места между списками */
+        gap: 40px;  /* Расстояние между списками */
+    }
+
+    .service-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .service-list li {
+        margin: 10px 0;
+    }
+
+    .service-list a {
+        text-decoration: none;
+        font-size: 18px;
+        color: #007bff;
+        transition: color 0.3s ease;
+    }
+
+    .service-list a:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -753,17 +790,13 @@ a:hover {
         <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:</div>
         <table>
           <tr>
-            <td>Current URL</td>
+            <td>Current URL <strong><div id="url-length"></div></strong></td>
             <td id="current-url">Загрузка...</td>
           </tr>
           
           <tr>
             <td>Language</td>
             <td id="lang">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>IP Address</td>
-            <td id="site-ip">Загрузка...</td>
           </tr>
           <tr>
             <td>Яндекс Метрика</td>
@@ -788,7 +821,23 @@ a:hover {
           <tr>
             <td>Код ответа сервера</td>
             <td id="response-code">Загрузка...</td>
-          </tr>    
+          </tr>
+          <tr>
+            <td>IP Address</td>
+            <td id="site-ip">Загрузка...</td>
+        </tr>
+        <tr>
+            <td>Дата регистрации домена</td>
+            <td id="domain-registration-date">Загрузка...</td>
+        </tr>
+        <tr>
+            <td>Дата истечения SSL сертификата</td>
+            <td id="ssl-expiry-date">Загрузка...</td>
+        </tr>
+        <tr>
+            <td>Возраст домена</td>
+            <td id="domain-age">Загрузка...</td>
+        </tr>
         </table>
       </div>
 
@@ -864,8 +913,8 @@ a:hover {
 
       <!-- About Tab -->
       <div id="about" class="tab">
-        <section id="about-seo-vision" style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f9f9f9; color: #333;">
-          <h1 style="text-align: center; font-size: 2rem; color: #4CAF50;">SEO Vision – ваш надежный помощник в мире SEO</h1>
+        <section id="about-seo-vision" style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #ffffff; color: #333;">
+          <h1 style="text-align: center; font-size: 2rem; color: #000000;">MATRYOSHKA TOOLS</h1>
           
           <p style="text-align: center; font-size: 1.1rem; margin-top: 10px;">
             Удобное и функциональное расширение для браузера, созданное для оптимизации работы с веб-страницами и сокращения времени на выполнение рутинных задач.
@@ -910,12 +959,8 @@ a:hover {
         
           <section style="margin-top: 30px;">
             <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Для кого?</h2>
-            <p style="margin-bottom: 10px;">
-              SEO Vision создан для специалистов и команд, работающих с сайтами:
-            </p>
             <ul style="list-style: none; padding: 0;">
               <li style="margin-bottom: 10px;">📌 SEO-специалистов.</li>
-              <li style="margin-bottom: 10px;">📌 Веб-мастеров.</li>
               <li style="margin-bottom: 10px;">📌 Маркетологов.</li>
               <li style="margin-bottom: 10px;">📌 Разработчиков.</li>
               <li style="margin-bottom: 10px;">📌 Контент-менеджеров.</li>
@@ -1003,7 +1048,7 @@ a:hover {
             <strong id="text-spamminess">0%</strong>
           </div>
         </section>
-    
+    <br>
         <div class="headings-summary">
           <div class="heading-count" data-heading="H1">
             <span>H1</span>
@@ -1047,10 +1092,9 @@ a:hover {
             <button class="tab-buttons texts" data-tab="twoWords">2 слова</button>
             <button class="tab-buttons texts" data-tab="threeWords">3 слова</button>
             <button class="tab-buttons texts" data-tab="linkWords">Слова в ссылках</button>
+              <input type="text" id="word-search" placeholder="Поиск слов..." />
           </div>
-          <div class="search-bar">
-            <input type="text" id="word-search" placeholder="Поиск слов..." />
-          </div>
+<br>
           <div class="table-wrapper">
             <table>
               <thead>
@@ -1075,11 +1119,87 @@ a:hover {
     
       <div id="others" class="tab">
         <h1>ПОЛЕЗНЫЕ СЕРВИСЫ</h1>
+        <div class="service-container">
+          <ul class="service-list">
+            <div class="section-title">ТЕКСТ:</div>
+              <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+              <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+              <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+              <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+          </ul>
+          <ul class="service-list">
+            <div class="section-title">ССЫЛКИ:</div>
+              <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+              <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+              <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+              <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+          </ul>
+          <ul class="service-list">
+            <div class="section-title">ИЗОБРАЖЕНИЯ:</div>
+            <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+            <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+            <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+            <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+        </ul>
+        <ul class="service-list">
+          <div class="section-title">АНАЛИТИКА:</div>
+          <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+          <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+          <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+          <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+      </ul>
+      <ul class="service-list">
+        <div class="section-title">НЕЙРОСЕТИ:</div>
+        <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+        <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+        <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+        <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+    </ul>
+      </div>
+      <div class="service-container">
+        <ul class="service-list">
+          <div class="section-title">ТЕКСТ:</div>
+            <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+            <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+            <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+            <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+        </ul>
+        <ul class="service-list">
+          <div class="section-title">ССЫЛКИ:</div>
+            <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+            <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+            <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+            <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+        </ul>
+        <ul class="service-list">
+          <div class="section-title">ИЗОБРАЖЕНИЯ:</div>
+          <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+          <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+          <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+          <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+      </ul>
+      <ul class="service-list">
+        <div class="section-title">АНАЛИТИКА:</div>
+        <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+        <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+        <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+        <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+    </ul>
+    <ul class="service-list">
+      <div class="section-title">НЕЙРОСЕТИ:</div>
+      <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
+      <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
+      <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
+      <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+  </ul>
+    </div>
       </div>
 
       <div id="tools" class="tab">
         <h1>ПОЛЕЗНЫЕ ИНСТРУМЕНТЫ</h1>
         <div class="page-panel">
+             <!-- Кнопка для перезагрузки страницы с очисткой кеша -->
+   <button id="reload-btn">Перезагрузить страницу с очисткой кеша</button>
           <div class="page-item">
             <span>Highlight Noindex Elements</span>
             <button id="highlight-noindex" class="page-button action-button">✔</button>
@@ -1095,22 +1215,6 @@ a:hover {
           <div class="page-item">
             <span>Toggle CSS</span>
             <button id="toggle-css" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Copy URL</span>
-            <button id="copy-url" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Open Google Cache</span>
-            <button id="open-cache" class="page-button google-button">G</button>
-          </div>
-          <div class="page-item">
-            <span>Check Page Speed</span>
-            <button id="check-speed" class="page-button google-button">G</button>
-          </div>
-          <div class="page-item">
-            <span>Check Mobile Optimization</span>
-            <button id="check-mobile" class="page-button google-button">G</button>
           </div>
         </div>
       </div>

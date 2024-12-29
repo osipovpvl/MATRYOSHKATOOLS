@@ -37,7 +37,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       //document.getElementById("links").textContent = seoData.linksCount || "N/A";
       //document.getElementById("images-count").textContent = seoData.imagesCount || "N/A";
       document.getElementById("lang").textContent = seoData.lang || "N/A";
-      document.getElementById("site-ip").textContent = seoData.siteIP || "N/A";
 
       
       // Populate microdata
@@ -83,25 +82,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("toggle-css").addEventListener("click", () => {
     toggleStyles(tab.id);
   });
-
-  document.getElementById("copy-url").addEventListener("click", () => {
-    copyToClipboard(tab.url);
-  });
-
-
-  document.getElementById("open-cache").addEventListener("click", () => {
-    openGoogleCache(tab.url);
-  });
-
-  document.getElementById("check-speed").addEventListener("click", () => {
-    openPageSpeedInsights(tab.url);
-  });
-
-  document.getElementById("check-mobile").addEventListener("click", () => {
-    openPageSpeedInsightsMobile(tab.url);
-  });
-
-  
 });
 
 // Function to highlight noindex elements
@@ -376,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const titleLength = title.length;
   const titleLengthElement = document.getElementById('title-length');
   if (titleLengthElement) {
-      titleLengthElement.textContent = `Длина: ${titleLength}`;
+      titleLengthElement.textContent = `${titleLength}`;
       updateMetaLengthStyles('title-length', titleLength, [60, 80]);
   }
 
@@ -385,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const descriptionLength = metaDescription.length;
   const descriptionLengthElement = document.getElementById('description-length');
   if (descriptionLengthElement) {
-      descriptionLengthElement.textContent = `Длина: ${descriptionLength}`;
+      descriptionLengthElement.textContent = `${descriptionLength}`;
       updateMetaLengthStyles('description-length', descriptionLength, [150, 200]);
   }
 });
@@ -652,7 +632,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const infoContainer = document.createElement("div");
       infoContainer.style.display = "flex";
       infoContainer.style.flexDirection = "column";
-
+      
       const altText = document.createElement("span");
       altText.textContent = img.alt ? `Alt: "${img.alt}"` : "Alt отсутствует";
 
@@ -665,11 +645,15 @@ document.addEventListener("DOMContentLoaded", function () {
       const weightText = document.createElement("span");
       weightText.textContent = `Вес: ${img.sizeInKB} КБ`;
 
+      const urlText = document.createElement("span");
+      urlText.textContent = `URL: ${img.src}`;
+
       // Добавляем информацию в контейнер
       infoContainer.appendChild(altText);
       infoContainer.appendChild(formatText);
       infoContainer.appendChild(sizeText);
       infoContainer.appendChild(weightText);
+      infoContainer.appendChild(urlText);
 
       // Собираем всё в элемент списка
       li.appendChild(imgPreview);
@@ -1250,16 +1234,22 @@ function checkMetaRobots(doc, container) {
   const metaElement = doc.querySelector('meta[name="robots"]');
 
   if (metaElement) {
-      const content = metaElement.content;
+      const content = metaElement.content.toLowerCase(); // Приводим содержимое к нижнему регистру для удобства проверки
+
       if (content.includes("noindex")) {
           container.innerHTML = `
               <span class="fa fa-times-circle" style="color:red;"></span>
               Индексация страницы запрещена (meta: ${content})
           `;
-      } else {
+      } else if (content.includes("index") || content.includes("follow")) {
           container.innerHTML = `
               <span class="fas fa-check-circle" style="color: green;"></span>
               Индексация страницы разрешена (meta: ${content})
+          `;
+      } else {
+          container.innerHTML = `
+              <span class="fas fa-question-circle" style="color: orange;"></span>
+              Meta robots указан, но содержит нестандартные значения (meta: ${content})
           `;
       }
   } else {
@@ -1269,6 +1259,7 @@ function checkMetaRobots(doc, container) {
       `;
   }
 }
+
 
 // Проверка robots.txt
 async function checkRobotsTxt(tabUrl, container) {
@@ -1356,3 +1347,104 @@ async function checkSitemap(tabUrl, container) {
       console.error("Ошибка при загрузке sitemap.xml:", error);
   }
 }
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // Получаем данные о текущей вкладке
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+      const tab = tabs[0];
+      const domain = new URL(tab.url).hostname;
+
+      // 1. Получаем и отображаем IP-адрес
+      const ipAddress = await getIPAddress(domain);
+      document.getElementById("site-ip").textContent = ipAddress || "Не удалось получить IP";
+
+      // 2. Получаем дату регистрации домена и возраст
+      const whoisData = await fetchWhoisData(domain);
+      document.getElementById("domain-registration-date").textContent =
+          whoisData.creationDate || "Не удалось получить данные";
+      document.getElementById("domain-age").textContent =
+          whoisData.domainAge || "Не удалось рассчитать возраст";
+
+      // 3. Получаем дату истечения SSL-сертификата
+      const sslData = await fetchSslExpiryDate(domain);
+      document.getElementById("ssl-expiry-date").textContent =
+          sslData.sslExpiryDate || "Не удалось получить данные";
+  });
+});
+
+// Функция для получения IP-адреса через Google DNS API
+async function getIPAddress(domain) {
+  try {
+      const response = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
+      if (!response.ok) {
+          console.error("Ошибка Google DNS API: " + response.status);
+          return "Не удалось получить IP";
+      }
+
+      const data = await response.json();
+      console.log("Ответ Google DNS API:", data);
+
+      // Возвращаем первый IP-адрес
+      return data.Answer ? data.Answer[0].data : "Не удалось получить IP";
+  } catch (error) {
+      console.error("Ошибка получения IP:", error);
+      return "Не удалось получить IP";
+  }
+}
+
+// Функция для обновления URL и количества символов
+function updateUrl() {
+  // Проверяем, если это расширение, то получаем URL текущей страницы
+  let currentUrl = window.location.href;
+  
+  // Проверяем, если это расширение (chrome-extension), то показываем URL страницы
+  if (currentUrl.startsWith('chrome-extension://')) {
+    // Получаем URL активной страницы через API
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      var pageUrl = tabs[0].url;
+      var urlLength = pageUrl.length; // Получаем длину URL страницы
+
+      // Обновляем содержимое элементов на странице
+      document.getElementById('current-url').textContent = pageUrl;
+      document.getElementById('url-length').textContent = `Символов: ` + urlLength;
+    });
+  } else {
+    var urlLength = currentUrl.length;
+    document.getElementById('current-url').textContent = currentUrl;
+    document.getElementById('url-length').textContent = `Символов: ` + urlLength;
+  }
+}
+
+// Обновляем данные при загрузке страницы
+window.onload = function() {
+  updateUrl();
+};
+
+// Также можно обновлять информацию при изменении URL (например, при навигации по страницам)
+window.onpopstate = function() {
+  updateUrl();
+};
+
+// Функция для перезагрузки страницы с обходом кеша
+function reloadPageWithCacheClear() {
+  // Используем chrome.tabs API для перезагрузки текущей вкладки
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    // Перезагружаем вкладку с флагом bypassCache
+    chrome.tabs.reload(tabs[0].id, { bypassCache: true });
+  });
+}
+
+// Обработчик нажатия на кнопку
+document.getElementById('reload-btn').addEventListener('click', function() {
+  reloadPageWithCacheClear();
+});
+
+// Обновляем данные при загрузке страницы
+window.onload = function() {
+  updateUrl();
+};
+
+// Обновляем информацию при изменении URL (например, при навигации по страницам)
+window.onpopstate = function() {
+  updateUrl();
+};
