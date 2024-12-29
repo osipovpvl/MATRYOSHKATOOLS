@@ -34,17 +34,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       populateMetaData("keywords", seoData.keywords, seoData.keywords?.length || 0);
       populateMetaData("h1", seoData.h1, seoData.h1?.length || 0);
       document.getElementById("current-url").textContent = tab.url || "N/A";
-      document.getElementById("canonical").textContent = seoData.canonical || "N/A";
       //document.getElementById("links").textContent = seoData.linksCount || "N/A";
       //document.getElementById("images-count").textContent = seoData.imagesCount || "N/A";
-      document.getElementById("robots").textContent = seoData.metaRobots || "N/A";
       document.getElementById("lang").textContent = seoData.lang || "N/A";
       document.getElementById("site-ip").textContent = seoData.siteIP || "N/A";
 
-      // Populate resources
-      document.getElementById("robots-txt").innerHTML = `<a href="${seoData.robotsTxt}" target="_blank">${seoData.robotsTxt || "N/A"}</a>`;
-      document.getElementById("sitemap-xml").innerHTML = `<a href="${seoData.sitemapXml}" target="_blank">${seoData.sitemapXml || "N/A"}</a>`;
-
+      
       // Populate microdata
       populateMicrodata("open-graph", seoData.openGraph, "og:");
       populateMicrodata("twitter-cards", seoData.twitterCards, "twitter:");
@@ -70,9 +65,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   );
 
   // Add event listeners for the "Page" tab functionalities
-  document.getElementById("highlight-headings").addEventListener("click", () => {
-    toggleHighlight(tab.id, "headings");
-  });
 
   document.getElementById("highlight-noindex").addEventListener("click", () => {
     highlightNoIndex(tab.id);
@@ -82,9 +74,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     highlightNoFollow(tab.id);
   });
 
-  document.getElementById("show-alt-text").addEventListener("click", () => {
-    showAltText(tab.id);
-  });
 
   // Other event listeners
   document.getElementById("toggle-js").addEventListener("click", () => {
@@ -99,13 +88,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     copyToClipboard(tab.url);
   });
 
-  document.getElementById("send-revisit").addEventListener("click", () => {
-    sendRevisitRequest(tab.url);
-  });
-
-  document.getElementById("check-response").addEventListener("click", () => {
-    checkResponse(tab.url);
-  });
 
   document.getElementById("open-cache").addEventListener("click", () => {
     openGoogleCache(tab.url);
@@ -119,9 +101,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     openPageSpeedInsightsMobile(tab.url);
   });
 
-  document.getElementById("text-stats").addEventListener("click", () => {
-    getTextStats(tab.id);
-  });
+  
 });
 
 // Function to highlight noindex elements
@@ -287,16 +267,10 @@ function scrapeSEOData() {
     description: document.querySelector('meta[name="description"]')?.content || "No Description",
     keywords: document.querySelector('meta[name="keywords"]')?.content || "No Keywords",
     h1: document.querySelector("h1")?.innerText || "No H1",
-    canonical: document.querySelector('link[rel="canonical"]')?.href || "No Canonical URL",
     linksCount: document.querySelectorAll("a[href]").length,
     imagesCount: document.querySelectorAll("img").length,
-    metaRobots: document.querySelector('meta[name="robots"]')?.content || "No Meta Robots",
     lang: document.documentElement.lang || "No Lang Attribute",
     siteIP: location.host,
-
-
-    robotsTxt: `${location.origin}/robots.txt`,
-    sitemapXml: `${location.origin}/sitemap.xml`,
 
     // Extract specific microdata
     openGraph: extractStructuredData('meta[property^="og:"]'),
@@ -306,6 +280,7 @@ function scrapeSEOData() {
     microdata: extractStructuredData('[itemscope]'),
   };
 }
+
 
 document.addEventListener('DOMContentLoaded', () => {
   // Слушатели для кнопок во вкладке "Поиск"
@@ -381,10 +356,6 @@ document.getElementById('search-google-maps').addEventListener('click', () => {
   }
 });
 
-
-
-
-
 document.addEventListener('DOMContentLoaded', () => {
   // Функция для проверки длины и окрашивания
   function updateMetaLengthStyles(id, length, validRange) {
@@ -419,11 +390,12 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const linksContainer = document.getElementById("links-details");
   let allLinks = []; // Хранит все ссылки для фильтрации
+  let displayedLinks = []; // Хранит отфильтрованные ссылки, которые отображаются на странице
 
+  // Получаем все ссылки на странице
   function fetchLinks() {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       chrome.scripting.executeScript(
@@ -435,8 +407,9 @@ document.addEventListener("DOMContentLoaded", () => {
           chrome.tabs.sendMessage(tabs[0].id, { action: "collectLinks" }, response => {
             if (response && response.links) {
               allLinks = response.links;
-              displayLinks(allLinks);
-              updateCounts(allLinks, tabs[0].url); // Учет текущего URL для внутренних/внешних ссылок
+              displayedLinks = [...allLinks]; // Изначально отображаем все ссылки
+              displayLinks(displayedLinks);
+              updateCounts(displayedLinks, tabs[0].url); // Учет текущего URL для внутренних/внешних ссылок
             } else {
               console.error("Не удалось получить ссылки с текущей страницы.");
             }
@@ -446,6 +419,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Отображение ссылок
   function displayLinks(links) {
     linksContainer.innerHTML = ""; // Очищаем контейнер перед обновлением
     if (links.length === 0) {
@@ -459,11 +433,19 @@ document.addEventListener("DOMContentLoaded", () => {
     links.forEach(link => {
       const div = document.createElement("div");
       div.className = "link-detail";
-      div.textContent = `Text: ${link.text}, Href: ${link.href}, Protocol: ${link.protocol}, Rel: ${link.rel}, Visible: ${link.visible}`;
+      div.innerHTML = `
+        <span><strong>Text:</strong> ${link.text}</span>
+        <span><strong>Href:</strong> <a href="${link.href}" target="_blank">${link.href}</a></span>
+        <span><strong>Protocol:</strong> ${link.protocol}</span>
+        <span><strong>Rel:</strong> ${link.rel}</span>
+        <span><strong>Visible:</strong> ${link.visible}</span>
+        <span><strong>Status:</strong> <span class="status-text">Не проверено</span></span>
+      `;
       linksContainer.appendChild(div);
     });
   }
 
+  // Обновление статистики ссылок
   function updateCounts(links, currentUrl) {
     const currentHost = new URL(currentUrl).hostname;
 
@@ -486,68 +468,79 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("http-links").textContent = links.filter(link => link.protocol === "http").length;
     document.getElementById("other-links").textContent = links.filter(link => !["https", "http"].includes(link.protocol)).length;
     document.getElementById("follow-links").textContent = links.filter(link => {
-      // Все ссылки без rel или с rel, но не содержащим nofollow, считаются follow
       return !link.rel || !link.rel.includes("nofollow");
     }).length;
     document.getElementById("nofollow-links").textContent = links.filter(link => {
-      // Ссылки с атрибутом nofollow
       return link.rel.includes("nofollow");
     }).length;
     document.getElementById("other-attributes").textContent = links.filter(link => {
-      // Ссылки с другими атрибутами (не nofollow и не follow)
       return link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow");
     }).length;
   }
 
-  function filterLinks(type, currentUrl) {
-    const currentHost = new URL(currentUrl).hostname;
+  // Функция для проверки статуса ссылок
+  async function checkLinksStatus() {
+    const statusElements = linksContainer.querySelectorAll(".link-detail");
 
-    switch (type) {
-      case "all":
-        displayLinks(allLinks);
-        break;
-      case "internal":
-        displayLinks(allLinks.filter(link => {
-          try {
-            return new URL(link.href, currentUrl).hostname === currentHost;
-          } catch (e) {
-            return false; // Пропускаем некорректные ссылки
+    for (let i = 0; i < statusElements.length; i++) {
+      const link = displayedLinks[i];
+      const statusText = statusElements[i].querySelector(".status-text");
+
+      if (statusText) {
+        statusText.textContent = "Проверка..."; // Изначально показываем, что идет проверка
+
+        try {
+          const response = await fetch(link.href, { method: 'HEAD' });
+          if (response.ok) {
+            statusText.textContent = `Status: ${response.status}`;
+            statusText.classList.add('success');
+          } else if (response.status === 404) {
+            statusText.textContent = `Error: ${response.status}`;
+            statusText.classList.add('error');
+          } else if (response.status === 301 || response.status === 500) {
+            statusText.textContent = `Warning: ${response.status}`;
+            statusText.classList.add('warning');
+          } else {
+            statusText.textContent = `Status: ${response.status}`;
           }
-        }));
-        break;
-      case "external":
-        displayLinks(allLinks.filter(link => {
-          try {
-            return new URL(link.href, currentUrl).hostname !== currentHost;
-          } catch (e) {
-            return false; // Пропускаем некорректные ссылки
-          }
-        }));
-        break;
-      case "https":
-        displayLinks(allLinks.filter(link => link.protocol === "https"));
-        break;
-      case "http":
-        displayLinks(allLinks.filter(link => link.protocol === "http"));
-        break;
-      case "other":
-        displayLinks(allLinks.filter(link => !["https", "http"].includes(link.protocol)));
-        break;
-      case "follow":
-        displayLinks(allLinks.filter(link => !link.rel || !link.rel.includes("nofollow")));
-        break;
-      case "nofollow":
-        displayLinks(allLinks.filter(link => link.rel.includes("nofollow")));
-        break;
-      case "other-attributes":
-        displayLinks(allLinks.filter(link => link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow")));
-        break;
-      default:
-        displayLinks([]);
-        break;
+        } catch (error) {
+          statusText.textContent = `Error: ${error.message}`;
+          statusText.classList.add('error');
+        }
+      }
     }
   }
 
+  // Функция для копирования ссылок в буфер обмена
+  function copyLinksToClipboard() {
+    const linksText = displayedLinks.map(link => link.href).join("\n");
+    navigator.clipboard.writeText(linksText)
+      .then(() => {
+        alert("Ссылки скопированы в буфер обмена!");
+      })
+      .catch(err => {
+        console.error("Ошибка при копировании: ", err);
+      });
+  }
+
+  // Функция для экспорта ссылок в CSV файл с UTF-8 кодировкой
+  function exportLinksToCSV() {
+    const csvContent = "Text, Href, Protocol, Rel, Visible, Status\n" + 
+      displayedLinks.map(link => `"${link.text}", "${link.href}", "${link.protocol}", "${link.rel}", "${link.visible}", "Не проверено"`).join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "links.csv";
+    link.click();
+  }
+
+  // Привязка событий к кнопкам
+  document.getElementById("check-links-status").addEventListener("click", checkLinksStatus);
+  document.getElementById("copy-links").addEventListener("click", copyLinksToClipboard);
+  document.getElementById("export-links").addEventListener("click", exportLinksToCSV);
+
+  // Слушатели для фильтрации ссылок
   document.getElementById("show-all-links").addEventListener("click", () => filterLinks("all", window.location.href));
   document.getElementById("show-internal-links").addEventListener("click", () => filterLinks("internal", window.location.href));
   document.getElementById("show-external-links").addEventListener("click", () => filterLinks("external", window.location.href));
@@ -558,8 +551,63 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("show-nofollow-links").addEventListener("click", () => filterLinks("nofollow", window.location.href));
   document.getElementById("show-other-attributes").addEventListener("click", () => filterLinks("other-attributes", window.location.href));
 
+  // Функция для фильтрации ссылок
+  function filterLinks(type, currentUrl) {
+    const currentHost = new URL(currentUrl).hostname;
+
+    switch (type) {
+      case "all":
+        displayedLinks = allLinks;
+        break;
+      case "internal":
+        displayedLinks = allLinks.filter(link => {
+          try {
+            return new URL(link.href, currentUrl).hostname === currentHost;
+          } catch (e) {
+            return false; // Пропускаем некорректные ссылки
+          }
+        });
+        break;
+      case "external":
+        displayedLinks = allLinks.filter(link => {
+          try {
+            return new URL(link.href, currentUrl).hostname !== currentHost;
+          } catch (e) {
+            return false; // Пропускаем некорректные ссылки
+          }
+        });
+        break;
+      case "https":
+        displayedLinks = allLinks.filter(link => link.protocol === "https");
+        break;
+      case "http":
+        displayedLinks = allLinks.filter(link => link.protocol === "http");
+        break;
+      case "other":
+        displayedLinks = allLinks.filter(link => !["https", "http"].includes(link.protocol));
+        break;
+      case "follow":
+        displayedLinks = allLinks.filter(link => !link.rel || !link.rel.includes("nofollow"));
+        break;
+      case "nofollow":
+        displayedLinks = allLinks.filter(link => link.rel.includes("nofollow"));
+        break;
+      case "other-attributes":
+        displayedLinks = allLinks.filter(link => link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow"));
+        break;
+      default:
+        displayedLinks = [];
+        break;
+    }
+
+    displayLinks(displayedLinks); // Обновляем отображаемые ссылки
+  }
+
+  // Загрузка данных ссылок при старте
   fetchLinks();
 });
+
+
 
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
@@ -776,6 +824,28 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCMSData();
 });
 
+// popup.js — скрипт для popup, который получает данные от content.js
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.pageSize) {
+      // Обновляем элемент с id 'page-size' в popup с полученным размером страницы
+      document.getElementById('page-size').textContent = message.pageSize + ' KB';
+  }
+});
+
+// popup.js — скрипт для popup, который получает данные от content.js
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+  if (message.pageSize) {
+      // Обновляем элемент с id 'page-size' в popup с полученным размером страницы
+      document.getElementById('page-size').textContent = message.pageSize + ' KB';
+  }
+  if (message.statusCode) {
+      // Обновляем элемент с id 'response-code' в popup с полученным кодом ответа сервера
+      document.getElementById('response-code').textContent = message.statusCode;
+  }
+});
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const headingsSummary = document.querySelector(".headings-summary");
@@ -908,7 +978,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
 document.addEventListener("DOMContentLoaded", () => {
-  const tabs = document.querySelectorAll(".tab-button");
+  const tabs = document.querySelectorAll(".tab-buttons");
   const wordList = document.getElementById("word-list");
   const wordSearch = document.getElementById("word-search");
   const prevPageBtn = document.getElementById("prev-page");
@@ -1113,4 +1183,176 @@ function analyzeText() {
     threeWords: countPhrases(words, 3),
     linkWords: countPhrases(Array.from(document.querySelectorAll("a")).map((a) => a.innerText), 1),
   };
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const canonicalResult = document.getElementById("canonical-result");
+  const metaRobotsResult = document.getElementById("meta-robots-result");
+  const robotsResult = document.getElementById("robots-result");
+  const sitemapResult = document.getElementById("sitemap-result");
+
+  try {
+      chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+          const tab = tabs[0];
+          if (!tab || !tab.url) {
+              throw new Error("Не удалось получить текущую вкладку.");
+          }
+
+          const response = await fetch(tab.url);
+          const html = await response.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+
+          // 1. Проверка каноничного адреса
+          checkCanonical(doc, tab.url, canonicalResult);
+
+          // 2. Проверка Meta Robots
+          checkMetaRobots(doc, metaRobotsResult);
+
+          // 3. Проверка robots.txt
+          await checkRobotsTxt(tab.url, robotsResult);
+
+          // 4. Проверка sitemap.xml
+          await checkSitemap(tab.url, sitemapResult);
+      });
+  } catch (error) {
+      console.error("Ошибка выполнения: ", error);
+  }
+});
+
+// Проверка каноничного адреса
+function checkCanonical(doc, currentUrl, container) {
+  const canonicalElement = doc.querySelector('link[rel="canonical"]');
+
+  if (canonicalElement) {
+      const canonicalUrl = canonicalElement.href;
+      if (canonicalUrl === currentUrl) {
+          container.innerHTML = `
+              <span class="fas fa-check-circle" style="color: green;"></span>
+              Каноничной страницей является текущая страница: <a href="${canonicalUrl}" target="_blank">${canonicalUrl}</a>
+          `;
+      } else {
+          container.innerHTML = `
+              <span class="fa fa-times-circle" style="color:red;"></span>
+              Каноничной является другая страница: <a href="${canonicalUrl}" target="_blank">${canonicalUrl}</a>
+          `;
+      }
+  } else {
+      container.innerHTML = `
+          <span class="fas fa-check-circle" style="color: green;"></span>
+          Каноничный адрес не указан
+      `;
+  }
+}
+
+// Проверка Meta Robots
+function checkMetaRobots(doc, container) {
+  const metaElement = doc.querySelector('meta[name="robots"]');
+
+  if (metaElement) {
+      const content = metaElement.content;
+      if (content.includes("noindex")) {
+          container.innerHTML = `
+              <span class="fa fa-times-circle" style="color:red;"></span>
+              Индексация страницы запрещена (meta: ${content})
+          `;
+      } else {
+          container.innerHTML = `
+              <span class="fas fa-check-circle" style="color: green;"></span>
+              Индексация страницы разрешена (meta: ${content})
+          `;
+      }
+  } else {
+      container.innerHTML = `
+          <span class="fas fa-check-circle" style="color: green;"></span>
+          Meta robots не указан (Индексация разрешена)
+      `;
+  }
+}
+
+// Проверка robots.txt
+async function checkRobotsTxt(tabUrl, container) {
+  const robotsUrl = new URL("/robots.txt", tabUrl).href;
+
+  try {
+      const response = await fetch(robotsUrl);
+      if (!response.ok) {
+          throw new Error("Не удалось загрузить robots.txt");
+      }
+
+      const robotsText = await response.text();
+      const lines = robotsText.split("\n");
+      const userAgents = {};
+      let currentAgent = null;
+
+      lines.forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed.toLowerCase().startsWith("user-agent:")) {
+              currentAgent = trimmed.split(":")[1].trim();
+              userAgents[currentAgent] = [];
+          } else if (
+              currentAgent &&
+              (trimmed.toLowerCase().startsWith("disallow:") ||
+                  trimmed.toLowerCase().startsWith("allow:"))
+          ) {
+              userAgents[currentAgent].push(trimmed);
+          }
+      });
+
+      let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
+      htmlContent += "<p>Список User-agent и их статус:</p>";
+      htmlContent += "<ul>";
+
+      for (const [agent, rules] of Object.entries(userAgents)) {
+          let isDisallowed = false;
+
+          rules.forEach((rule) => {
+              if (
+                  rule.toLowerCase().startsWith("disallow:") &&
+                  rule.split(":")[1].trim() === "/"
+              ) {
+                  isDisallowed = true;
+              }
+          });
+
+          if (isDisallowed) {
+              htmlContent += `<li>User-Agent: ${agent} <span class="fa fa-times-circle" style="color:red;"></span> Запрещено</li>`;
+          } else {
+              htmlContent += `<li>User-Agent: ${agent} <span class="fas fa-check-circle" style="color: green;"></span> Разрешено</li>`;
+          }
+      }
+
+      htmlContent += "</ul>";
+      container.innerHTML = htmlContent;
+  } catch (error) {
+      container.innerHTML = `
+          <span class="fa fa-times-circle" style="color:red;"></span>
+          Не удалось загрузить robots.txt
+      `;
+      console.error("Ошибка при загрузке robots.txt:", error);
+  }
+}
+
+
+// Проверка sitemap.xml
+async function checkSitemap(tabUrl, container) {
+  const sitemapUrl = new URL("/sitemap.xml", tabUrl).href;
+
+  try {
+      const response = await fetch(sitemapUrl);
+      if (!response.ok) {
+          throw new Error("Sitemap.xml не найден");
+      }
+
+      container.innerHTML = `
+          <span class="fas fa-check-circle" style="color: green;"></span>
+          Файл sitemap.xml: <a href="${sitemapUrl}" target="_blank">${sitemapUrl}</a>
+      `;
+  } catch (error) {
+      container.innerHTML = `
+          <span class="fa fa-times-circle" style="color:red;"></span>
+          Sitemap.xml не найден
+      `;
+      console.error("Ошибка при загрузке sitemap.xml:", error);
+  }
 }

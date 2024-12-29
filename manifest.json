@@ -2,6 +2,7 @@
 {
   "manifest_version": 3,
   "name": "MATRYOSHKA TOOLS",
+  "description": "Инструменты для анализа и оптимизации сайта: метатеги, анализ текста, анализ изображений, анализ ссылок, анализ микроразметки, полезные инструменты, сервисы и другое!",
   "version": "1.0",
   "permissions": ["activeTab", "scripting"],
   "host_permissions": ["<all_urls>","https://gogetlinks.net/*","https://checktrust.ru/*"],

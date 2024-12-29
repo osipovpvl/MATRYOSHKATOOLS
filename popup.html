@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SEO Vision v1.0</title>
+  <title>MATRYOSHKA TOOLS v1.0</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -27,7 +27,6 @@
     /* Tabs navigation */
     #tabs {
       display: flex;
-      background-color: #000000;
       border-bottom: 2px solid #ddd;
     }
 
@@ -57,15 +56,6 @@
     .tab {
       display: none;
       padding: 20px;
-    }
-
-    .ttab {
-      display: none;
-      padding: 20px;
-    }
-
-    .ttab.active {
-      display: block;
     }
 
     .tab.active {
@@ -133,8 +123,9 @@
 
 #image-summary button {
     padding: 8px 12px;
-    border: 1px solid #ccc;
+    border: 1px solid #000000;
     background-color: #f9f9f9;
+    color: black;
     cursor: pointer;
     border-radius: 5px;
     transition: background-color 0.3s;
@@ -283,19 +274,80 @@
     background-color: #1a73e8;
   }
 
-  .links-summary button:hover {
-    color: white;
-    background-color: #000000;
+  .links-summary,
+.links-protocols,
+.links-attributes,
+.links-check,
+.links-actions {
+  margin: 10px 0;
 }
 
-.links-protocols button:hover {
-  color: white;
-  background-color: #000000;
+
+/* Таблица с ссылками */
+#links-details {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: white;
+  border-radius: 5px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.links-attributes button:hover {
+.link-detail {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+}
+
+.link-detail:last-child {
+  border-bottom: none;
+}
+
+a {
+  color: #3498db;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* Статус ссылки */
+.status-text {
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* Цветовая индикация статуса */
+.status-text.success {
+  color: green;
+}
+
+.status-text.error {
+  color: red;
+}
+
+.status-text.warning {
+  color: orange;
+}
+
+/* Кнопки экспорта и копирования */
+button {
+  background-color: #2ecc71;
   color: white;
-  background-color: #000000;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+input[type="number"] {
+  padding: 5px;
+  margin-left: 10px;
+  margin-right: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 
@@ -328,7 +380,8 @@
   }
 
   .filter-button:hover {
-    background-color: #e0e0e0;
+    background-color: #000000;
+    color: white;
   }
 
   .links-summary, .links-protocols, .links-attributes, .links-check, .links-actions {
@@ -379,8 +432,9 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      background: #fff;
-      border: 1px solid #ddd;
+      background: white;
+      border: 1px solid #000000;
+      color: rgb(0, 0, 0);
       border-radius: 5px;
       padding: 10px;
       font-size: 12px;
@@ -394,12 +448,19 @@
     }
 
     .heading-count strong {
-      color: #4CAF50;
+      color: rgb(0, 0, 0);
+      font-size: 14px;
+    }
+
+    .heading-count:hover strong {
+      color: rgb(255, 255, 255);
       font-size: 14px;
     }
 
     .heading-count:hover {
-      background-color: #f1f1f1;
+      border: 1px solid white;
+      background-color: #000000;
+      color: rgb(255, 255, 255);
     }
 
     #toggle-highlight-headings {
@@ -519,18 +580,91 @@ tr:nth-child(even) {
   cursor: not-allowed;
 }
     }
+
+    .status {
+    margin: 10px 0;
+    font-size: 14px;
+    align-items: center;
+}
+
+.loading {
+    color: gray;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
+.block {
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.title {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.sitemap {
+    margin-top: 10px;
+}
+
+a {
+    color: #1a73e8;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.user-agents {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+/* CSS для галочек и крестиков */
+.status-icon {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 16px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.status-icon.green {
+    background-color: #12d312;
+}
+
+.status-icon.red {
+    background-color: red;
+}
+
+.status-icon.loading {
+    background-color: gray;
+}
   </style>
 </head>
 <body>
   <div id="container">
     <!-- Navigation Tabs -->
     <div id="tabs">
-      <button class="tab-button active" data-tab="seo">ОСНОВНОЕ</button>
+      <button class="tab-button active" data-tab="seo">СТРАНИЦА</button>
       <button class="tab-button" data-tab="texts">ТЕКСТ</button>
       <button class="tab-button" data-tab="links-info">ССЫЛКИ</button>
       <button class="tab-button" data-tab="images">ИЗОБРАЖЕНИЯ</button>
       <button class="tab-button" data-tab="microdata">МИКРОРАЗМЕТКА</button>
-      <button class="tab-button" data-tab="page">СТРАНИЦА</button>
       <button class="tab-button" data-tab="search">ПОИСК</button>
       <button class="tab-button" data-tab="tools">ИНСТРУМЕНТЫ</button>
       <button class="tab-button" data-tab="others">ПОЛЕЗНЫЕ СЕРВИСЫ</button>
@@ -547,41 +681,41 @@ tr:nth-child(even) {
             <th>Мета-теги</th>
             <th>Значение</th>
             <th></th>
-          </tr>
-          <tr>
+        </tr>
+        <tr>
             <td>Title <div id="title-length" class="meta-length">-</div></td>
             <td>
-              <div id="title">Загрузка...</div>
+                <div id="title">Загрузка...</div>
             </td>
             <td>
-              <button class="copy-button" data-target="title">
-                <i class="fas fa-clone"></i>
-              </button>
+                <button class="copy-button" data-target="title">
+                    <i class="fas fa-clone"></i>
+                </button>
             </td>
-          </tr>
-          <tr>
+        </tr>
+        <tr>
             <td>Description <div id="description-length" class="meta-length">-</div></td>
             <td>
-              <div id="description">Загрузка...</div>
+                <div id="description">Загрузка...</div>
             </td>
             <td>
-              <button class="copy-button" data-target="description">
-                <i class="fas fa-clone"></i>
-              </button>
+                <button class="copy-button" data-target="description">
+                    <i class="fas fa-clone"></i>
+                </button>
             </td>
-          </tr>
-          <tr>
+        </tr>
+        <tr>
             <td>H1 <div id="h1-length" class="meta-length">-</div></td>
             <td>
-              <div id="h1">Загрузка...</div>
+                <div id="h1">Загрузка...</div>
             </td>
             <td>
-              <button class="copy-button" data-target="h1">
-                <i class="fas fa-clone"></i>
-              </button>
+                <button class="copy-button" data-target="h1">
+                    <i class="fas fa-clone"></i>
+                </button>
             </td>
-          </tr>
-          <tr>
+        </tr>
+        <tr>
             <td>Keywords <div id="keywords-length" class="meta-length">-</div></td>
             <td>
               <div id="keywords">Загрузка...</div>
@@ -595,7 +729,26 @@ tr:nth-child(even) {
         </table>
         
         
-        
+        <div class="section-title">ИНДЕКСАЦИЯ:</div>
+        <div class="block">
+          <div class="title">Rel Canonical</div>
+          <div id="canonical-result" class="status loading">Загрузка...</div>
+        </div>
+  
+      <div class="block">
+          <div class="title">Meta Robots</div>
+          <div id="meta-robots-result" class="status loading">Загрузка...</div>
+      </div>
+  
+      <div class="block">
+          <div class="title">Robots.txt</div>
+          <div id="robots-result" class="status loading">Загрузка...</div>
+      </div>
+  
+      <div class="block sitemap">
+          <div class="title">Sitemap.xml</div>
+          <div id="sitemap-result" class="status loading">Загрузка...</div>
+      </div>
 
         <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:</div>
         <table>
@@ -603,23 +756,7 @@ tr:nth-child(even) {
             <td>Current URL</td>
             <td id="current-url">Загрузка...</td>
           </tr>
-          <tr>
-            <td>Canonical</td>
-            <td id="canonical">Загрузка...</td>
-          </tr>
-          <!--<tr>
-            <td>Links Count</td>
-            <td id="links">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>Images Count</td>
-            <td id="images-count">Загрузка...</td>
-          </tr>
-             -->
-          <tr>
-            <td>Meta Robots</td>
-            <td id="robots">Загрузка...</td>
-          </tr>
+          
           <tr>
             <td>Language</td>
             <td id="lang">Загрузка...</td>
@@ -627,14 +764,6 @@ tr:nth-child(even) {
           <tr>
             <td>IP Address</td>
             <td id="site-ip">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>Robots.txt</td>
-            <td id="robots-txt"><a href="#" target="_blank">Загрузка...</a></td>
-          </tr>
-          <tr>
-            <td>Sitemap.xml</td>
-            <td id="sitemap-xml"><a href="#" target="_blank">Загрузка...</a></td>
           </tr>
           <tr>
             <td>Яндекс Метрика</td>
@@ -652,7 +781,14 @@ tr:nth-child(even) {
             <td>CMS</td>
             <td id="cms-data">Загрузка...</td>
           </tr>
-                   
+          <tr>
+            <td>Размер страницы</td>
+            <td id="page-size">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Код ответа сервера</td>
+            <td id="response-code">Загрузка...</td>
+          </tr>    
         </table>
       </div>
 
@@ -685,64 +821,6 @@ tr:nth-child(even) {
         </table>
       </div>
 
-      <!-- Page Tab -->
-      <div id="page" class="tab">
-        <h1>АНАЛИЗ СТРАНИЦЫ</h1>
-        <div class="page-panel">
-          <div class="page-item">
-            <span>Highlight Noindex Elements</span>
-            <button id="highlight-noindex" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Highlight Nofollow Links</span>
-            <button id="highlight-nofollow" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Show Alt Text for Images</span>
-            <button id="show-alt-text" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Highlight Headings</span>
-            <button id="highlight-headings" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Toggle JavaScript</span>
-            <button id="toggle-js" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Toggle CSS</span>
-            <button id="toggle-css" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Copy URL</span>
-            <button id="copy-url" class="page-button action-button">✔</button>
-          </div>
-          <div class="page-item">
-            <span>Send Revisit to Yandex</span>
-            <button id="send-revisit" class="page-button link-button">↗</button>
-          </div>
-          <div class="page-item">
-            <span>Check Server Response</span>
-            <button id="check-response" class="page-button link-button">↗</button>
-          </div>
-          <div class="page-item">
-            <span>Open Google Cache</span>
-            <button id="open-cache" class="page-button google-button">G</button>
-          </div>
-          <div class="page-item">
-            <span>Check Page Speed</span>
-            <button id="check-speed" class="page-button google-button">G</button>
-          </div>
-          <div class="page-item">
-            <span>Check Mobile Optimization</span>
-            <button id="check-mobile" class="page-button google-button">G</button>
-          </div>
-          <div class="page-item">
-            <span>Show Text Stats</span>
-            <button id="text-stats" class="page-button action-button">✔</button>
-          </div>
-        </div>
-      </div>
 
       <div id="search" class="tab">
         <h1>АНАЛИЗ ПОИСКА</h1>
@@ -879,15 +957,10 @@ tr:nth-child(even) {
           <button class="filter-button" id="show-other-attributes">Другой (<span id="other-attributes">0</span>)</button>
         </div>
       
-        <div class="links-check">
-          <label for="delay">Проверить ссылки с задержкой</label>
-          <input type="number" id="delay" value="200" min="0"> мс
-          <button id="check-links-status">Проверить</button>
-        </div>
-      
         <div class="links-actions">
-          <button id="export-links">Экспортировать</button>
-          <button id="copy-links">Копировать</button>
+          <button id="copy-links">Копировать ссылки</button>
+          <button id="check-links-status">Проверить статус ссылок</button>
+          <button id="export-links">Экспортировать в CSV</button>
         </div>
       
         <div id="links-details"></div>
@@ -907,7 +980,7 @@ tr:nth-child(even) {
       </div>
 
     
-      <div id="texts" class="ttab">
+      <div id="texts" class="tab">
         <h1>АНАЛИЗ ТЕКСТА</h1>
       <div class="container">
 
@@ -970,10 +1043,10 @@ tr:nth-child(even) {
         <!-- Анализ слов -->
         <section class="word-analysis">
           <div class="tabs">
-            <button class="tab-button texts active" data-tab="oneWord">1 слово</button>
-            <button class="tab-button texts" data-tab="twoWords">2 слова</button>
-            <button class="tab-button texts" data-tab="threeWords">3 слова</button>
-            <button class="tab-button texts" data-tab="linkWords">Слова в ссылках</button>
+            <button class="tab-buttons texts active" data-tab="oneWord">1 слово</button>
+            <button class="tab-buttons texts" data-tab="twoWords">2 слова</button>
+            <button class="tab-buttons texts" data-tab="threeWords">3 слова</button>
+            <button class="tab-buttons texts" data-tab="linkWords">Слова в ссылках</button>
           </div>
           <div class="search-bar">
             <input type="text" id="word-search" placeholder="Поиск слов..." />
@@ -1002,12 +1075,44 @@ tr:nth-child(even) {
     
       <div id="others" class="tab">
         <h1>ПОЛЕЗНЫЕ СЕРВИСЫ</h1>
-        <p>Инструменты для SEO анализа будут здесь.</p>
       </div>
 
       <div id="tools" class="tab">
         <h1>ПОЛЕЗНЫЕ ИНСТРУМЕНТЫ</h1>
-        <p>Инструменты для SEO анализа будут здесь.</p>
+        <div class="page-panel">
+          <div class="page-item">
+            <span>Highlight Noindex Elements</span>
+            <button id="highlight-noindex" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Highlight Nofollow Links</span>
+            <button id="highlight-nofollow" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Toggle JavaScript</span>
+            <button id="toggle-js" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Toggle CSS</span>
+            <button id="toggle-css" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Copy URL</span>
+            <button id="copy-url" class="page-button action-button">✔</button>
+          </div>
+          <div class="page-item">
+            <span>Open Google Cache</span>
+            <button id="open-cache" class="page-button google-button">G</button>
+          </div>
+          <div class="page-item">
+            <span>Check Page Speed</span>
+            <button id="check-speed" class="page-button google-button">G</button>
+          </div>
+          <div class="page-item">
+            <span>Check Mobile Optimization</span>
+            <button id="check-mobile" class="page-button google-button">G</button>
+          </div>
+        </div>
       </div>
     </div>
 

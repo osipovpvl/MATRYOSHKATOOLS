@@ -283,3 +283,49 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Указываем асинхронный ответ
   }
 });
+
+// content.js — скрипт, который будет запускаться на текущей странице
+function getPageSize() {
+  // Получаем HTML-контент страницы
+  const pageContent = document.documentElement.outerHTML;
+
+  // Рассчитываем размер страницы в байтах
+  const sizeInBytes = new Blob([pageContent]).size;
+  const sizeInKB = (sizeInBytes / 1024).toFixed(2); // Переводим в КБ
+
+  // Отправляем размер страницы в popup через message passing
+  chrome.runtime.sendMessage({ pageSize: sizeInKB });
+}
+
+// Вызываем функцию для получения размера страницы
+getPageSize();
+
+// content.js — скрипт для работы с текущей страницей
+function getPageSize() {
+  // Получаем HTML-контент страницы
+  const pageContent = document.documentElement.outerHTML;
+
+  // Рассчитываем размер страницы в байтах
+  const sizeInBytes = new Blob([pageContent]).size;
+  const sizeInKB = (sizeInBytes / 1024).toFixed(2); // Переводим в КБ
+
+  // Отправляем размер страницы в popup через message passing
+  chrome.runtime.sendMessage({ pageSize: sizeInKB });
+}
+
+// Функция для получения кода ответа сервера
+function getResponseCode() {
+  const xhr = new XMLHttpRequest();
+  xhr.open("GET", window.location.href, true); // Отправляем GET-запрос на текущий URL
+  xhr.onreadystatechange = function () {
+      if (xhr.readyState === 4) { // Если запрос завершен
+          // Отправляем код ответа на сервер в popup
+          chrome.runtime.sendMessage({ statusCode: xhr.status });
+      }
+  };
+  xhr.send();
+}
+
+// Вызываем функции для получения размера страницы и кода ответа
+getPageSize();
+getResponseCode();
