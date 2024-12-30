@@ -1,7 +1,7 @@
 // Функция для получения цвета по значению Trust
 function getTrustColor(trust) {
   if (trust >= 0 && trust <= 30) return "red";
-  if (trust >= 31 && trust <= 50) return "yellow";
+  if (trust >= 31 && trust <= 50) return "orange";
   if (trust >= 51 && trust <= 100) return "green";
   return "black";
 }
@@ -9,7 +9,7 @@ function getTrustColor(trust) {
 // Функция для получения цвета по значению Spam
 function getSpamColor(spam) {
   if (spam >= 0 && spam <= 7) return "green";
-  if (spam > 7 && spam <= 12) return "yellow";
+  if (spam > 7 && spam <= 12) return "orange";
   if (spam > 12 && spam <= 100) return "red";
   return "black";
 }
@@ -22,7 +22,7 @@ async function fetchDomainData(domain) {
   try {
     const response = await fetch(apiUrl);
     if (!response.ok) {
-      throw new Error(`Ошибка API: ${response.status}`);
+      throw new Error(`Не удалось проверить: ${response.status}`);
     }
 
     const data = await response.json();
@@ -69,11 +69,11 @@ async function updateSiteInfo() {
         const spamColor = getSpamColor(data.spam);
 
         infoSpan.innerHTML = `
-          <b>Trust:</b> <span style="color: ${trustColor};">${data.trust}</span>,
-          <b>Spam:</b> <span style="color: ${spamColor};">${data.spam}</span>
+          ТРАСТ: <span style="color: ${trustColor};">${data.trust}</span>,
+          СПАМ: <span style="color: ${spamColor};">${data.spam}</span>
         `;
       } else {
-        infoSpan.textContent = "Ошибка API";
+        infoSpan.textContent = "Не удалось проверить";
         infoSpan.style.color = "red";
       }
     });
@@ -328,4 +328,3 @@ function getResponseCode() {
 // Вызываем функции для получения размера страницы и кода ответа
 getPageSize();
 getResponseCode();
-

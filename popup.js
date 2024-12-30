@@ -33,18 +33,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       populateMetaData("description", seoData.description, seoData.description?.length || 0);
       populateMetaData("keywords", seoData.keywords, seoData.keywords?.length || 0);
       populateMetaData("h1", seoData.h1, seoData.h1?.length || 0);
-      document.getElementById("current-url").textContent = tab.url || "N/A";
+      document.getElementById("current-url").textContent = tab.url || "Не удалось определить";
       //document.getElementById("links").textContent = seoData.linksCount || "N/A";
       //document.getElementById("images-count").textContent = seoData.imagesCount || "N/A";
-      document.getElementById("lang").textContent = seoData.lang || "N/A";
+      document.getElementById("lang").textContent = seoData.lang || "Не удалось определить";
 
       
       // Populate microdata
-      populateMicrodata("open-graph", seoData.openGraph, "og:");
-      populateMicrodata("twitter-cards", seoData.twitterCards, "twitter:");
-      populateMicrodata("schema-org", seoData.schemaOrg, "Schema.org");
-      populateMicrodata("rdfa", seoData.rdfa, "RDFa");
-      populateMicrodata("microdata-check", seoData.microdata, "Microdata");
+      populateMicrodata("open-graph", seoData.openGraph, "");
+      populateMicrodata("twitter-cards", seoData.twitterCards, "");
+      populateMicrodata("schema-org", seoData.schemaOrg, "");
+      populateMicrodata("rdfa", seoData.rdfa, "");
+      populateMicrodata("microdata-check", seoData.microdata, "");
 
       // Add event listeners for copy buttons
       document.querySelectorAll(".copy-button").forEach((button) => {
@@ -210,14 +210,93 @@ function getTextStats(tabId) {
   });
 }
 
-// Function to populate meta data
+// Функция для обновления длины и окрашивания текста
+function updateMetaLengthStyles(element, length, ranges) {
+  if (!element) return;
+
+  if (length >= ranges.good[0] && length <= ranges.good[1]) {
+    element.style.color = "green";  // Хорошо
+    element.style.fontWeight = "bold";
+  } else if (
+    (length >= ranges.acceptable[0] && length <= ranges.acceptable[1]) ||
+    (length >= ranges.acceptable[2] && length <= ranges.acceptable[3])
+  ) {
+    element.style.color = "orange";  // Приемлемо
+    element.style.fontWeight = "bold";
+  } else {
+    element.style.color = "red";  // Плохо
+    element.style.fontWeight = "bold";
+  }
+}
+
+// Функция для заполнения мета-данных
 function populateMetaData(id, value, length) {
   const element = document.getElementById(id);
   const lengthElement = document.getElementById(`${id}-length`);
 
   element.textContent = value || "N/A";
   lengthElement.textContent = `Символов: ${length}`;
+
+  // Устанавливаем стиль длины для разных мета-данных
+  if (id === 'title') {
+    updateMetaLengthStyles(lengthElement, length, {
+      good: [30, 70],
+      acceptable: [10, 29, 71, 90],
+    });
+  } else if (id === 'description') {
+    updateMetaLengthStyles(lengthElement, length, {
+      good: [150, 250],
+      acceptable: [75, 149, 251, 300],
+    });
+  } else if (id === 'h1') {
+    updateMetaLengthStyles(lengthElement, length, {
+      good: [20, 60],
+      acceptable: [5, 19, 61, 70],
+    });
+  }
 }
+
+// Обработчик для извлечения и отображения SEO данных
+document.addEventListener('DOMContentLoaded', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tab.id },
+        func: scrapeSEOData,  // Ваша функция для извлечения SEO данных
+      },
+      (results) => {
+        const seoData = results[0].result;
+
+        // Заполняем мета-данные и стили
+        populateMetaData("title", seoData.title, seoData.title?.length || 0);
+        populateMetaData("description", seoData.description, seoData.description?.length || 0);
+        populateMetaData("h1", seoData.h1, seoData.h1?.length || 0);
+
+        // Отображаем URL и язык
+        document.getElementById("current-url").textContent = tab.url || "N/A";
+        document.getElementById("lang").textContent = seoData.lang || "N/A";
+
+        // Добавляем обработчики для кнопок копирования
+        document.querySelectorAll(".copy-button").forEach((button) => {
+          button.addEventListener("click", () => {
+            const targetId = button.getAttribute("data-target");
+            const textToCopy = document.getElementById(targetId).textContent;
+
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              const status = document.getElementById("copy-status");
+              status.classList.remove("hidden");
+              status.textContent = `${targetId.charAt(0).toUpperCase() + targetId.slice(1)} copied!`;
+              setTimeout(() => status.classList.add("hidden"), 2000);
+            });
+          });
+        });
+      }
+    );
+  });
+});
+
 
 // Function to populate microdata content
 function populateMicrodata(elementId, data, label) {
@@ -232,7 +311,7 @@ function populateMicrodata(elementId, data, label) {
       container.appendChild(div);
     });
   } else {
-    container.textContent = `${label} data not found.`;
+    container.textContent = `${label} Отсутствует`;
   }
 }
 
@@ -243,13 +322,13 @@ function scrapeSEOData() {
   };
 
   return {
-    title: document.querySelector("title")?.innerText || "No Title",
-    description: document.querySelector('meta[name="description"]')?.content || "No Description",
-    keywords: document.querySelector('meta[name="keywords"]')?.content || "No Keywords",
-    h1: document.querySelector("h1")?.innerText || "No H1",
+    title: document.querySelector("title")?.innerText || "Отсутствует",
+    description: document.querySelector('meta[name="description"]')?.content || "Отсутствует",
+    keywords: document.querySelector('meta[name="keywords"]')?.content || "Отсутствует",
+    h1: document.querySelector("h1")?.innerText || "Отсутствует",
     linksCount: document.querySelectorAll("a[href]").length,
     imagesCount: document.querySelectorAll("img").length,
-    lang: document.documentElement.lang || "No Lang Attribute",
+    lang: document.documentElement.lang || "Отсутствует",
     siteIP: location.host,
 
     // Extract specific microdata
@@ -336,39 +415,7 @@ document.getElementById('search-google-maps').addEventListener('click', () => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Функция для проверки длины и окрашивания
-  function updateMetaLengthStyles(id, length, validRange) {
-      const element = document.getElementById(id);
-      if (!element) return;
 
-      if (length >= validRange[0] && length <= validRange[1]) {
-          element.style.color = "green";
-          element.style.fontWeight = "bold";
-      } else {
-          element.style.color = "red";
-          element.style.fontWeight = "bold";
-      }
-  }
-
-  // Пример обработки для Title
-  const title = document.querySelector('title')?.innerText || "";
-  const titleLength = title.length;
-  const titleLengthElement = document.getElementById('title-length');
-  if (titleLengthElement) {
-      titleLengthElement.textContent = `${titleLength}`;
-      updateMetaLengthStyles('title-length', titleLength, [60, 80]);
-  }
-
-  // Пример обработки для Description
-  const metaDescription = document.querySelector('meta[name="description"]')?.getAttribute('content') || "";
-  const descriptionLength = metaDescription.length;
-  const descriptionLengthElement = document.getElementById('description-length');
-  if (descriptionLengthElement) {
-      descriptionLengthElement.textContent = `${descriptionLength}`;
-      updateMetaLengthStyles('description-length', descriptionLength, [150, 200]);
-  }
-});
 
 document.addEventListener("DOMContentLoaded", () => {
   const linksContainer = document.getElementById("links-details");
@@ -414,12 +461,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.className = "link-detail";
       div.innerHTML = `
-        <span><strong>Text:</strong> ${link.text}</span>
-        <span><strong>Href:</strong> <a href="${link.href}" target="_blank">${link.href}</a></span>
-        <span><strong>Protocol:</strong> ${link.protocol}</span>
-        <span><strong>Rel:</strong> ${link.rel}</span>
-        <span><strong>Visible:</strong> ${link.visible}</span>
-        <span><strong>Status:</strong> <span class="status-text">Не проверено</span></span>
+        <span><strong>Текст:</strong> ${link.text}</span>
+        <span><strong>Ссылка:</strong> <a href="${link.href}" target="_blank">${link.href}</a></span>
+        <span><strong>Протокол:</strong> ${link.protocol}</span>
+        <span><strong>Атрибут rel:</strong> ${link.rel}</span>
+        <span><strong>Видимость:</strong> ${link.visible}</span>
+        <span><strong>Код ответа:</strong> <span class="status-text">Не проверено</span></span>
       `;
       linksContainer.appendChild(div);
     });
@@ -472,19 +519,19 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           const response = await fetch(link.href, { method: 'HEAD' });
           if (response.ok) {
-            statusText.textContent = `Status: ${response.status}`;
+            statusText.textContent = `${response.status}`;
             statusText.classList.add('success');
           } else if (response.status === 404) {
-            statusText.textContent = `Error: ${response.status}`;
+            statusText.textContent = `${response.status}`;
             statusText.classList.add('error');
           } else if (response.status === 301 || response.status === 500) {
-            statusText.textContent = `Warning: ${response.status}`;
+            statusText.textContent = `${response.status}`;
             statusText.classList.add('warning');
           } else {
-            statusText.textContent = `Status: ${response.status}`;
+            statusText.textContent = `${response.status}`;
           }
         } catch (error) {
-          statusText.textContent = `Error: ${error.message}`;
+          statusText.textContent = `${error.message}`;
           statusText.classList.add('error');
         }
       }

@@ -682,13 +682,13 @@ a:hover {
 
     .service-list a {
         text-decoration: none;
-        font-size: 18px;
+        font-size: 15px;
         color: #007bff;
         transition: color 0.3s ease;
     }
 
     .service-list a:hover {
-        color: #0056b3;
+        color: #000000;
         text-decoration: underline;
     }
   </style>
@@ -720,7 +720,7 @@ a:hover {
             <th></th>
         </tr>
         <tr>
-            <td>Title <div id="title-length" class="meta-length">-</div></td>
+          <td>Title <strong><div id="title-length" class="meta-length">-</div></strong></td>
             <td>
                 <div id="title">Загрузка...</div>
             </td>
@@ -731,7 +731,7 @@ a:hover {
             </td>
         </tr>
         <tr>
-            <td>Description <div id="description-length" class="meta-length">-</div></td>
+           <td>Description   <strong><div id="description-length" class="meta-length">-</div></strong></td>
             <td>
                 <div id="description">Загрузка...</div>
             </td>
@@ -742,7 +742,7 @@ a:hover {
             </td>
         </tr>
         <tr>
-            <td>H1 <div id="h1-length" class="meta-length">-</div></td>
+          <td>H1 <strong><div id="h1-length" class="meta-length">-</div></strong></td>
             <td>
                 <div id="h1">Загрузка...</div>
             </td>
@@ -753,7 +753,7 @@ a:hover {
             </td>
         </tr>
         <tr>
-            <td>Keywords <div id="keywords-length" class="meta-length">-</div></td>
+        <td>Keywords   <strong><div id="keywords-length" class="meta-length">-</div></strong></td>
             <td>
               <div id="keywords">Загрузка...</div>
             </td>
@@ -790,12 +790,12 @@ a:hover {
         <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:</div>
         <table>
           <tr>
-            <td>Current URL <strong><div id="url-length"></div></strong></td>
+            <td>Текущий URL <strong><div id="url-length" style="color:#555;font-size: 0.9em;"></div></strong></td>
             <td id="current-url">Загрузка...</td>
           </tr>
           
           <tr>
-            <td>Language</td>
+            <td>Атрибут lang</td>
             <td id="lang">Загрузка...</td>
           </tr>
           <tr>
@@ -811,7 +811,7 @@ a:hover {
             <td id="google-analytics">Загрузка...</td>
           </tr>
           <tr>
-            <td>CMS</td>
+            <td>CMS / WYSI / WYG</td>
             <td id="cms-data">Загрузка...</td>
           </tr>
           <tr>
@@ -1121,55 +1121,57 @@ a:hover {
         <h1>ПОЛЕЗНЫЕ СЕРВИСЫ</h1>
         <div class="service-container">
           <ul class="service-list">
+            <div class="section-title">АНАЛИТИКА:</div>
+              <li><a href="https://webmaster.yandex.ru/sites/" target="_blank">Яндекс Веб Мастер</a></li>
+              <li><a href="https://metrika.yandex.ru/list" target="_blank">Яндекс Метрика</a></li>
+              <li><a href="https://search.google.com/search-console" target="_blank">Google Search Console</a></li>
+              <li><a href="https://analytics.google.com/analytics/" target="_blank">Google Analytics</a></li>
+          </ul>
+          <ul class="service-list">
             <div class="section-title">ТЕКСТ:</div>
-              <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-              <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-              <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-              <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+              <li><a href="https://www.etxt.ru/" target="_blank">ETXT</a></li>
+              <li><a href="https://text.ru/" target="_blank">https://text.ru/</a></li>
+              <li><a href="https://turgenev.ashmanov.com/" target="_blank">https://turgenev.ashmanov.com/</a></li>
+              <li><a href="https://miratext.ru/" target="_blank">https://miratext.ru/</a></li>
           </ul>
           <ul class="service-list">
             <div class="section-title">ССЫЛКИ:</div>
-              <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-              <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-              <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-              <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+            <li><a href="https://ahrefs.com/" target="_blank">https://ahrefs.com/</a></li>
+            <li><a href="https://gogetlinks.net/" target="_blank">https://gogetlinks.net/</a></li>
+            <li><a href="https://links.sape.ru/" target="_blank">https://links.sape.ru/</a></li>
+            <li><a href="https://pr.sape.ru/" target="_blank">https://pr.sape.ru/</a></li>
+            <li><a href="https://www.semrush.com/" target="_blank">https://www.semrush.com/</a></li>
+            <li><a href="https://majestic.com/" target="_blank">https://majestic.com/</a></li>
+            <li><a href="https://www.miralinks.ru/" target="_blank">https://www.miralinks.ru/</a></li>
+            <li><a href="https://xtool.ru/" target="_blank">https://xtool.ru/</a></li>
+            <li><a href="https://checktrust.ru/" target="_blank">https://checktrust.ru/</a></li>
+            <li><a href="https://search.google.com/search-console/disavow-links" target="_blank">https://search.google.com/search-console/disavow-links</a></li>
           </ul>
-          <ul class="service-list">
-            <div class="section-title">ИЗОБРАЖЕНИЯ:</div>
-            <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-            <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-            <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-            <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
-        </ul>
-        <ul class="service-list">
-          <div class="section-title">АНАЛИТИКА:</div>
-          <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-          <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-          <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-          <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
-      </ul>
-      <ul class="service-list">
-        <div class="section-title">НЕЙРОСЕТИ:</div>
-        <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-        <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-        <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-        <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
-    </ul>
       </div>
       <div class="service-container">
         <ul class="service-list">
-          <div class="section-title">ТЕКСТ:</div>
-            <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-            <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-            <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-            <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+          <div class="section-title">AI:</div>
+            <li><a href="https://a.ya.ru/" target="_blank">https://a.ya.ru/</a></li>
+            <li><a href="https://gemini.google.com/" target="_blank">https://gemini.google.com/</a></li>
+            <li><a href="https://chatgpt.com/" target="_blank">https://chatgpt.com/</a></li>
+            <li><a href="https://huggingface.co/" target="_blank">https://huggingface.co/</a></li>
         </ul>
         <ul class="service-list">
-          <div class="section-title">ССЫЛКИ:</div>
-            <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-            <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-            <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-            <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
+          <div class="section-title">РАЗРАБОТКА:</div>
+            <li><a href="https://github.com/" target="_blank">https://github.com/</a></li>
+            <li><a href="http://localhost/" target="_blank">http://localhost/</a></li>
+            <li><a href="https://stackoverflow.com/" target="_blank">https://stackoverflow.com/</a></li>
+            <li><a href="https://www.php.net/manual/ru/" target="_blank">https://www.php.net/manual/ru/</a></li>
+            <li><a href="https://validator.w3.org/" target="_blank">https://validator.w3.org/</a></li>
+            <li><a href="https://htmlbook.ru/" target="_blank">https://htmlbook.ru/</a></li>
+            <li><a href="https://snipp.ru/handbk/emoji" target="_blank">https://snipp.ru/handbk/emoji</a></li>
+            <li><a href="https://learn.javascript.ru/" target="_blank">https://learn.javascript.ru/</a></li>
+            <li><a href="https://developer.mozilla.org/" target="_blank">https://developer.mozilla.org/</a></li>
+            <li><a href="https://www.codewars.com/" target="_blank">https://www.codewars.com/</a></li>
+            <li><a href="https://jsbin.com/?js,console" target="_blank">https://jsbin.com/?js,console</a></li>
+            <li><a href="https://playcode.io/" target="_blank">https://playcode.io/</a></li>
+            <li><a href="https://www.w3schools.com/php/phptryit.asp?filename=tryphp_compiler" target="_blank">https://www.w3schools.com/php/phptryit.asp?filename=tryphp_compiler</a></li>
+            <li><a href="https://onlinephp.io/" target="_blank">https://onlinephp.io/</a></li>
         </ul>
         <ul class="service-list">
           <div class="section-title">ИЗОБРАЖЕНИЯ:</div>
@@ -1178,20 +1180,6 @@ a:hover {
           <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
           <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
       </ul>
-      <ul class="service-list">
-        <div class="section-title">АНАЛИТИКА:</div>
-        <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-        <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-        <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-        <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
-    </ul>
-    <ul class="service-list">
-      <div class="section-title">НЕЙРОСЕТИ:</div>
-      <li><a href="https://example1.com" target="_blank">Полезный сервис 1</a></li>
-      <li><a href="https://example2.com" target="_blank">Полезный сервис 2</a></li>
-      <li><a href="https://example3.com" target="_blank">Полезный сервис 3</a></li>
-      <li><a href="https://example4.com" target="_blank">Полезный сервис 4</a></li>
-  </ul>
     </div>
       </div>
 
