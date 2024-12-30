@@ -31,12 +31,8 @@ async function fetchDomainData(domain) {
         trust: parseFloat(data.summary.trust),
         spam: parseFloat(data.summary.spam),
       };
-    } else {
-      console.error("Ошибка: Неверный формат ответа API:", data);
-      return null;
-    }
+    } 
   } catch (error) {
-    console.error("Ошибка при обращении к API:", error);
     return null;
   }
 }
