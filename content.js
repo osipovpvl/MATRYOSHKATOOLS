@@ -157,49 +157,72 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 function getMetricsData() {
-  const scripts = Array.from(document.scripts);
   const metrics = {
-    yandexMetrika: [],
-    googleTagManager: [],
-    googleAnalytics: [],
+    yandexMetrika: new Set(),
+    googleTagManager: new Set(),
+    googleAnalytics: new Set(),
   };
 
+  // Проверяем все скрипты на странице
+  const scripts = Array.from(document.scripts);
   scripts.forEach(script => {
     const src = script.src || "";
     const innerContent = script.innerHTML || "";
 
-    // Поиск Яндекс Метрики в src или innerHTML
+    // Яндекс Метрика
     if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(")) {
-      const matchSrc = src.match(/watch\/(\d+)/); // Поиск ID в URL
-      const matchYM = innerContent.match(/ym\((\d+),/); // Поиск ID в методе ym
+      const matchSrc = src.match(/watch\/(\d+)/); // ID в src
+      const matchYM = innerContent.match(/ym\((\d+),/); // ID в ym()
+      if (matchSrc) metrics.yandexMetrika.add(matchSrc[1]);
+      if (matchYM) metrics.yandexMetrika.add(matchYM[1]);
 
-      if (matchSrc) metrics.yandexMetrika.push(matchSrc[1]);
-      if (matchYM) metrics.yandexMetrika.push(matchYM[1]);
+      // Поиск window.mainMetrikaId
+      const mainMetrikaMatch = innerContent.match(/window\.mainMetrikaId\s*=\s*['"](\d+)['"]/);
+      if (mainMetrikaMatch) metrics.yandexMetrika.add(mainMetrikaMatch[1]);
     }
 
-    // Поиск Google Tag Manager
+    // Google Tag Manager
     if (src.includes("googletagmanager.com/gtm.js")) {
       const match = src.match(/id=GTM-[A-Z0-9]+/);
-      if (match) metrics.googleTagManager.push(match[0].split("=")[1]);
+      if (match) metrics.googleTagManager.add(match[0].split("=")[1]);
     }
 
-    // Поиск Google Analytics
+    // Google Analytics
     if (src.includes("google-analytics.com/analytics.js") || src.includes("gtag/js") || innerContent.includes("ga(")) {
       const match = src.match(/UA-\d+-\d+/) || src.match(/G-[A-Z0-9]+/) || innerContent.match(/['"]UA-\d+-\d+['"]/);
-      if (match) metrics.googleAnalytics.push(match[0].replace(/['"]/g, ""));
+      if (match) metrics.googleAnalytics.add(match[0].replace(/['"]/g, ""));
     }
   });
 
-  return metrics;
+  // Проверка переменной window.mainMetrikaId
+  if (window.mainMetrikaId) {
+    metrics.yandexMetrika.add(window.mainMetrikaId);
+  }
+
+  return {
+    yandexMetrika: Array.from(metrics.yandexMetrika),
+    googleTagManager: Array.from(metrics.googleTagManager),
+    googleAnalytics: Array.from(metrics.googleAnalytics),
+  };
+}
+
+// Функция для отслеживания динамических изменений
+function observeDOM() {
+  const observer = new MutationObserver(() => {
+    const metricsData = getMetricsData();
+    chrome.runtime.sendMessage({ action: "updateMetrics", metrics: metricsData });
+  });
+
+  observer.observe(document, { childList: true, subtree: true });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "getMetrics") {
     const metricsData = getMetricsData();
     sendResponse(metricsData);
+    observeDOM(); // Начинаем отслеживать изменения DOM
   }
 });
-
 
 function getCMSData() {
   const cmsData = {
@@ -235,7 +258,7 @@ function getCMSData() {
     return { name: "WordPress" };
   }
   if (htmlContent.includes("joomla")) {
-    return { name: "Joomla!" };
+    return { name: "Joomla" };
   }
   if (htmlContent.includes("sites/all/themes") || htmlContent.includes("drupal")) {
     return { name: "Drupal" };

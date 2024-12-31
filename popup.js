@@ -29,10 +29,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       const seoData = results[0].result;
 
       // Populate SEO data
-      populateMetaData("title", seoData.title, seoData.title?.length || 0);
-      populateMetaData("description", seoData.description, seoData.description?.length || 0);
-      populateMetaData("keywords", seoData.keywords, seoData.keywords?.length || 0);
-      populateMetaData("h1", seoData.h1, seoData.h1?.length || 0);
+      populateMetaData("title", seoData.title);
+      populateMetaData("description", seoData.description);
+      populateMetaData("keywords", seoData.keywords);
+      populateMetaData("h1", seoData.h1);
+      
       document.getElementById("current-url").textContent = tab.url || "Не удалось определить";
       //document.getElementById("links").textContent = seoData.linksCount || "N/A";
       //document.getElementById("images-count").textContent = seoData.imagesCount || "N/A";
@@ -211,9 +212,17 @@ function getTextStats(tabId) {
 }
 
 // Функция для обновления длины и окрашивания текста
-function updateMetaLengthStyles(element, length, ranges) {
+function updateMetaLengthStyles(element, length, ranges, isMissing) {
   if (!element) return;
 
+  // Если данные отсутствуют, устанавливаем серый цвет и жирный шрифт
+  if (isMissing) {
+    element.style.color = "red";  // Серый цвет для отсутствующих данных
+    element.style.fontWeight = "bold";  // Жирный шрифт для отсутствующих данных
+    return;
+  }
+
+  // Если данные присутствуют, вычисляем цвет по диапазонам
   if (length >= ranges.good[0] && length <= ranges.good[1]) {
     element.style.color = "green";  // Хорошо
     element.style.fontWeight = "bold";
@@ -230,73 +239,92 @@ function updateMetaLengthStyles(element, length, ranges) {
 }
 
 // Функция для заполнения мета-данных
-function populateMetaData(id, value, length) {
+function populateMetaData(id, value) {
   const element = document.getElementById(id);
   const lengthElement = document.getElementById(`${id}-length`);
 
-  element.textContent = value || "N/A";
-  lengthElement.textContent = `Символов: ${length}`;
+  // Проверка на отсутствие значения: если значение пустое или состоит только из пробелов
+  const isMissing = !value || value.trim() === "" || value === "Отсутствует";  // Проверяем на пустую строку и на null/undefined
+
+  // Устанавливаем текстовое значение
+  if (isMissing) {
+    element.textContent = "Отсутствует";  // Текст для отсутствующих данных
+  } else {
+    element.textContent = value;  // Устанавливаем сам текст мета-данных
+  }
+
+  // Устанавливаем длину (если отсутствует, длина = 0)
+  const displayedLength = isMissing ? 0 : value.length;  // Длина равна 0, если данных нет
+  lengthElement.textContent = `Символов: ${displayedLength}`;  // Отображаем длину
 
   // Устанавливаем стиль длины для разных мета-данных
   if (id === 'title') {
-    updateMetaLengthStyles(lengthElement, length, {
+    updateMetaLengthStyles(lengthElement, displayedLength, {
       good: [30, 70],
       acceptable: [10, 29, 71, 90],
-    });
+    }, isMissing);
   } else if (id === 'description') {
-    updateMetaLengthStyles(lengthElement, length, {
+    updateMetaLengthStyles(lengthElement, displayedLength, {
       good: [150, 250],
       acceptable: [75, 149, 251, 300],
-    });
+    }, isMissing);
   } else if (id === 'h1') {
-    updateMetaLengthStyles(lengthElement, length, {
+    updateMetaLengthStyles(lengthElement, displayedLength, {
       good: [20, 60],
       acceptable: [5, 19, 61, 70],
-    });
+    }, isMissing);
   }
 }
 
-// Обработчик для извлечения и отображения SEO данных
+
+
+
+// Копирование мета-тегов
 document.addEventListener('DOMContentLoaded', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    const tab = tabs[0];
-    
-    chrome.scripting.executeScript(
-      {
-        target: { tabId: tab.id },
-        func: scrapeSEOData,  // Ваша функция для извлечения SEO данных
-      },
-      (results) => {
-        const seoData = results[0].result;
+      const tab = tabs[0];
+      
+      chrome.scripting.executeScript(
+          {
+              target: { tabId: tab.id },
+              func: scrapeSEOData,
+          },
+          (results) => {
+              if (!results || results.length === 0 || !results[0].result) {
+                  console.error("Данные не получены из scrapeSEOData.");
+                  return;
+              }
 
-        // Заполняем мета-данные и стили
-        populateMetaData("title", seoData.title, seoData.title?.length || 0);
-        populateMetaData("description", seoData.description, seoData.description?.length || 0);
-        populateMetaData("h1", seoData.h1, seoData.h1?.length || 0);
+              const seoData = results[0].result;
 
-        // Отображаем URL и язык
-        document.getElementById("current-url").textContent = tab.url || "N/A";
-        document.getElementById("lang").textContent = seoData.lang || "N/A";
+              // Заполняем мета-данные и стили
+              populateMetaData("title", seoData.title);
+              populateMetaData("description", seoData.description);
+              populateMetaData("h1", seoData.h1);
+              populateMetaData("keywords", seoData.keywords);
 
-        // Добавляем обработчики для кнопок копирования
-        document.querySelectorAll(".copy-button").forEach((button) => {
-          button.addEventListener("click", () => {
-            const targetId = button.getAttribute("data-target");
-            const textToCopy = document.getElementById(targetId).textContent;
+              // Отображаем URL и язык
+              document.getElementById("current-url").textContent = tab.url || "N/A";
+              document.getElementById("lang").textContent = seoData.lang || "N/A";
 
-            navigator.clipboard.writeText(textToCopy).then(() => {
-              const status = document.getElementById("copy-status");
-              status.classList.remove("hidden");
-              status.textContent = `${targetId.charAt(0).toUpperCase() + targetId.slice(1)} copied!`;
-              setTimeout(() => status.classList.add("hidden"), 2000);
-            });
-          });
-        });
-      }
-    );
+              // Добавляем обработчики для кнопок копирования
+              document.querySelectorAll(".copy-button").forEach((button) => {
+                  button.addEventListener("click", () => {
+                      const targetId = button.getAttribute("data-target");
+                      const textToCopy = document.getElementById(targetId).textContent;
+
+                      navigator.clipboard.writeText(textToCopy).then(() => {
+                          const status = document.getElementById("copy-status");
+                          status.classList.remove("hidden");
+                          status.textContent = `${targetId.charAt(0).toUpperCase() + targetId.slice(1)} copied!`;
+                          setTimeout(() => status.classList.add("hidden"), 2000);
+                      });
+                  });
+              });
+          }
+      );
   });
 });
-
 
 // Function to populate microdata content
 function populateMicrodata(elementId, data, label) {
@@ -316,29 +344,37 @@ function populateMicrodata(elementId, data, label) {
 }
 
 // Function to scrape SEO data from the page
+// Функция для извлечения SEO данных
 function scrapeSEOData() {
+  // Функция для извлечения структурированных данных, таких как OpenGraph, Twitter и т. д.
   const extractStructuredData = (selector, attribute = "content") => {
-    return Array.from(document.querySelectorAll(selector)).map(el => `${el.getAttribute("property") || el.getAttribute("name")}: ${el.getAttribute(attribute) || el.outerHTML}`);
+    return Array.from(document.querySelectorAll(selector)).map(el => {
+      const property = el.getAttribute("property") || el.getAttribute("name");
+      const content = el.getAttribute(attribute) || el.outerHTML;
+      return `${property}: ${content}`;
+    });
   };
 
+  // Извлекаем мета-данные
   return {
-    title: document.querySelector("title")?.innerText || "Отсутствует",
+    title: document.querySelector("title")?.textContent || "Отсутствует", // textContent вместо innerText
     description: document.querySelector('meta[name="description"]')?.content || "Отсутствует",
     keywords: document.querySelector('meta[name="keywords"]')?.content || "Отсутствует",
-    h1: document.querySelector("h1")?.innerText || "Отсутствует",
-    linksCount: document.querySelectorAll("a[href]").length,
-    imagesCount: document.querySelectorAll("img").length,
-    lang: document.documentElement.lang || "Отсутствует",
-    siteIP: location.host,
+    h1: document.querySelector("h1")?.textContent || "Отсутствует",  // textContent для H1
+    linksCount: document.querySelectorAll("a[href]").length,  // Количество ссылок на странице
+    imagesCount: document.querySelectorAll("img").length,  // Количество изображений на странице
+    lang: document.documentElement.lang || "Отсутствует", // Язык страницы
+    siteIP: location.host,  // IP сайта, если доступен
 
-    // Extract specific microdata
+    // Извлекаем специфические мета-данные
     openGraph: extractStructuredData('meta[property^="og:"]'),
     twitterCards: extractStructuredData('meta[name^="twitter:"]'),
-    schemaOrg: extractStructuredData('[type="application/ld+json"]', "textContent"),
+    schemaOrg: extractStructuredData('[type="application/ld+json"]', "textContent"),  // Для JSON-LD
     rdfa: extractStructuredData('[prefix]'),
     microdata: extractStructuredData('[itemscope]'),
   };
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -770,36 +806,6 @@ function fetchMetrics() {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     chrome.tabs.sendMessage(tabs[0].id, { action: "getMetrics" }, response => {
       if (response) {
-        // Обновляем данные в таблице
-        document.getElementById("yandex-metrika").textContent = response.yandexMetrika.length
-          ? response.yandexMetrika.join(", ")
-          : "Не найдено";
-
-        document.getElementById("google-tag-manager").textContent = response.googleTagManager.length
-          ? response.googleTagManager.join(", ")
-          : "Не найдено";
-
-        document.getElementById("google-analytics").textContent = response.googleAnalytics.length
-          ? response.googleAnalytics.join(", ")
-          : "Не найдено";
-      } else {
-        console.error("Не удалось получить данные о метриках.");
-      }
-    });
-  });
-}
-
-// Вызываем при загрузке расширения
-document.addEventListener("DOMContentLoaded", () => {
-  fetchMetrics();
-});
-
-
-function fetchMetrics() {
-  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-    chrome.tabs.sendMessage(tabs[0].id, { action: "getMetrics" }, response => {
-      if (response) {
-        // Обновляем данные в таблице
         updateMetricStatus("yandex-metrika", response.yandexMetrika);
         updateMetricStatus("google-tag-manager", response.googleTagManager);
         updateMetricStatus("google-analytics", response.googleAnalytics);
@@ -823,13 +829,15 @@ function updateMetricStatus(elementId, data) {
     icon.innerHTML = '<i class="fas fa-exclamation-circle" style="color: orange;"></i>';
   }
 
+  element.innerHTML = ""; // Очищаем перед обновлением
+  element.appendChild(document.createTextNode(data.length ? data.join(", ") : "Не найдено"));
   element.appendChild(icon);
 }
 
-// Вызываем при загрузке расширения
 document.addEventListener("DOMContentLoaded", () => {
   fetchMetrics();
 });
+
 
 
 function fetchCMSData() {
