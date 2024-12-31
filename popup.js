@@ -497,12 +497,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const div = document.createElement("div");
       div.className = "link-detail";
       div.innerHTML = `
-        <span><strong>Текст:</strong> ${link.text}</span>
-        <span><strong>Ссылка:</strong> <a href="${link.href}" target="_blank">${link.href}</a></span>
-        <span><strong>Протокол:</strong> ${link.protocol}</span>
-        <span><strong>Атрибут rel:</strong> ${link.rel}</span>
-        <span><strong>Видимость:</strong> ${link.visible}</span>
-        <span><strong>Код ответа:</strong> <span class="status-text">Не проверено</span></span>
+        <span>Текст: ${link.text}</span>
+        <span>Ссылка: <a href="${link.href}" target="_blank">${link.href}</a></span>
+        <span>Протокол: ${link.protocol}</span>
+        <span>Атрибут rel: ${link.rel}</span>
+        <span>Видимость: ${link.visible}</span>
+        <span>Код ответа: <span class="status-text">Не проверено</span></span>
       `;
       linksContainer.appendChild(div);
     });
@@ -513,32 +513,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const currentHost = new URL(currentUrl).hostname;
 
     document.getElementById("total-links").textContent = links.length;
-    document.getElementById("internal-links").textContent = links.filter(link => {
-      try {
-        return new URL(link.href, currentUrl).hostname === currentHost;
-      } catch (e) {
-        return false; // Пропускаем некорректные ссылки
-      }
-    }).length;
-    document.getElementById("external-links").textContent = links.filter(link => {
-      try {
-        return new URL(link.href, currentUrl).hostname !== currentHost;
-      } catch (e) {
-        return false; // Пропускаем некорректные ссылки
-      }
-    }).length;
+    document.getElementById("internal-links").textContent = links.filter(link => isInternalLink(link, currentUrl)).length;
+    document.getElementById("external-links").textContent = links.filter(link => !isInternalLink(link, currentUrl) && !isMailToOrTel(link)).length;
     document.getElementById("https-links").textContent = links.filter(link => link.protocol === "https").length;
     document.getElementById("http-links").textContent = links.filter(link => link.protocol === "http").length;
-    document.getElementById("other-links").textContent = links.filter(link => !["https", "http"].includes(link.protocol)).length;
-    document.getElementById("follow-links").textContent = links.filter(link => {
-      return !link.rel || !link.rel.includes("nofollow");
-    }).length;
-    document.getElementById("nofollow-links").textContent = links.filter(link => {
-      return link.rel.includes("nofollow");
-    }).length;
-    document.getElementById("other-attributes").textContent = links.filter(link => {
-      return link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow");
-    }).length;
+    document.getElementById("other-links").textContent = links.filter(link => !["https", "http"].includes(link.protocol) && !isMailToOrTel(link)).length;
+    document.getElementById("follow-links").textContent = links.filter(link => !link.rel || !link.rel.includes("nofollow")).length;
+    document.getElementById("nofollow-links").textContent = links.filter(link => link.rel.includes("nofollow")).length;
+    document.getElementById("other-attributes").textContent = links.filter(link => link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow")).length;
   }
 
   // Функция для проверки статуса ссылок
@@ -623,22 +605,10 @@ document.addEventListener("DOMContentLoaded", () => {
         displayedLinks = allLinks;
         break;
       case "internal":
-        displayedLinks = allLinks.filter(link => {
-          try {
-            return new URL(link.href, currentUrl).hostname === currentHost;
-          } catch (e) {
-            return false; // Пропускаем некорректные ссылки
-          }
-        });
+        displayedLinks = allLinks.filter(link => isInternalLink(link, currentUrl));
         break;
       case "external":
-        displayedLinks = allLinks.filter(link => {
-          try {
-            return new URL(link.href, currentUrl).hostname !== currentHost;
-          } catch (e) {
-            return false; // Пропускаем некорректные ссылки
-          }
-        });
+        displayedLinks = allLinks.filter(link => !isInternalLink(link, currentUrl) && !isMailToOrTel(link));
         break;
       case "https":
         displayedLinks = allLinks.filter(link => link.protocol === "https");
@@ -647,7 +617,7 @@ document.addEventListener("DOMContentLoaded", () => {
         displayedLinks = allLinks.filter(link => link.protocol === "http");
         break;
       case "other":
-        displayedLinks = allLinks.filter(link => !["https", "http"].includes(link.protocol));
+        displayedLinks = allLinks.filter(link => !["https", "http"].includes(link.protocol) && !isMailToOrTel(link));
         break;
       case "follow":
         displayedLinks = allLinks.filter(link => !link.rel || !link.rel.includes("nofollow"));
@@ -666,15 +636,32 @@ document.addEventListener("DOMContentLoaded", () => {
     displayLinks(displayedLinks); // Обновляем отображаемые ссылки
   }
 
+  // Проверка, является ли ссылка внутренней
+  function isInternalLink(link, currentUrl) {
+    try {
+      const linkUrl = new URL(link.href, currentUrl);
+      return linkUrl.hostname === new URL(currentUrl).hostname;
+    } catch (e) {
+      return false; // Некорректная ссылка
+    }
+  }
+
+  // Проверка на mailto или tel
+  function isMailToOrTel(link) {
+    return link.protocol === "mailto:" || link.protocol === "tel:";
+  }
+
   // Загрузка данных ссылок при старте
   fetchLinks();
 });
 
 
-
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
   const imageList = document.getElementById("image-list");
+  const checkStatusButton = document.getElementById("check-status");
+
+  let cachedImages = []; // Храним изображения с их статусами
 
   function updateImageDetails(filter, images) {
     imageList.innerHTML = ""; // Очистка списка изображений
@@ -692,6 +679,12 @@ document.addEventListener("DOMContentLoaded", function () {
         break;
       case "filled-alt":
         filteredImages = images.filter(img => img.alt && img.alt !== "");
+        break;
+      case "status-200":
+        filteredImages = images.filter(img => img.status === 200);
+        break;
+      case "status-404":
+        filteredImages = images.filter(img => img.status === 404);
         break;
       default:
         filteredImages = images;
@@ -715,7 +708,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const infoContainer = document.createElement("div");
       infoContainer.style.display = "flex";
       infoContainer.style.flexDirection = "column";
-      
+
       const altText = document.createElement("span");
       altText.textContent = img.alt ? `Alt: "${img.alt}"` : "Alt отсутствует";
 
@@ -731,12 +724,16 @@ document.addEventListener("DOMContentLoaded", function () {
       const urlText = document.createElement("span");
       urlText.textContent = `URL: ${img.src}`;
 
+      const statusText = document.createElement("span");
+      statusText.textContent = img.status ? `Код ответа: ${img.status}` : "Код ответа: Не проверено";
+
       // Добавляем информацию в контейнер
       infoContainer.appendChild(altText);
       infoContainer.appendChild(formatText);
       infoContainer.appendChild(sizeText);
       infoContainer.appendChild(weightText);
       infoContainer.appendChild(urlText);
+      infoContainer.appendChild(statusText);
 
       // Собираем всё в элемент списка
       li.appendChild(imgPreview);
@@ -749,17 +746,25 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("empty-alt-count").textContent = images.filter(img => img.alt === "").length;
     document.getElementById("missing-alt-count").textContent = images.filter(img => !img.hasAlt).length;
     document.getElementById("filled-alt-count").textContent = images.filter(img => img.alt && img.alt !== "").length;
+    document.getElementById("status-200-count").textContent = images.filter(img => img.status === 200).length;
+    document.getElementById("status-404-count").textContent = images.filter(img => img.status === 404).length;
   }
 
   function fetchImages(filter = "all") {
-    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, { action: "getImages" }, response => {
-        if (response && response.images) {
-          updateImageDetails(filter, response.images);
-        } else {
-          console.error("Не удалось получить данные об изображениях.");
-        }
-      });
+    const imagesToUse = cachedImages.length > 0 ? cachedImages : []; // Используем кэшированные данные, если они есть
+    updateImageDetails(filter, imagesToUse);
+  }
+
+  function checkStatus(images) {
+    const promises = images.map(img =>
+      fetch(img.src, { method: "HEAD" })
+        .then(response => ({ ...img, status: response.status }))
+        .catch(() => ({ ...img, status: 404 }))
+    );
+
+    Promise.all(promises).then(updatedImages => {
+      cachedImages = updatedImages; // Сохраняем данные в кэш
+      updateImageDetails("all", updatedImages);
     });
   }
 
@@ -770,7 +775,28 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 
-  fetchImages();
+  checkStatusButton.addEventListener("click", () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, { action: "getImages" }, response => {
+        if (response && response.images) {
+          checkStatus(response.images);
+        } else {
+          console.error("Не удалось получить данные об изображениях.");
+        }
+      });
+    });
+  });
+
+  chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "getImages" }, response => {
+      if (response && response.images) {
+        cachedImages = response.images; // Сохраняем данные в кэш при загрузке
+        updateImageDetails("all", cachedImages);
+      } else {
+        console.error("Не удалось получить данные об изображениях.");
+      }
+    });
+  });
 });
 
 
@@ -1191,10 +1217,35 @@ function analyzeText() {
   const totalLength = text.length;
 
   function calculateWateriness() {
-    const stopWords = ["и", "в", "на", "с", "по", "а"]; // Пример стоп-слов
-    const waterWordsCount = words.filter((word) => stopWords.includes(word.toLowerCase())).length;
-    return ((waterWordsCount / words.length) * 100).toFixed(2);
+    const stopWords = ["и", "в", "на", "с", "по", "а"];  // Пример стоп-слов
+    const cleanWords = words
+      .map(word => word.replace(/[^\wа-яА-Я]/g, '').toLowerCase())  // Убираем все неалфавитные символы и приводим к нижнему регистру
+      .filter(word => word.length > 0);  // Убираем пустые строки
+  
+    // Выводим все очищенные слова для отладки
+    console.log("Чистые слова:", cleanWords);
+  
+    // Проверяем, сколько из слов являются стоп-словами
+    const waterWordsCount = cleanWords.filter(word => stopWords.includes(word)).length;
+  
+    // Выводим количество стоп-слов
+    console.log("Количество водянистых слов:", waterWordsCount);
+    console.log("Общее количество слов:", cleanWords.length);
+  
+    // Если нет ни одного слова, то возвращаем 0%
+    if (cleanWords.length === 0) {
+      return 0;
+    }
+  
+    // Рассчитываем процент водянистых слов
+    const waterinessPercentage = ((waterWordsCount / cleanWords.length) * 100).toFixed(2);
+  
+    // Выводим процент для отладки
+    console.log("Процент водянистых слов:", waterinessPercentage);
+  
+    return waterinessPercentage;
   }
+  
 
   function calculateSpamminess(word, count) {
     return ((count / words.length) * 100).toFixed(2);
@@ -1382,26 +1433,62 @@ async function checkRobotsTxt(tabUrl, container) {
 
 // Проверка sitemap.xml
 async function checkSitemap(tabUrl, container) {
-  const sitemapUrl = new URL("/sitemap.xml", tabUrl).href;
+  // Формируем URL для robots.txt
+  const robotsUrl = new URL("/robots.txt", tabUrl).href;
 
   try {
-      const response = await fetch(sitemapUrl);
-      if (!response.ok) {
-          throw new Error("Sitemap.xml не найден");
-      }
+    const robotsResponse = await fetch(robotsUrl);
+    if (!robotsResponse.ok) {
+      throw new Error("robots.txt не найден");
+    }
 
+    // Получаем текст из robots.txt
+    const robotsText = await robotsResponse.text();
+    
+    // Ищем все строки, начинающиеся с "Sitemap:"
+    const sitemapUrls = [];
+    const sitemapRegex = /Sitemap:\s*(https?:\/\/[^\s]+)/g;
+    let match;
+    while ((match = sitemapRegex.exec(robotsText)) !== null) {
+      sitemapUrls.push(match[1]);  // Добавляем каждый найденный sitemap URL в список
+    }
+
+    // Если нет найденных sitemap, выводим сообщение
+    if (sitemapUrls.length === 0) {
       container.innerHTML = `
-          <span class="fas fa-check-circle" style="color: green;"></span>
-          Файл sitemap.xml: <a href="${sitemapUrl}" target="_blank">${sitemapUrl}</a>
+        <span class="fa fa-times-circle" style="color:red;"></span>
+        Ссылок на файл sitemap.xml не найдено
       `;
+      return;
+    }
+
+    // Проверяем доступность каждого найденного sitemap
+    let resultHtml = `<span class="fas fa-check-circle" style="color: green;"></span> Найдены следующие sitemap.xml файлы:`;
+    for (const sitemapUrl of sitemapUrls) {
+      try {
+        const response = await fetch(sitemapUrl);
+        if (!response.ok) {
+          throw new Error(`Не удалось найти: ${sitemapUrl}`);
+        }
+        resultHtml += `<div><a href="${sitemapUrl}" target="_blank">${sitemapUrl}</a></div>`;
+      } catch (error) {
+        resultHtml += `<div style="color: red;">Ошибка: ${sitemapUrl}</div>`;
+        console.error("Ошибка при проверке sitemap:", error);
+      }
+    }
+
+    // Обновляем контейнер с результатами
+    container.innerHTML = resultHtml;
+
   } catch (error) {
-      container.innerHTML = `
-          <span class="fa fa-times-circle" style="color:red;"></span>
-          Sitemap.xml не найден
-      `;
-      console.error("Ошибка при загрузке sitemap.xml:", error);
+    container.innerHTML = `
+      <span class="fa fa-times-circle" style="color:red;"></span>
+      robots.txt не найден или ошибка в запросе
+    `;
+    console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", async () => {
   // Получаем данные о текущей вкладке
@@ -1427,25 +1514,74 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
-// Функция для получения IP-адреса через Google DNS API
+// Функция для получения IP-адреса и локации
 async function getIPAddress(domain) {
   try {
       const response = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
       if (!response.ok) {
           console.error("Ошибка Google DNS API: " + response.status);
-          return "Не удалось получить IP";
+          return { address: "Не удалось получить IP", location: "Не удалось определить страну" };
       }
 
       const data = await response.json();
       console.log("Ответ Google DNS API:", data);
 
-      // Возвращаем первый IP-адрес
-      return data.Answer ? data.Answer[0].data : "Не удалось получить IP";
+      const ip = data.Answer ? data.Answer[0].data : null;
+      if (ip) {
+          // Получаем локацию по IP через ipinfo.io
+          const locationData = await getLocationByIP(ip);
+          const country = locationData.country || "Не удалось определить страну";  // Проверяем наличие страны
+          return {
+              address: ip,
+              location: country
+          };
+      }
+      return { address: "Не удалось получить IP", location: "Не удалось определить страну" };
   } catch (error) {
       console.error("Ошибка получения IP:", error);
-      return "Не удалось получить IP";
+      return { address: "Не удалось получить IP", location: "Не удалось определить страну" };
   }
 }
+
+// Функция для получения локации по IP через ipinfo.io
+async function getLocationByIP(ip) {
+  try {
+      const response = await fetch(`https://ipinfo.io/${ip}/json?token=205111941c59e0`);  // Используем ваш токен
+      if (!response.ok) {
+          console.error("Ошибка получения локации: " + response.status);
+          return {};  // Возвращаем пустой объект при ошибке
+      }
+
+      const data = await response.json();
+      console.log("Ответ ipinfo.io:", data);
+
+      return data;  // Возвращаем данные с локацией
+  } catch (error) {
+      console.error("Ошибка получения локации:", error);
+      return {};  // Возвращаем пустой объект при ошибке
+  }
+}
+
+// Основная логика отображения IP и локации
+document.addEventListener("DOMContentLoaded", async () => {
+  // Получаем данные о текущей вкладке
+  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
+      const tab = tabs[0];
+      const domain = new URL(tab.url).hostname;
+
+      // 1. Получаем и отображаем IP-адрес и локацию
+      const { address, location } = await getIPAddress(domain);
+      
+      // Формируем строку, если страна найдена, иначе только IP
+      const ipLocationText = location && location !== "Не удалось определить страну"
+        ? `${address} (${location})`
+        : address;
+
+      // Выводим результат в элемент
+      document.getElementById("site-ip").textContent = ipLocationText;
+  });
+});
+
 
 // Функция для обновления URL и количества символов
 function updateUrl() {

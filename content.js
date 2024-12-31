@@ -88,7 +88,6 @@ async function updateSiteInfo() {
 
 // Запускаем скрипт после загрузки страницы
 window.addEventListener("load", () => {
-  console.log("Content script loaded.");
   updateSiteInfo();
 });
 
@@ -114,6 +113,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse({ links });
   }
 });
+
 
 function getImagesData() {
   const images = Array.from(document.images);

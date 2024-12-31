@@ -314,7 +314,6 @@ a:hover {
 
 /* Статус ссылки */
 .status-text {
-  font-weight: bold;
   margin-top: 5px;
 }
 
@@ -1004,12 +1003,13 @@ a:hover {
       
         <div class="links-actions">
           <button id="copy-links">Копировать ссылки</button>
-          <button id="check-links-status">Проверить статус ссылок</button>
+          <button id="check-links-status">Проверить код ответа</button>
           <button id="export-links">Экспортировать в CSV</button>
         </div>
       
         <div id="links-details"></div>
       </div>
+
 
       <div id="images" class="tab">
         <h1>АНАЛИЗ ИЗОБРАЖЕНИЙ</h1>
@@ -1018,7 +1018,10 @@ a:hover {
           <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
           <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button>
           <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
+          <button data-filter="status-200">Код 200 (<span id="status-200-count">0</span>)</button>
+          <button data-filter="status-404">Код 404 (<span id="status-404-count">0</span>)</button>
         </div>
+        <button id="check-status">Проверить код ответа</button>
         <div id="image-details">
           <ul id="image-list" style="list-style: none; padding: 0;"></ul>
         </div>
@@ -1043,9 +1046,9 @@ a:hover {
             <span>Водность текста:</span>
             <strong id="text-wateriness">0%</strong>
           </div>
-          <div class="info-block">
+          <div style="display: none;" class="info-block">
             <span>Тошнота текста:</span>
-            <strong id="text-spamminess">0%</strong>
+            <strong id="text-spamminess"></strong>
           </div>
         </section>
     <br>
