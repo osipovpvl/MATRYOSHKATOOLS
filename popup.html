@@ -203,12 +203,12 @@
 
 .search-button.yandex {
   color: #ffffff;
-  background-color: #ff3434;
+  background-color: #000000;
 }
 
 .search-button.google {
   color: #ffffff;
-  background-color: #34a853;
+  background-color: #000000;
 }
 
 .search-button:hover {
@@ -266,7 +266,7 @@
 
   .action-button {
     color: #ffffff;
-    background-color: #4caf50;
+    background-color: black;
   }
 
   .link-button {
@@ -315,19 +315,6 @@ a:hover {
 /* Статус ссылки */
 .status-text {
   margin-top: 5px;
-}
-
-/* Цветовая индикация статуса */
-.status-text.success {
-  color: green;
-}
-
-.status-text.error {
-  color: red;
-}
-
-.status-text.warning {
-  color: orange;
 }
 
 /* Кнопки экспорта и копирования */
@@ -436,13 +423,12 @@ input[type="number"] {
       color: rgb(0, 0, 0);
       border-radius: 5px;
       padding: 10px;
-      font-size: 12px;
+      font-size: 14px;
       cursor: pointer;
       text-align: center;
     }
 
     .heading-count span {
-      font-weight: bold;
       margin-bottom: 5px;
     }
 
@@ -704,7 +690,6 @@ a:hover {
       <button class="tab-button" data-tab="search">ПОИСК</button>
       <button class="tab-button" data-tab="tools">ИНСТРУМЕНТЫ</button>
       <button class="tab-button" data-tab="others">ПОЛЕЗНЫЕ СЕРВИСЫ</button>
-      <button class="tab-button" data-tab="about">ОБ ИНСТРУМЕНТЕ</button>
     </div>
 
     <!-- Tab Content -->
@@ -810,7 +795,7 @@ a:hover {
             <td id="google-analytics">Загрузка...</td>
           </tr>
           <tr>
-            <td>CMS / WYSI / WYG</td>
+            <td>CMS/WYSI/WYG</td>
             <td id="cms-data">Загрузка...</td>
           </tr>
           <tr>
@@ -837,6 +822,10 @@ a:hover {
             <td>Возраст домена</td>
             <td id="domain-age">Загрузка...</td>
         </tr>
+        <tr>
+          <td>Яндекс ИКС</td>
+          <td id="yandex-iks">Загрузка...</td>
+      </tr>
         </table>
       </div>
 
@@ -874,24 +863,16 @@ a:hover {
         <h1>АНАЛИЗ ПОИСКА</h1>
         <div class="search-panel">
           <div class="search-item">
-            <span>Проверить индексацию в Яндексе</span>
-            <button id="check-index-yandex" class="search-button yandex">Я</button>
-          </div>
-          <div class="search-item">
-            <span>Проверить индексацию в Google</span>
+            <span>Поиск по оператору site:</span>
+            <button id="operator-site-yandex" class="search-button yandex">Я</button>
             <button id="check-index-google" class="search-button google">G</button>
           </div>
           <div class="search-item">
-            <span>Поиск site:</span>
-            <button id="operator-site-yandex" class="search-button yandex">Я</button>
-            <button id="operator-site-google" class="search-button google">G</button>
-          </div>
-          <div class="search-item">
-            <span>Поиск url:</span>
+            <span>Поиск по оператору url:</span>
             <button id="operator-url-yandex" class="search-button yandex">Я</button>
           </div>
           <div class="search-item">
-            <span>Поиск host:</span>
+            <span>Поиск по оператору host:</span>
             <button id="operator-host-yandex" class="search-button yandex">Я</button>
           </div>
           <div class="search-item">
@@ -899,90 +880,17 @@ a:hover {
             <button id="operator-title-yandex" class="search-button yandex">Я</button>
           </div>
           <div class="search-item">
-            <span>Искать на Яндекс.Картах</span>
+            <span>Искать на картах</span>
             <button id="search-yandex-maps" class="search-button yandex">Я</button>
-          </div>
-          <div class="search-item">
-            <span>Искать на Google.Картах</span>
             <button id="search-google-maps" class="search-button google">G</button>
           </div>
-          <p class="search-info">Контент для поиска будет здесь.</p>
         </div>
-      </div>
-
-      <!-- About Tab -->
-      <div id="about" class="tab">
-        <section id="about-seo-vision" style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #ffffff; color: #333;">
-          <h1 style="text-align: center; font-size: 2rem; color: #000000;">MATRYOSHKA TOOLS</h1>
-          
-          <p style="text-align: center; font-size: 1.1rem; margin-top: 10px;">
-            Удобное и функциональное расширение для браузера, созданное для оптимизации работы с веб-страницами и сокращения времени на выполнение рутинных задач.
-          </p>
-
-          <section style="margin-top: 30px;">
-            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Преимущества:</h2>
-            <p style="margin-bottom: 10px;">
-              Текст
-            </p>
-            <p style="margin-top: 15px;">
-              Текст
-            </p>
-          </section>
-        
-          <section style="margin-top: 30px;">
-            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Для чего?</h2>
-            <ul style="list-style: none; padding: 0;">
-              <li style="margin-bottom: 10px;">
-                ✅ Быстро анализировать мета-теги (title, description, keywords и др.).
-              </li>
-              <li style="margin-bottom: 10px;">
-                ✅ Проверять индексацию страниц и их соответствие техническим требованиям.
-              </li>
-              <li style="margin-bottom: 10px;">
-                ✅ Искать и устранять ошибки на сайте.
-              </li>
-              <li style="margin-bottom: 10px;">
-                ✅ Работать с данными поисковой выдачи.
-              </li>
-              <li style="margin-bottom: 10px;">
-                ✅ Переходить к полезным SEO-сервисам в один клик.
-              </li>
-              <li style="margin-bottom: 10px;">
-                ✅ Изучать ключевые запросы через Яндекс Вордстат.
-              </li>
-              <li style="margin-bottom: 10px;">
-                ✅ И многое другое! Полный список возможностей доступен на странице <strong>«Возможности»</strong>.
-              </li>
-            </ul>
-          </section>
-        
-          <section style="margin-top: 30px;">
-            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Для кого?</h2>
-            <ul style="list-style: none; padding: 0;">
-              <li style="margin-bottom: 10px;">📌 SEO-специалистов.</li>
-              <li style="margin-bottom: 10px;">📌 Маркетологов.</li>
-              <li style="margin-bottom: 10px;">📌 Разработчиков.</li>
-              <li style="margin-bottom: 10px;">📌 Контент-менеджеров.</li>
-              <li style="margin-bottom: 10px;">📌 Владельцев сайтов и менеджеров проектов.</li>
-            </ul>
-            <p style="margin-top: 15px;">
-              Расширение подходит всем, кто стремится сделать анализ сайта быстрее, эффективнее и удобнее!
-            </p>
-          </section>
-
-          <section style="margin-top: 30px;">
-            <h2 style="font-size: 1.5rem; color: #333; margin-bottom: 15px;">Версия расширения:</h2>
-            <p style="margin-bottom: 10px;">
-              1.0 12.24
-            </p>
-          </section>
-        </section>
-
-        
       </div>
 
       <div id="links-info" class="tab">
         <h1>АНАЛИЗ ССЫЛОК</h1>
+      
+        <!-- Фильтры для ссылок -->
         <div class="links-summary">
           <button class="filter-button" id="show-all-links">Все ссылки (<span id="total-links">0</span>)</button>
           <button class="filter-button" id="show-internal-links">Внутренние (<span id="internal-links">0</span>)</button>
@@ -1001,15 +909,26 @@ a:hover {
           <button class="filter-button" id="show-other-attributes">Другой (<span id="other-attributes">0</span>)</button>
         </div>
       
+        <div class="links-status">
+          <button class="filter-button" id="show-status-200">Код ответа 2xx (<span id="status-200-links">0</span>)</button>
+          <button class="filter-button" id="show-status-300">Код ответа 3xx (<span id="status-300-links">0</span>)</button>
+          <button class="filter-button" id="show-status-400">Код ответа 4xx (<span id="status-400-links">0</span>)</button>
+          <button class="filter-button" id="show-status-500">Код ответа 5xx (<span id="status-500-links">0</span>)</button>
+        </div>
+      
+        <!-- Действия -->
         <div class="links-actions">
-          <button id="copy-links">Копировать ссылки</button>
           <button id="check-links-status">Проверить код ответа</button>
+          <button id="copy-links">Копировать ссылки</button>
           <button id="export-links">Экспортировать в CSV</button>
         </div>
       
-        <div id="links-details"></div>
+        <!-- Детали ссылок -->
+        <div id="links-details">
+          <!-- Ссылки будут добавлены здесь через JS -->
+        </div>
       </div>
-
+      
 
       <div id="images" class="tab">
         <h1>АНАЛИЗ ИЗОБРАЖЕНИЙ</h1>
@@ -1018,8 +937,8 @@ a:hover {
           <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
           <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button>
           <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
-          <button data-filter="status-200">Код 200 (<span id="status-200-count">0</span>)</button>
-          <button data-filter="status-404">Код 404 (<span id="status-404-count">0</span>)</button>
+          <div>          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button>
+            <button data-filter="status-404">Код ответа 4xx (<span id="status-404-count">0</span>)</button></div>
         </div>
         <button id="check-status">Проверить код ответа</button>
         <div id="image-details">
@@ -1055,31 +974,31 @@ a:hover {
         <div class="headings-summary">
           <div class="heading-count" data-heading="H1">
             <span>H1</span>
-            <strong id="h1-count">0</strong>
+            <span>(<span id="h1-count">0</span>)</span>
           </div>
           <div class="heading-count" data-heading="H2">
             <span>H2</span>
-            <strong id="h2-count">0</strong>
+            <span>(<span id="h2-count">0</span>)</span>
           </div>
           <div class="heading-count" data-heading="H3">
             <span>H3</span>
-            <strong id="h3-count">0</strong>
+            <span>(<span id="h3-count">0</span>)</span>
           </div>
           <div class="heading-count" data-heading="H4">
             <span>H4</span>
-            <strong id="h4-count">0</strong>
+            <span>(<span id="h4-count">0</span>)</span>
           </div>
           <div class="heading-count" data-heading="H5">
             <span>H5</span>
-            <strong id="h5-count">0</strong>
+            <span>(<span id="h5-count">0</span>)</span>
           </div>
           <div class="heading-count" data-heading="H6">
             <span>H6</span>
-            <strong id="h6-count">0</strong>
+            <span>(<span id="h6-count">0</span>)</span>
           </div>
           <div class="heading-count" data-heading="all">
             <span>H1-H6</span>
-            <strong id="all-headings-count">0</strong>
+            <span>(<span id="all-headings-count">0</span>)</span>
           </div>
         </div>
         <button id="toggle-highlight-headings">Подсветить заголовки</button>
@@ -1096,6 +1015,7 @@ a:hover {
             <button class="tab-buttons texts" data-tab="threeWords">3 слова</button>
             <button class="tab-buttons texts" data-tab="linkWords">Слова в ссылках</button>
               <input type="text" id="word-search" placeholder="Поиск слов..." />
+             
           </div>
 <br>
           <div class="table-wrapper">
@@ -1115,7 +1035,7 @@ a:hover {
             <span id="page-info">Страница 1 из 1</span>
             <button id="next-page" class="button">Вперёд</button>
           </div>
-          <button id="export-button" class="button">Экспорт CSV</button>
+          <button id="export-button" class="button">Экспортировать в CSV</button>
         </section>
       </div>
     </div>
@@ -1248,22 +1168,25 @@ a:hover {
         <h1>ПОЛЕЗНЫЕ ИНСТРУМЕНТЫ</h1>
         <div class="page-panel">
              <!-- Кнопка для перезагрузки страницы с очисткой кеша -->
-   <button id="reload-btn">Перезагрузить страницу с очисткой кеша</button>
+   <div class="page-item">
+    <span>Перезагрузить страницу с очисткой кеша</span>
+    <button id="reload-btn" class="page-button action-button"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+  </div>
           <div class="page-item">
-            <span>Highlight Noindex Elements</span>
-            <button id="highlight-noindex" class="page-button action-button">✔</button>
+            <span>Подсветить элементы noindex</span>
+            <button id="highlight-noindex" class="page-button action-button"><i class="fa fa-adjust" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Highlight Nofollow Links</span>
-            <button id="highlight-nofollow" class="page-button action-button">✔</button>
+            <span>Подсветить элементы nofollow</span>
+            <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-adjust" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Toggle JavaScript</span>
-            <button id="toggle-js" class="page-button action-button">✔</button>
+            <span>Отключение/включение Java Script</span>
+            <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Toggle CSS</span>
-            <button id="toggle-css" class="page-button action-button">✔</button>
+            <span>Отключение/включение CSS</span>
+            <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
         </div>
       </div>
@@ -1280,7 +1203,7 @@ a:hover {
         </a>
       </div>
       <div style="color: #555;">MATRYOSHKA TOOLS</div>
-      <div style="color: #555;">&copy; 2024</div>
+      <div style="color: #555;">&copy; 2025</div>
     </footer>
   </div>
 

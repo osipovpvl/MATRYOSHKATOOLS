@@ -4,8 +4,12 @@
   "name": "MATRYOSHKA TOOLS",
   "description": "Инструменты для анализа и оптимизации сайта: метатеги, анализ текста, анализ изображений, анализ ссылок, анализ микроразметки, полезные инструменты, сервисы и другое!",
   "version": "1.0",
-  "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["<all_urls>","https://gogetlinks.net/*","https://checktrust.ru/*"],
+  "permissions": ["activeTab", "tabs", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["<all_urls>","http://*/*",
+    "https://*/*", "https://gogetlinks.net/*","https://checktrust.ru/*"],
   "action": {
   "default_popup": "popup.html",
   "default_icon": {
