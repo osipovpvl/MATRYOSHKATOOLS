@@ -64,17 +64,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   );
 
-  // Add event listeners for the "Page" tab functionalities
-
-  document.getElementById("highlight-noindex").addEventListener("click", () => {
-    highlightNoIndex(tab.id);
-  });
-
-  document.getElementById("highlight-nofollow").addEventListener("click", () => {
-    highlightNoFollow(tab.id);
-  });
-
-
   // Other event listeners
   document.getElementById("toggle-js").addEventListener("click", () => {
     toggleScripts(tab.id);
@@ -84,32 +73,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     toggleStyles(tab.id);
   });
 });
-
-// Function to highlight noindex elements
-function highlightNoIndex(tabId) {
-  chrome.scripting.executeScript({
-    target: { tabId },
-    func: () => {
-      const noIndexElements = document.querySelectorAll('[content="noindex"], meta[content="noindex"], [rel="noindex"]');
-      noIndexElements.forEach((el) => {
-        el.style.outline = "2px solid red";
-      });
-    },
-  });
-}
-
-// Function to highlight nofollow links
-function highlightNoFollow(tabId) {
-  chrome.scripting.executeScript({
-    target: { tabId },
-    func: () => {
-      const noFollowLinks = document.querySelectorAll('a[rel="nofollow"]');
-      noFollowLinks.forEach((link) => {
-        link.style.outline = "2px solid blue";
-      });
-    },
-  });
-}
 
 // Function to toggle JavaScript
 function toggleScripts(tabId) {
@@ -132,6 +95,74 @@ function toggleStyles(tabId) {
     },
   });
 }
+
+
+let noIndexActive = false; // Состояние подсветки для noindex
+let noFollowActive = false; // Состояние подсветки для nofollow
+
+// Обработчик для кнопки подсветки noindex
+document.getElementById("highlight-noindex").addEventListener("click", () => {
+  noIndexActive = !noIndexActive; // Переключаем состояние подсветки
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    toggleHighlight(tabs[0].id, "noindex", noIndexActive); // Отправляем на активную вкладку
+  });
+});
+
+// Обработчик для кнопки подсветки nofollow
+document.getElementById("highlight-nofollow").addEventListener("click", () => {
+  noFollowActive = !noFollowActive; // Переключаем состояние подсветки
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    toggleHighlight(tabs[0].id, "nofollow", noFollowActive); // Отправляем на активную вкладку
+  });
+});
+
+// Функция для подсветки элементов
+function toggleHighlight(tabId, type, isEnabled) {
+  chrome.scripting.executeScript({
+    target: { tabId },
+    func: highlightElements,
+    args: [type, isEnabled]
+  });
+}
+
+// Функция для выделения элементов на странице
+function highlightElements(type, isEnabled) {
+  let elements;
+
+  if (type === "noindex") {
+    // Поиск всех тегов <noindex> на странице
+    const noIndexElements = document.querySelectorAll('noindex');
+
+    noIndexElements.forEach((el) => {
+      // Ищем первый контейнер внутри <noindex>
+      const firstContainer = el.querySelector('div, section, article, main, nav'); // Подставьте контейнеры, которые вам нужны
+
+      if (firstContainer) {
+        if (isEnabled) {
+          // Подсвечиваем только первый контейнер внутри <noindex>
+          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)"; // Черный фон для контейнера
+          firstContainer.style.border = "2px solid black"; // Рамка для контейнера
+        } else {
+          firstContainer.style.backgroundColor = ""; // Убираем фон
+          firstContainer.style.border = ""; // Убираем рамку
+        }
+      }
+    });
+  } else if (type === "nofollow") {
+    elements = document.querySelectorAll('a[rel="nofollow"]');
+    elements.forEach((el) => {
+      if (isEnabled) {
+        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)"; // Черный фон для nofollow
+        el.style.border = "2px solid black"; // Рамка для nofollow
+      } else {
+        el.style.backgroundColor = ""; // Убираем фон
+        el.style.border = ""; // Убираем рамку
+      }
+    });
+  }
+}
+
+
 
 // Функция для обновления длины и окрашивания текста
 function updateMetaLengthStyles(element, length, ranges, isMissing) {
