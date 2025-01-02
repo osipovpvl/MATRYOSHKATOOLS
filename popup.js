@@ -387,8 +387,6 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
           }
 
-          console.log("Получены ссылки:", results[0].result);
-
           allLinks = results[0].result;
           displayedLinks = [...allLinks];
           updateCounts();
@@ -421,8 +419,6 @@ document.addEventListener("DOMContentLoaded", () => {
         visible: visible,
       };
     });
-
-    console.log("Собранные ссылки:", links);
     return links;
   }
 
@@ -1251,15 +1247,11 @@ function analyzeText() {
       .map(word => word.replace(/[^\wа-яА-Я]/g, '').toLowerCase())  // Убираем все неалфавитные символы и приводим к нижнему регистру
       .filter(word => word.length > 0);  // Убираем пустые строки
   
-    // Выводим все очищенные слова для отладки
-    console.log("Чистые слова:", cleanWords);
   
     // Проверяем, сколько из слов являются стоп-словами
     const waterWordsCount = cleanWords.filter(word => stopWords.includes(word)).length;
   
-    // Выводим количество стоп-слов
-    console.log("Количество водянистых слов:", waterWordsCount);
-    console.log("Общее количество слов:", cleanWords.length);
+  
   
     // Если нет ни одного слова, то возвращаем 0%
     if (cleanWords.length === 0) {
@@ -1269,8 +1261,6 @@ function analyzeText() {
     // Рассчитываем процент водянистых слов
     const waterinessPercentage = ((waterWordsCount / cleanWords.length) * 100).toFixed(2);
   
-    // Выводим процент для отладки
-    console.log("Процент водянистых слов:", waterinessPercentage);
   
     return waterinessPercentage;
   }
@@ -1639,8 +1629,6 @@ document.addEventListener("DOMContentLoaded", function () {
     // Отправка запроса для получения кода статуса HTTP напрямую
     fetch(url)
       .then(response => {
-        // Выводим код ответа в консоль для диагностики
-        console.log('HTTP Status Code:', response.status);  // Код ответа сервера
 
         // Выводим код ответа в UI
         responseCodeElement.textContent = response.status; // Код ответа сервера
@@ -1658,4 +1646,187 @@ document.addEventListener("DOMContentLoaded", function () {
         timeCodeElement.textContent = "Ошибка"; // Если ошибка, то выводим ошибку
       });
   });
+});
+
+function fetchSslInfoAndUpdatePopup() {
+  let hostname = null;
+
+  // Получаем домен текущей страницы с помощью API Chrome
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].url) {
+      const origin = tabs[0].url;
+      const host = new URL(origin).hostname;
+      hostname = host;
+
+      console.log("Current hostname: ", hostname); // Лог для проверки текущего домена
+
+      // Формируем URL для запроса к API
+      const url = `https://majento.ru/pages/seo-analize/read-ssl/search.php?url=${origin}`;
+      console.log("API URL: ", url); // Лог для проверки URL
+
+      // Выполняем запрос на API
+      fetch(url)
+        .then((response) => {
+          console.log("Response status: ", response.status); // Лог статуса ответа
+
+          if (!response.ok) {
+            throw new Error(`Ошибка запроса: ${response.statusText}`);
+          }
+
+          return response.json();  // Парсим ответ как JSON
+        })
+        .then((data) => {
+          console.log("API response (JSON): ", data); // Лог для проверки JSON-ответа
+
+          // Извлекаем HTML-контент из JSON-ответа
+          const html = data.json.ssl;
+
+          // Создаем временный элемент для парсинга HTML
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, 'text/html');
+
+          // Ищем все строки таблицы
+          const rows = doc.querySelectorAll('table tr');
+
+          let sslExpiryDate = null;
+
+          // Перебираем все строки таблицы
+          rows.forEach((row) => {
+            const cells = row.querySelectorAll('td');
+
+            if (cells.length > 1) {
+              // Проверяем, что первая ячейка содержит "Valid To"
+              const parameter = cells[0].textContent.trim();
+              if (parameter === 'Valid To') {
+                // Ищем вложенный div с датой
+                const dateDiv = cells[1].querySelector('div');
+                if (dateDiv) {
+                  sslExpiryDate = dateDiv.textContent.trim();  // Извлекаем дату из div
+                }
+              }
+            }
+          });
+
+          if (sslExpiryDate) {
+            console.log("SSL Expiry Date: ", sslExpiryDate); // Лог для проверки даты
+            document.getElementById("ssl-expiry-date").textContent = sslExpiryDate;
+          } else {
+            document.getElementById("ssl-expiry-date").textContent = "Дата не найдена";
+          }
+        })
+        .catch((error) => {
+          console.error("Ошибка при получении данных о SSL:", error);
+          document.getElementById("ssl-expiry-date").textContent = `Ошибка: ${error.message}`;
+        });
+    } else {
+      console.error("Не удалось получить информацию о текущей вкладке");
+      document.getElementById("ssl-expiry-date").textContent = "Ошибка при получении данных";
+    }
+  });
+}
+
+// Запускаем функцию после загрузки контента страницы
+document.addEventListener("DOMContentLoaded", fetchSslInfoAndUpdatePopup);
+
+// Функция для форматирования даты
+function formatDate(date) {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return date.toLocaleDateString('ru-RU', options);
+}
+
+// Функция для получения возраста домена
+function getAge(createdDate, currentDate) {
+  const ageInMilliseconds = currentDate - createdDate;
+  const ageInDays = ageInMilliseconds / (1000 * 60 * 60 * 24);
+  return Math.floor(ageInDays / 365); // Возраст в годах
+}
+
+// Пример функции для перевода
+function translate(key) {
+  const translations = {
+      "domainAgeAge": "лет"
+  };
+  return translations[key] || key;
+}
+
+// Функция для получения данных с API
+async function loadDomainData(domain) {
+  const url = `https://api.whois.vu/?q=${domain}`;
+
+  try {
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.created) {
+          const created = new Date(data.created * 1000); // Преобразуем в дату
+          // Отображение даты регистрации
+          document.getElementById("domain-registration-date").textContent = formatDate(created);
+
+          // Отображение возраста домена
+          document.getElementById("domain-age").innerHTML =
+              `${getAge(created, new Date())} <span data-translation="domainAgeAge">${translate("domainAgeAge")}</span>`;
+      } else {
+          document.getElementById("domain-registration-date").textContent = "Информация не доступна";
+          document.getElementById("domain-age").textContent = "Информация не доступна";
+      }
+  } catch (error) {
+      console.error('Ошибка при получении данных:', error);
+      document.getElementById("domain-registration-date").textContent = "Ошибка загрузки";
+      document.getElementById("domain-age").textContent = "Ошибка загрузки";
+  }
+}
+
+// Функция для получения текущего домена с активной вкладки
+function getCurrentDomain() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0] && tabs[0].url) {
+      const origin = tabs[0].url;
+      const host = new URL(origin).hostname;
+      loadDomainData(host); // Загружаем данные по домену текущей вкладки
+    } else {
+      console.log('Не удалось получить URL текущей вкладки');
+    }
+  });
+}
+
+// Вызов функции после загрузки страницы
+document.addEventListener("DOMContentLoaded", function() {
+  getCurrentDomain(); // Получаем текущий домен и загружаем его данные
+});
+
+
+chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+  if (tabs[0] && tabs[0].url) {
+    // Получаем URL текущей страницы
+    const origin = tabs[0].url;
+    
+    // Извлекаем домен с помощью URL API
+    const host = new URL(origin).hostname;
+
+    // Запрашиваем информацию о домене через IP API
+    fetch(`http://ip-api.com/json/${host}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const { status, query: ip, country } = data;
+
+        if (status === "fail") {
+          throw new Error("Не удалось получить данные о IP");
+        }
+
+        // Обновляем элемент в таблице с IP-адресом
+        const ipAddressElement = document.querySelector("#site-ip");
+        ipAddressElement.innerHTML = `<span id="ip-address-link">${ip}</span> (${country})`;
+
+        // Добавляем обработчик клика на ссылку с IP-адресом
+        const ipAddressButton = document.querySelector("#ip-address-link");
+        ipAddressButton.onclick = () => {
+          document.dispatchEvent(new CustomEvent("ShowModalWithIpMatches"));
+        };
+      })
+      .catch(() => {
+        // Обрабатываем ошибку в случае неудачного запроса
+        const ipAddressElement = document.querySelector("#site-ip");
+        ipAddressElement.innerHTML = "Ошибка получения IP";
+      });
+  }
 });

@@ -8,8 +8,7 @@
   "background": {
     "service_worker": "background.js"
   },
-  "host_permissions": ["<all_urls>","http://*/*",
-    "https://*/*", "https://gogetlinks.net/*","https://checktrust.ru/*"],
+  "host_permissions": ["<all_urls>","https://*/*", "http://*/*", "https://gogetlinks.net/*","https://checktrust.ru/*"],
   "action": {
   "default_popup": "popup.html",
   "default_icon": {
