@@ -940,28 +940,6 @@ document.addEventListener("DOMContentLoaded", () => {
   fetchCMSData();
 });
 
-// popup.js — скрипт для popup, который получает данные от content.js
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.pageSize) {
-      // Обновляем элемент с id 'page-size' в popup с полученным размером страницы
-      document.getElementById('page-size').textContent = message.pageSize + ' KB';
-  }
-});
-
-// popup.js — скрипт для popup, который получает данные от content.js
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.pageSize) {
-      // Обновляем элемент с id 'page-size' в popup с полученным размером страницы
-      document.getElementById('page-size').textContent = message.pageSize + ' KB';
-  }
-  if (message.statusCode) {
-      // Обновляем элемент с id 'response-code' в popup с полученным кодом ответа сервера
-      document.getElementById('response-code').textContent = message.statusCode;
-  }
-});
-
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const headingsSummary = document.querySelector(".headings-summary");
@@ -1540,100 +1518,6 @@ async function checkSitemap(tabUrl, container) {
   }
 }
 
-
-document.addEventListener("DOMContentLoaded", async () => {
-  // Получаем данные о текущей вкладке
-  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-      const tab = tabs[0];
-      const domain = new URL(tab.url).hostname;
-
-      // 1. Получаем и отображаем IP-адрес
-      const ipAddress = await getIPAddress(domain);
-      document.getElementById("site-ip").textContent = ipAddress || "Не удалось получить IP";
-
-      // 2. Получаем дату регистрации домена и возраст
-      const whoisData = await fetchWhoisData(domain);
-      document.getElementById("domain-registration-date").textContent =
-          whoisData.creationDate || "Не удалось получить данные";
-      document.getElementById("domain-age").textContent =
-          whoisData.domainAge || "Не удалось рассчитать возраст";
-
-      // 3. Получаем дату истечения SSL-сертификата
-      const sslData = await fetchSslExpiryDate(domain);
-      document.getElementById("ssl-expiry-date").textContent =
-          sslData.sslExpiryDate || "Не удалось получить данные";
-  });
-});
-
-// Функция для получения IP-адреса и локации
-async function getIPAddress(domain) {
-  try {
-      const response = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
-      if (!response.ok) {
-          console.error("Ошибка Google DNS API: " + response.status);
-          return { address: "Не удалось получить IP", location: "Не удалось определить страну" };
-      }
-
-      const data = await response.json();
-      console.log("Ответ Google DNS API:", data);
-
-      const ip = data.Answer ? data.Answer[0].data : null;
-      if (ip) {
-          // Получаем локацию по IP через ipinfo.io
-          const locationData = await getLocationByIP(ip);
-          const country = locationData.country || "Не удалось определить страну";  // Проверяем наличие страны
-          return {
-              address: ip,
-              location: country
-          };
-      }
-      return { address: "Не удалось получить IP", location: "Не удалось определить страну" };
-  } catch (error) {
-      console.error("Ошибка получения IP:", error);
-      return { address: "Не удалось получить IP", location: "Не удалось определить страну" };
-  }
-}
-
-// Функция для получения локации по IP через ipinfo.io
-async function getLocationByIP(ip) {
-  try {
-      const response = await fetch(`https://ipinfo.io/${ip}/json?token=205111941c59e0`);  // Используем ваш токен
-      if (!response.ok) {
-          console.error("Ошибка получения локации: " + response.status);
-          return {};  // Возвращаем пустой объект при ошибке
-      }
-
-      const data = await response.json();
-      console.log("Ответ ipinfo.io:", data);
-
-      return data;  // Возвращаем данные с локацией
-  } catch (error) {
-      console.error("Ошибка получения локации:", error);
-      return {};  // Возвращаем пустой объект при ошибке
-  }
-}
-
-// Основная логика отображения IP и локации
-document.addEventListener("DOMContentLoaded", async () => {
-  // Получаем данные о текущей вкладке
-  chrome.tabs.query({ active: true, currentWindow: true }, async (tabs) => {
-      const tab = tabs[0];
-      const domain = new URL(tab.url).hostname;
-
-      // 1. Получаем и отображаем IP-адрес и локацию
-      const { address, location } = await getIPAddress(domain);
-      
-      // Формируем строку, если страна найдена, иначе только IP
-      const ipLocationText = location && location !== "Не удалось определить страну"
-        ? `${address} (${location})`
-        : address;
-
-      // Выводим результат в элемент
-      document.getElementById("site-ip").textContent = ipLocationText;
-  });
-});
-
-
 // Функция для обновления URL и количества символов
 function updateUrl() {
   // Проверяем, если это расширение, то получаем URL текущей страницы
@@ -1690,3 +1574,88 @@ window.onload = function() {
 window.onpopstate = function() {
   updateUrl();
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Получаем активную вкладку
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+      const domain = new URL(tabs[0].url).hostname;
+
+      // Формируем URL для получения ИКС (с уникальным параметром для предотвращения кеширования)
+      const imgUrl = `https://yandex.ru/cycounter?theme=light&host=${domain}&t=${new Date().getTime()}`;
+
+      // Находим элементы DOM
+      const iksImage = document.getElementById('iksImage');
+      const iksText = document.getElementById('yandex-iks');
+      const loadingMessage = document.getElementById('loadingMessage');
+
+      // Скрываем текст "Загрузка..." и пробуем показать картинку
+      iksImage.style.display = 'none';
+      loadingMessage.style.display = 'block';
+
+      // Пробуем загрузить картинку с ИКС
+      iksImage.src = imgUrl;
+
+      iksImage.onload = function() {
+          // Если картинка загружена, показываем её
+          iksImage.style.display = 'block';
+          loadingMessage.style.display = 'none';
+      };
+
+      iksImage.onerror = function() {
+          // Если картинка не загружается, выводим сообщение об ошибке
+          iksText.textContent = 'ИКС не найден';
+          loadingMessage.style.display = 'none';
+      };
+  });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+  const pageSizeElement = document.getElementById("page-size");
+  const responseCodeElement = document.getElementById("response-code");
+  const timeCodeElement = document.getElementById("time-code"); // Элемент для времени
+
+  // Получение текущей активной вкладки
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const tab = tabs[0];
+    const url = tab.url;  // Получаем полный URL страницы
+
+    // Отправка запроса на полный URL для размера страницы
+    fetch(url)
+      .then(response => {
+        // Получаем размер страницы
+        return response.text().then(text => {
+          const sizeInBytes = new Blob([text]).size;
+          const sizeInKB = (sizeInBytes / 1024).toFixed(2);
+          pageSizeElement.textContent = `${sizeInKB} KB`;
+        });
+      })
+      .catch(() => {
+        pageSizeElement.textContent = "Ошибка";
+      });
+
+    // Замер времени ответа сервера
+    const startTime = Date.now(); // Засекаем время перед запросом
+
+    // Отправка запроса для получения кода статуса HTTP напрямую
+    fetch(url)
+      .then(response => {
+        // Выводим код ответа в консоль для диагностики
+        console.log('HTTP Status Code:', response.status);  // Код ответа сервера
+
+        // Выводим код ответа в UI
+        responseCodeElement.textContent = response.status; // Код ответа сервера
+
+        // Замер времени после получения ответа
+        const endTime = Date.now(); 
+        const responseTime = endTime - startTime; // Время ответа в мс
+
+        // Выводим время ответа в UI
+        timeCodeElement.textContent = `${responseTime} мс`; 
+      })
+      .catch(error => {
+        console.error(error);
+        responseCodeElement.textContent = "Ошибка";
+        timeCodeElement.textContent = "Ошибка"; // Если ошибка, то выводим ошибку
+      });
+  });
+});
