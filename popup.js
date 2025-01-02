@@ -768,18 +768,31 @@ document.addEventListener("DOMContentLoaded", function () {
       const weightText = document.createElement("span");
       weightText.textContent = `Вес: ${img.sizeInKB} КБ`;
 
-      const urlText = document.createElement("span");
-      urlText.textContent = `URL: ${img.src}`;
+
+
+// Создаем элемент ссылки для URL
+const urlText = document.createElement("a");
+urlText.textContent = img.src;
+urlText.href = img.src;
+urlText.target = "_blank";  // Открывать ссылку в новой вкладке
+
+
+      // Создаем элемент для текста "Источник: "
+const text = document.createElement("span");
+text.textContent = "Ссылка: "
+
+text.appendChild(urlText);;
 
       const statusText = document.createElement("span");
       statusText.textContent = img.status ? `Код ответа: ${img.status}` : "Код ответа: Не проверено";
+      
 
       // Добавляем информацию в контейнер
       infoContainer.appendChild(altText);
       infoContainer.appendChild(formatText);
       infoContainer.appendChild(sizeText);
       infoContainer.appendChild(weightText);
-      infoContainer.appendChild(urlText);
+      infoContainer.appendChild(text);
       infoContainer.appendChild(statusText);
 
       // Собираем всё в элемент списка
