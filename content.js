@@ -91,40 +91,6 @@ window.addEventListener("load", () => {
   updateSiteInfo();
 });
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "collectLinks") {
-    // Собираем все ссылки на странице
-    const links = Array.from(document.querySelectorAll("a")).map(link => {
-      const href = link.getAttribute("href") || "";
-      let fullHref = href;
-
-      // Если это mailto: или tel:, оставляем их без изменений
-      if (href.startsWith("mailto:") || href.startsWith("tel:")) {
-        fullHref = href;  // Просто оставляем так, как есть
-      } else if (!href.startsWith("http") && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
-        // Если ссылка относительная, делаем её абсолютной
-        fullHref = new URL(href, window.location.origin).href;
-      }
-
-      const protocol = new URL(fullHref).protocol.split(":")[0]; // Извлекаем протокол из URL
-      const rel = link.getAttribute("rel") || ""; // Считываем атрибут rel
-      const text = link.innerText.trim() || link.querySelector("img")?.alt || "Без текста"; // Текст ссылки
-      const visible = link.offsetParent !== null && getComputedStyle(link).display !== "none"; // Проверка видимости
-
-      return {
-        href: fullHref, // Полный URL
-        protocol: protocol, // Протокол
-        rel: rel.toLowerCase(), // Приводим rel к нижнему регистру
-        text: text,
-        visible: visible,
-      };
-    });
-
-    // Отправляем собранные ссылки обратно в popup.js
-    sendResponse({ links: links });
-  }
-});
-
 
 function getImagesData() {
   const images = Array.from(document.images);
@@ -313,4 +279,40 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "collectLinks") {
+    // Собираем все ссылки на странице
+    const links = Array.from(document.querySelectorAll("a")).map(link => {
+      const href = link.getAttribute("href") || "";
+      let fullHref = href;
+
+      // Если это mailto: или tel:, оставляем их без изменений
+      if (href.startsWith("mailto:") || href.startsWith("tel:")) {
+        fullHref = href;  // Просто оставляем так, как есть
+      } else if (!href.startsWith("http") && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
+        // Если ссылка относительная, делаем её абсолютной
+        fullHref = new URL(href, window.location.origin).href;
+      }
+
+      const protocol = new URL(fullHref).protocol.split(":")[0]; // Извлекаем протокол из URL
+      const rel = link.getAttribute("rel") || ""; // Считываем атрибут rel
+      const text = link.innerText.trim() || link.querySelector("img")?.alt || "Без текста"; // Текст ссылки
+      const visible = link.offsetParent !== null && getComputedStyle(link).display !== "none"; // Проверка видимости
+
+      // Добавляем свойство status, которое будет хранить код ответа (или null, если не проверено)
+      return {
+        href: fullHref, 
+        protocol: protocol, 
+        rel: rel.toLowerCase(), 
+        text: text, 
+        visible: visible,
+        status: null // Изначально статус не проверен
+      };
+    });
+
+    // Отправляем собранные ссылки обратно в popup.js
+    sendResponse({ links: links });
+  }
+});
 

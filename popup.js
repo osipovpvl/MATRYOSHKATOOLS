@@ -64,26 +64,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   );
 
-  // Other event listeners
-  document.getElementById("toggle-js").addEventListener("click", () => {
-    toggleScripts(tab.id);
-  });
 
-  document.getElementById("toggle-css").addEventListener("click", () => {
-    toggleStyles(tab.id);
-  });
+
+document.getElementById("toggle-css").addEventListener("click", () => {
+  toggleStyles(tab.id);
 });
-
-// Function to toggle JavaScript
-function toggleScripts(tabId) {
-  chrome.scripting.executeScript({
-    target: { tabId },
-    func: () => {
-      const scripts = document.querySelectorAll("script");
-      scripts.forEach((script) => (script.disabled = !script.disabled));
-    },
-  });
-}
+});
 
 // Function to toggle CSS
 function toggleStyles(tabId) {
@@ -106,6 +92,7 @@ document.getElementById("highlight-noindex").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     toggleHighlight(tabs[0].id, "noindex", noIndexActive); // Отправляем на активную вкладку
   });
+  updateButtonState("highlight-noindex", noIndexActive); // Обновляем состояние кнопки
 });
 
 // Обработчик для кнопки подсветки nofollow
@@ -114,6 +101,7 @@ document.getElementById("highlight-nofollow").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     toggleHighlight(tabs[0].id, "nofollow", noFollowActive); // Отправляем на активную вкладку
   });
+  updateButtonState("highlight-nofollow", noFollowActive); // Обновляем состояние кнопки
 });
 
 // Функция для подсветки элементов
@@ -140,7 +128,7 @@ function highlightElements(type, isEnabled) {
       if (firstContainer) {
         if (isEnabled) {
           // Подсвечиваем только первый контейнер внутри <noindex>
-          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)"; // Черный фон для контейнера
+          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)"; // Фон для контейнера
           firstContainer.style.border = "2px solid black"; // Рамка для контейнера
         } else {
           firstContainer.style.backgroundColor = ""; // Убираем фон
@@ -152,13 +140,23 @@ function highlightElements(type, isEnabled) {
     elements = document.querySelectorAll('a[rel="nofollow"]');
     elements.forEach((el) => {
       if (isEnabled) {
-        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)"; // Черный фон для nofollow
+        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)"; // Фон для nofollow
         el.style.border = "2px solid black"; // Рамка для nofollow
       } else {
         el.style.backgroundColor = ""; // Убираем фон
         el.style.border = ""; // Убираем рамку
       }
     });
+  }
+}
+
+// Функция для обновления состояния кнопок
+function updateButtonState(buttonId, isActive) {
+  const button = document.getElementById(buttonId);
+  if (isActive) {
+    button.classList.add("active");
+  } else {
+    button.classList.remove("active");
   }
 }
 
@@ -393,6 +391,10 @@ document.getElementById('search-google-maps').addEventListener('click', () => {
   }
 });
 
+
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const linksContainer = document.getElementById("links-details");
   let allLinks = [];
@@ -534,12 +536,12 @@ document.addEventListener("DOMContentLoaded", () => {
       case "nofollow":
         displayedLinks = allLinks.filter((link) => link.rel.includes("nofollow"));
         break;
-      case "other-attributes":
-        displayedLinks = allLinks.filter((link) => 
-          link.rel.includes("noopener") && 
-          link.rel.includes("noreferrer") &&
-          !link.rel.includes("nofollow")
-        );
+        case "other-attributes":
+  displayedLinks = allLinks.filter((link) => 
+    (link.rel.includes("noopener") || link.rel.includes("noreferrer")) &&
+    !link.rel.includes("nofollow")
+  );
+
         break;
       default:
         displayedLinks = [];
@@ -558,7 +560,6 @@ document.addEventListener("DOMContentLoaded", () => {
 // Массив для хранения статусов ссылок
 let linkStatuses = { 200: [], 300: [], 400: [], 500: [], mailto_tel: [], javascript_void: [], error: [] };
 
-// Функция для проверки статуса ссылок
 async function checkLinksStatus() {
   const statusElements = linksContainer.querySelectorAll(".link-detail");
 
@@ -567,66 +568,79 @@ async function checkLinksStatus() {
     const link = displayedLinks[i];
     const statusText = statusElements[i].querySelector(".status-text");
 
-    if (statusText) {
-      // Пропускаем ссылки с протоколами mailto:, tel: и javascript:void(0)
-      if (link.href.startsWith("mailto:") || link.href.startsWith("tel:") || link.href.startsWith("javascript:void(0)")) {
-        statusText.textContent = "Ссылка не проверяется"; // Для этих ссылок показываем "Не проверено"
-        if (link.href.startsWith("mailto:") || link.href.startsWith("tel:")) {
-          linkStatuses.mailto_tel.push(link); // Сохраняем ссылки mailto и tel в соответствующий массив
-        } else {
-          linkStatuses.javascript_void.push(link); // Сохраняем ссылки javascript:void(0) в соответствующий массив
-        }
-        continue; // Пропускаем выполнение запроса для этих ссылок
+    // Пропускаем ссылки с протоколами mailto:, tel: и javascript:void(0)
+    if (link.href.startsWith("mailto:") || link.href.startsWith("tel:") || link.href.startsWith("javascript:void(0)")) {
+      statusText.textContent = "Ссылка не проверяется"; // Для этих ссылок показываем "Не проверено"
+      if (link.href.startsWith("mailto:") || link.href.startsWith("tel:")) {
+        linkStatuses.mailto_tel.push(link); // Сохраняем ссылки mailto и tel в соответствующий массив
+      } else {
+        linkStatuses.javascript_void.push(link); // Сохраняем ссылки javascript:void(0) в соответствующий массив
       }
+      continue; // Пропускаем выполнение запроса для этих ссылок
+    }
 
-      statusText.textContent = "Проверка..."; // Изначально показываем, что идет проверка
-
-      try {
-        const response = await fetch(link.href, { method: 'HEAD' });
-
-        // Сохраняем статус в массив
-        const status = response.status;
-
-        // Обработка успешных ответов
-        if (response.ok) {
-          statusText.textContent = `${status}`;
-          statusText.classList.add('success');
-          linkStatuses[200].push(link);
-        } 
-        // Обработка ошибок 3xx, 4xx, 5xx
-        else if (status >= 300 && status < 400) {
-          statusText.textContent = `${status}`;
-          statusText.classList.add('warning');
-          linkStatuses[300].push(link); // Для перенаправлений (3xx)
-        } else if (status >= 400 && status < 500) {
-          statusText.textContent = `${status}`;
-          statusText.classList.add('error');
-          linkStatuses[400].push(link); // Для ошибок клиента (4xx)
-        } else if (status >= 500 && status < 600) {
-          statusText.textContent = `${status}`;
-          statusText.classList.add('warning');
-          linkStatuses[500].push(link); // Для ошибок сервера (5xx)
-        } 
-        // В случае других статусов
-        else {
-          statusText.textContent = `${status}`;
-        }
-      } catch (error) {
-        // Если ошибка при запросе, выводим сообщение об ошибке
-        statusText.textContent = "Ошибка";
+    if (link.status) {
+      // Если статус уже был проверен (не null), пропускаем
+      statusText.textContent = `${link.status}`;
+      if (link.status === 200) {
+        statusText.classList.add('success');
+      } else if (link.status >= 300 && link.status < 400) {
+        statusText.classList.add('warning');
+      } else if (link.status >= 400 && link.status < 500) {
         statusText.classList.add('error');
-        linkStatuses['error'].push(link); // Сохраняем ошибочные ссылки
-      } finally {
-        // Обновляем счетчики сразу после того, как статус получен, даже если ошибка
-        updateStatusButtons();
+      } else if (link.status >= 500 && link.status < 600) {
+        statusText.classList.add('warning');
       }
+      continue; // Пропускаем проверку, если статус уже есть
+    }
+
+    statusText.textContent = "Проверка..."; // Изначально показываем, что идет проверка
+
+    try {
+      const response = await fetch(link.href, { method: 'HEAD' });
+
+      // Сохраняем статус в объекте ссылки
+      const status = response.status;
+      link.status = status; // Присваиваем статус ссылке
+
+      // Обработка успешных ответов
+      if (response.ok) {
+        statusText.textContent = `${status}`;
+        statusText.classList.add('success');
+        linkStatuses[200].push(link);
+      } 
+      // Обработка ошибок 3xx, 4xx, 5xx
+      else if (status >= 300 && status < 400) {
+        statusText.textContent = `${status}`;
+        statusText.classList.add('warning');
+        linkStatuses[300].push(link); // Для перенаправлений (3xx)
+      } else if (status >= 400 && status < 500) {
+        statusText.textContent = `${status}`;
+        statusText.classList.add('error');
+        linkStatuses[400].push(link); // Для ошибок клиента (4xx)
+      } else if (status >= 500 && status < 600) {
+        statusText.textContent = `${status}`;
+        statusText.classList.add('warning');
+        linkStatuses[500].push(link); // Для ошибок сервера (5xx)
+      } 
+      // В случае других статусов
+      else {
+        statusText.textContent = `${status}`;
+      }
+    } catch (error) {
+      // Если ошибка при запросе, выводим сообщение об ошибке
+      statusText.textContent = "Ошибка";
+      statusText.classList.add('error');
+      linkStatuses['error'].push(link); // Сохраняем ошибочные ссылки
+    } finally {
+      // Обновляем счетчики сразу после того, как статус получен, даже если ошибка
+      updateStatusButtons();
     }
   }
 }
 
 // Функция для обновления счетчиков на кнопках
 function updateStatusButtons() {
-  // Подсчитываем количество ссылок для каждого статуса
   const counts = {
     200: linkStatuses[200].length,
     300: linkStatuses[300].length,
@@ -636,15 +650,12 @@ function updateStatusButtons() {
     javascript_void: linkStatuses.javascript_void.length
   };
 
-  // Обновляем отображаемое количество на кнопках
   document.getElementById("status-200-links").textContent = counts[200];
   document.getElementById("status-300-links").textContent = counts[300];
   document.getElementById("status-400-links").textContent = counts[400];
   document.getElementById("status-500-links").textContent = counts[500];
-  // Пример для mailto, tel и javascript:void(0)
-  console.log(`mailto_tel links: ${counts.mailto_tel}`);
-  console.log(`javascript_void links: ${counts.javascript_void}`);
 }
+
 
 // Функция для фильтрации ссылок по статусу
 function filterLinksByStatus(status) {
@@ -732,6 +743,13 @@ checkLinksStatus();
   // Инициализация
   fetchLinks();
 });
+
+
+
+
+
+
+
 
 
 document.addEventListener("DOMContentLoaded", function () {
