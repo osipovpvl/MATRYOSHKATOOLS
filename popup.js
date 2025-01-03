@@ -461,10 +461,10 @@ document.addEventListener("DOMContentLoaded", () => {
       linkElement.classList.add('link-detail');
       linkElement.innerHTML = `
         <span>Анкор: ${link.text}</span>
-        <span>Ссылка: <a href="${link.href}" target="_blank">${link.href}</a></span>
         <span>Протокол: ${link.protocol}</span>
-        <span>Атрибут rel: ${link.rel}</span>
+      <span>Атрибут rel: ${link.rel || 'Отсутствует'}</span>
         <span>Видимость: ${link.visible ? 'Да' : 'Нет'}</span>
+        <span>Ссылка: <a href="${link.href}" target="_blank">${link.href}</a></span>
         <span>Код ответа: <span class="status-text">${link.status || "Не проверено"}</span></span>
         ${link.redirectTo ? `<span class="redirect-url">Редирект на: <a href="${link.redirectTo}" target="_blank">${link.redirectTo}</a></span>` : ''}
       `;
