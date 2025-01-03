@@ -563,7 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
   
       // Если статус уже был определен, просто выводим его
-      if (link.status) {
+      if (link.status !== null) {
         statusText.textContent = `${link.status}`;
         if (redirectUrlElement) {
           redirectUrlElement.textContent = link.redirectTo || "Нет редиректа";
@@ -578,55 +578,59 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await fetch(link.href, { method: 'HEAD', redirect: 'manual' });
         const status = response.status;
   
-        link.status = status;
-  
-        // Если код ответа 301 или 302, проверяем редирект
-        if (status === 301 || status === 302) {
+        // Если статус 0 (ошибка или редирект), сохраняем информацию
+        if (status === 0) {
+          statusText.textContent = "301/302";
           const redirectedUrl = response.headers.get("Location");
           if (redirectedUrl) {
             link.redirectTo = redirectedUrl;  // Сохраняем адрес редиректа
+            if (redirectUrlElement) {
+              redirectUrlElement.innerHTML = `Редирект на: <a href="${link.redirectTo}" target="_blank">${link.redirectTo}</a>`;
+            }
           }
-        }
-  
-        // Если код ответа 0 (ошибка или редирект), то предполагаем, что это редирект
-        if (status === 0) {
-          statusText.textContent = "301/302";
-          if (redirectUrlElement) {
-            redirectUrlElement.innerHTML = `Редирект на: <a href="${link.redirectTo}" target="_blank">${link.redirectTo}</a>`;
-          }
+          // Добавляем в фильтр 3xx для редиректов или ошибки в 5xx
+          link.status = `301/302`; // Сохраняем ошибку или редирект
+          linkStatuses[300].push(link);  // Если это редирект
+          updateStatusButton(300);
         } else {
-          statusText.textContent = `${status}`;
+          link.status = status; // Сохраняем статус
+          statusText.textContent = `301/302`;
           if (redirectUrlElement) {
             redirectUrlElement.textContent = link.redirectTo || "Нет редиректа";
           }
+  
+          // Сортировка по статусу для статистики
+          if (status >= 200 && status < 300) {
+            linkStatuses[200].push(link);
+            updateStatusButton(200);
+          } else if (status >= 300 && status < 400) {
+            linkStatuses[300].push(link);
+            updateStatusButton(300);
+          } else if (status >= 400 && status < 500) {
+            linkStatuses[400].push(link);
+            updateStatusButton(400);
+          } else if (status >= 500 && status < 600) {
+            linkStatuses[500].push(link);
+            updateStatusButton(500);
+          }
         }
   
-        updateLinkStatusClass(statusText, status);
-  
-        // Сортировка по статусу для статистики
-        if (status >= 200 && status < 300) {
-          linkStatuses[200].push(link);
-          updateStatusButton(200);
-        } else if (status >= 300 && status < 400) {
-          linkStatuses[300].push(link);
-          updateStatusButton(300);
-        } else if (status >= 400 && status < 500) {
-          linkStatuses[400].push(link);
-          updateStatusButton(400);
-        } else if (status >= 500 && status < 600) {
-          linkStatuses[500].push(link);
-          updateStatusButton(500);
-        }
+        updateLinkStatusClass(statusText, link.status);
   
       } catch (error) {
+        // Если произошла ошибка (например, ошибка сети), считаем, что это ошибка сервера (500)
         statusText.textContent = "Ошибка";
         if (redirectUrlElement) {
           redirectUrlElement.textContent = "";
         }
-        linkStatuses.error.push(link);
+        link.status = 500; // Ошибка сервера
+        linkStatuses[500].push(link); // Добавляем в фильтр 5xx
+        updateStatusButton(500);
       }
     }
   }
+  
+  
   
   
   function updateStatusButton(statusCode) {
