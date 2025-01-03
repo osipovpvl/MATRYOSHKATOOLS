@@ -739,12 +739,6 @@ fetchLinks();
 
 
 
-
-
-
-
-
-
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
   const imageList = document.getElementById("image-list");
@@ -810,24 +804,21 @@ document.addEventListener("DOMContentLoaded", function () {
       const weightText = document.createElement("span");
       weightText.textContent = `Вес: ${img.sizeInKB} КБ`;
 
-
-
-// Создаем элемент ссылки для URL
-const urlText = document.createElement("a");
-urlText.textContent = img.src;
-urlText.href = img.src;
-urlText.target = "_blank";  // Открывать ссылку в новой вкладке
-
+      // Создаем элемент ссылки для URL
+      const urlText = document.createElement("a");
+      urlText.textContent = img.src;
+      urlText.href = img.src;
+      urlText.target = "_blank";  // Открывать ссылку в новой вкладке
 
       // Создаем элемент для текста "Источник: "
-const text = document.createElement("span");
-text.textContent = "Ссылка: "
+      const text = document.createElement("span");
+      text.textContent = "Ссылка: ";
 
-text.appendChild(urlText);;
+      text.appendChild(urlText);
 
       const statusText = document.createElement("span");
-      statusText.textContent = img.status ? `Код ответа: ${img.status}` : "Код ответа: Не проверено";
-      
+      // Если статус ещё не проверен, то показываем "Не проверено"
+      statusText.textContent = img.status === undefined ? "Код ответа: Не проверено" : `Код ответа: ${img.status}`;
 
       // Добавляем информацию в контейнер
       infoContainer.appendChild(altText);
@@ -858,12 +849,26 @@ text.appendChild(urlText);;
   }
 
   function checkStatus(images) {
+    // Устанавливаем всем изображениям статус "не проверен"
+    const imagesWithInitialStatus = images.map(img => ({ ...img, status: undefined }));
+    cachedImages = imagesWithInitialStatus; // Обновляем кэш
+    updateImageDetails("all", imagesWithInitialStatus);
+
+    // Меняем текст на "Проверка..." на всех изображениях
+    const statusTextElements = document.querySelectorAll('li span');
+    statusTextElements.forEach(span => {
+      if (span.textContent === "Код ответа: Не проверено") {
+        span.textContent = "Код ответа: Проверка...";
+      }
+    });
+
     const promises = images.map(img =>
       fetch(img.src, { method: "HEAD" })
         .then(response => ({ ...img, status: response.status }))
         .catch(() => ({ ...img, status: 404 }))
     );
 
+    // После получения всех ответов обновляем кэш и выводим изображения
     Promise.all(promises).then(updatedImages => {
       cachedImages = updatedImages; // Сохраняем данные в кэш
       updateImageDetails("all", updatedImages);
@@ -900,7 +905,6 @@ text.appendChild(urlText);;
     });
   });
 });
-
 
 
 document.addEventListener("DOMContentLoaded", () => {
