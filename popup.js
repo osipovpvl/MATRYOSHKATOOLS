@@ -594,7 +594,7 @@ document.addEventListener("DOMContentLoaded", () => {
           updateStatusButton(300);
         } else {
           link.status = status; // Сохраняем статус
-          statusText.textContent = `301/302`;
+          statusText.textContent = `${status}`;
           if (redirectUrlElement) {
             redirectUrlElement.textContent = link.redirectTo || "Нет редиректа";
           }
@@ -619,7 +619,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
       } catch (error) {
         // Если произошла ошибка (например, ошибка сети), считаем, что это ошибка сервера (500)
-        statusText.textContent = "Ошибка";
+        statusText.textContent = "500";
         if (redirectUrlElement) {
           redirectUrlElement.textContent = "";
         }
