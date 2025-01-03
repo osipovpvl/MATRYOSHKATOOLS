@@ -392,9 +392,6 @@ document.getElementById('search-google-maps').addEventListener('click', () => {
 });
 
 
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const linksContainer = document.getElementById("links-details");
   let allLinks = [];
@@ -450,11 +447,33 @@ document.addEventListener("DOMContentLoaded", () => {
         rel: rel.toLowerCase(),
         text: text,
         visible: visible,
+        status: null // Статус будет заполняться позже
       };
     });
+
     return links;
   }
 
+  // Функция для отображения ссылок
+  function displayLinks(linksToDisplay) {
+    linksContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых ссылок
+
+    linksToDisplay.forEach(link => {
+      const linkElement = document.createElement('div');
+      linkElement.classList.add('link-detail');
+      linkElement.innerHTML = `
+       <span>Анкор: ${link.text}</span>
+        <span>Ссылка: <a href="${link.href}" target="_blank">${link.href}</a></span>
+        <span>Протокол: ${link.protocol}</span>
+        <span>Атрибут rel: ${link.rel}</span>
+        <span>Видимость: ${link.visible}</span>
+        <span>Код ответа: <span class="status-text">${link.status || "Не проверено"}</span></span>
+      `;
+      linksContainer.appendChild(linkElement);
+    });
+  }
+
+  // Функция для обновления счетчиков
   function updateCounts() {
     const internalLinks = allLinks.filter((link) => isInternal(link));
     const externalLinks = allLinks.filter((link) => !isInternal(link));
@@ -470,32 +489,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("follow-links").textContent = allLinks.filter((link) => !link.rel.includes("nofollow")).length;
     document.getElementById("nofollow-links").textContent = allLinks.filter((link) => link.rel.includes("nofollow")).length;
     document.getElementById("other-attributes").textContent = allLinks.filter((link) => link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow")).length;
-  }
-
-  function displayLinks(links) {
-    linksContainer.innerHTML = "";
-  
-    if (links.length === 0) {
-      linksContainer.innerHTML = "<div class='link-detail'>Ссылок не найдено.</div>";
-      return;
-    }
-  
-    links.forEach((link) => {
-      const div = document.createElement("div");
-      div.className = "link-detail";
-  
-      const isMailToOrTel = link.protocol === "mailto:" || link.protocol === "tel:";
-  
-      div.innerHTML = `
-        <span>Анкор: ${link.text}</span>
-        <span>Ссылка: ${isMailToOrTel ? link.href : `<a href="${link.href}" target="_blank">${link.href}</a>`}</span>
-        <span>Протокол: ${link.protocol}</span>
-        <span>Атрибут rel: ${link.rel}</span>
-        <span>Видимость: ${link.visible}</span>
-        <span>Код ответа: <span class="status-text">Не проверено</span></span>
-      `;
-      linksContainer.appendChild(div);
-    });
   }
 
   // Проверка, является ли ссылка внутренней
@@ -536,12 +529,11 @@ document.addEventListener("DOMContentLoaded", () => {
       case "nofollow":
         displayedLinks = allLinks.filter((link) => link.rel.includes("nofollow"));
         break;
-        case "other-attributes":
-  displayedLinks = allLinks.filter((link) => 
-    (link.rel.includes("noopener") || link.rel.includes("noreferrer")) &&
-    !link.rel.includes("nofollow")
-  );
-
+      case "other-attributes":
+        displayedLinks = allLinks.filter((link) => 
+          (link.rel.includes("noopener") || link.rel.includes("noreferrer")) &&
+          !link.rel.includes("nofollow")
+        );
         break;
       default:
         displayedLinks = [];
@@ -550,183 +542,104 @@ document.addEventListener("DOMContentLoaded", () => {
     displayLinks(displayedLinks);
   }
 
-  // Функция копирования ссылок
-  function copyLinks() {
-    const linksText = displayedLinks.map((link) => link.href).join("\n");
-    navigator.clipboard.writeText(linksText).then(() => {
-      alert("Ссылки скопированы в буфер обмена");
-    });
-  }
-// Массив для хранения статусов ссылок
-let linkStatuses = { 200: [], 300: [], 400: [], 500: [], mailto_tel: [], javascript_void: [], error: [] };
-
-async function checkLinksStatus() {
-  const statusElements = linksContainer.querySelectorAll(".link-detail");
-
-  // Проходим по всем ссылкам и проверяем их статус
-  for (let i = 0; i < statusElements.length; i++) {
-    const link = displayedLinks[i];
-    const statusText = statusElements[i].querySelector(".status-text");
-
-    // Пропускаем ссылки с протоколами mailto:, tel: и javascript:void(0)
-    if (link.href.startsWith("mailto:") || link.href.startsWith("tel:") || link.href.startsWith("javascript:void(0)")) {
-      statusText.textContent = "Ссылка не проверяется"; // Для этих ссылок показываем "Не проверено"
-      if (link.href.startsWith("mailto:") || link.href.startsWith("tel:")) {
-        linkStatuses.mailto_tel.push(link); // Сохраняем ссылки mailto и tel в соответствующий массив
-      } else {
-        linkStatuses.javascript_void.push(link); // Сохраняем ссылки javascript:void(0) в соответствующий массив
-      }
-      continue; // Пропускаем выполнение запроса для этих ссылок
-    }
-
-    if (link.status) {
-      // Если статус уже был проверен (не null), пропускаем
-      statusText.textContent = `${link.status}`;
-      if (link.status === 200) {
-        statusText.classList.add('success');
-      } else if (link.status >= 300 && link.status < 400) {
-        statusText.classList.add('warning');
-      } else if (link.status >= 400 && link.status < 500) {
-        statusText.classList.add('error');
-      } else if (link.status >= 500 && link.status < 600) {
-        statusText.classList.add('warning');
-      }
-      continue; // Пропускаем проверку, если статус уже есть
-    }
-
-    statusText.textContent = "Проверка..."; // Изначально показываем, что идет проверка
-
-    try {
-      const response = await fetch(link.href, { method: 'HEAD' });
-
-      // Сохраняем статус в объекте ссылки
-      const status = response.status;
-      link.status = status; // Присваиваем статус ссылке
-
-      // Обработка успешных ответов
-      if (response.ok) {
-        statusText.textContent = `${status}`;
-        statusText.classList.add('success');
-        linkStatuses[200].push(link);
-      } 
-      // Обработка ошибок 3xx, 4xx, 5xx
-      else if (status >= 300 && status < 400) {
-        statusText.textContent = `${status}`;
-        statusText.classList.add('warning');
-        linkStatuses[300].push(link); // Для перенаправлений (3xx)
-      } else if (status >= 400 && status < 500) {
-        statusText.textContent = `${status}`;
-        statusText.classList.add('error');
-        linkStatuses[400].push(link); // Для ошибок клиента (4xx)
-      } else if (status >= 500 && status < 600) {
-        statusText.textContent = `${status}`;
-        statusText.classList.add('warning');
-        linkStatuses[500].push(link); // Для ошибок сервера (5xx)
-      } 
-      // В случае других статусов
-      else {
-        statusText.textContent = `${status}`;
-      }
-    } catch (error) {
-      // Если ошибка при запросе, выводим сообщение об ошибке
-      statusText.textContent = "Ошибка";
-      statusText.classList.add('error');
-      linkStatuses['error'].push(link); // Сохраняем ошибочные ссылки
-    } finally {
-      // Обновляем счетчики сразу после того, как статус получен, даже если ошибка
-      updateStatusButtons();
-    }
-  }
-}
-
-// Функция для обновления счетчиков на кнопках
-function updateStatusButtons() {
-  const counts = {
-    200: linkStatuses[200].length,
-    300: linkStatuses[300].length,
-    400: linkStatuses[400].length,
-    500: linkStatuses[500].length,
-    mailto_tel: linkStatuses.mailto_tel.length,
-    javascript_void: linkStatuses.javascript_void.length
+  const linkStatuses = {
+    200: [],
+    300: [],
+    400: [],
+    500: [],
+    error: []
   };
-
-  document.getElementById("status-200-links").textContent = counts[200];
-  document.getElementById("status-300-links").textContent = counts[300];
-  document.getElementById("status-400-links").textContent = counts[400];
-  document.getElementById("status-500-links").textContent = counts[500];
-}
-
-
-// Функция для фильтрации ссылок по статусу
-function filterLinksByStatus(status) {
-  let filteredLinks = [];
-
-  // Фильтруем ссылки по статусу
-  filteredLinks = linkStatuses[status] || [];
-
-  // Отображаем только отфильтрованные ссылки
-  displayLinks(filteredLinks);
-}
-
-// Функция для отображения ссылок
-function displayLinks(links) {
-  linksContainer.innerHTML = ""; // Очищаем контейнер
-
-  // Отображаем только те ссылки, которые были переданы в параметрах
-  if (links.length === 0) {
-    linksContainer.innerHTML = "<div class='link-detail'>Ссылок не найдено.</div>";
-  } else {
-    links.forEach((link) => {
-      const div = document.createElement("div");
-      div.className = "link-detail";
-      div.innerHTML = `
-        <span>Анкор: ${link.text}</span>
-        <span>Ссылка: <a href="${link.href}" target="_blank">${link.href}</a></span>
-        <span>Протокол: ${link.protocol}</span>
-        <span>Атрибут rel: ${link.rel}</span>
-        <span>Видимость: ${link.visible}</span>
-        <span>Код ответа: <span class="status-text">${link.status || "Не проверено"}</span></span>
-      `;
-      linksContainer.appendChild(div);
-    });
-  }
-}
-
-// Обработчики для кнопок фильтрации по статусу
-document.getElementById("show-status-200").addEventListener("click", () => filterLinksByStatus(200));
-document.getElementById("show-status-300").addEventListener("click", () => filterLinksByStatus(300));
-document.getElementById("show-status-400").addEventListener("click", () => filterLinksByStatus(400));
-document.getElementById("show-status-500").addEventListener("click", () => filterLinksByStatus(500));
-
-// Запускаем проверку статусов
-checkLinksStatus();
-
-
-  // Экспорт в CSV
-  function exportLinksToCSV() {
-    const csvRows = [];
-    const header = ["Анкор", "Ссылка", "Протокол", "Атрибут rel", "Видимость"];
-    csvRows.push(header.join(","));
   
-    displayedLinks.forEach(link => {
-      const row = [
-        link.text,
-        link.href,
-        link.protocol,
-        link.rel,
-        link.visible ? "Да" : "Нет"
-      ];
-      csvRows.push(row.join(","));
-    });
+  async function checkLinksStatus() {
+    const statusElements = linksContainer.querySelectorAll(".link-detail");
   
-    const csvFile = new Blob([csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(csvFile);
-    link.download = "links.csv";
-    link.click();
+    for (let i = 0; i < statusElements.length; i++) {
+      const link = displayedLinks[i];
+      const statusText = statusElements[i].querySelector(".status-text");
+  
+      if (link.href.startsWith("mailto:") || link.href.startsWith("tel:") || link.href.startsWith("javascript:void(0)")) {
+        statusText.textContent = "Ссылка не проверяется";
+        continue;
+      }
+  
+      if (link.status) {
+        statusText.textContent = `${link.status}`;
+        updateLinkStatusClass(statusText, link.status);
+        continue;
+      }
+  
+      statusText.textContent = "Проверка...";
+  
+      try {
+        const response = await fetch(link.href, { method: 'HEAD' });
+        const status = response.status;
+        link.status = status;
+        statusText.textContent = `${status}`;
+        updateLinkStatusClass(statusText, status);
+  
+        if (status >= 200 && status < 300) {
+          linkStatuses[200].push(link);
+          updateStatusButton(200);
+        } else if (status >= 300 && status < 400) {
+          linkStatuses[300].push(link);
+          updateStatusButton(300);
+        } else if (status >= 400 && status < 500) {
+          linkStatuses[400].push(link);
+          updateStatusButton(400);
+        } else if (status >= 500 && status < 600) {
+          linkStatuses[500].push(link);
+          updateStatusButton(500);
+        }
+  
+      } catch (error) {
+        statusText.textContent = "Ошибка";
+        linkStatuses.error.push(link);
+      }
+    }
   }
 
-  // Обработчики для кнопок
+  function updateStatusButton(statusCode) {
+    const button = document.getElementById(`status-${statusCode}-links`);
+    const count = linkStatuses[statusCode].length;
+    button.textContent = `${getStatusText(statusCode)}${count}`;
+  }
+
+  function getStatusText(statusCode) {
+    switch (statusCode) {
+      case 200:
+        return "";
+      case 300:
+        return "";
+      case 400:
+        return "";
+      case 500:
+        return "";
+      default:
+        return "Неизвестный код";
+    }
+  }
+
+  function filterLinksByStatus(status) {
+    displayedLinks = linkStatuses[status];
+    displayLinks(displayedLinks);
+  }
+
+  function updateLinkStatusClass(statusElement, status) {
+    statusElement.classList.remove("status-200", "status-300", "status-400", "status-500");
+    if (status >= 200 && status < 300) {
+      statusElement.classList.add("status-200");
+    } else if (status >= 300 && status < 400) {
+      statusElement.classList.add("status-300");
+    } else if (status >= 400 && status < 500) {
+      statusElement.classList.add("status-400");
+    } else if (status >= 500 && status < 600) {
+      statusElement.classList.add("status-500");
+    }
+  }
+
+  document.getElementById("check-links-status").addEventListener("click", checkLinksStatus);
+
+  // Фильтры на кнопках
   document.getElementById("show-all-links").addEventListener("click", () => filterLinks("all"));
   document.getElementById("show-internal-links").addEventListener("click", () => filterLinks("internal"));
   document.getElementById("show-external-links").addEventListener("click", () => filterLinks("external"));
@@ -736,11 +649,12 @@ checkLinksStatus();
   document.getElementById("show-follow-links").addEventListener("click", () => filterLinks("follow"));
   document.getElementById("show-nofollow-links").addEventListener("click", () => filterLinks("nofollow"));
   document.getElementById("show-other-attributes").addEventListener("click", () => filterLinks("other-attributes"));
-  document.getElementById("check-links-status").addEventListener("click", checkLinksStatus);
-  document.getElementById("copy-links").addEventListener("click", copyLinks);
-  document.getElementById("export-links").addEventListener("click", exportLinksToCSV);
-
-  // Инициализация
+// Обработчики для кнопок фильтрации по статусу
+document.getElementById("show-status-200").addEventListener("click", () => filterLinksByStatus(200));
+document.getElementById("show-status-300").addEventListener("click", () => filterLinksByStatus(300));
+document.getElementById("show-status-400").addEventListener("click", () => filterLinksByStatus(400));
+document.getElementById("show-status-500").addEventListener("click", () => filterLinksByStatus(500));
+  // Загрузка ссылок при старте
   fetchLinks();
 });
 
