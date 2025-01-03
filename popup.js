@@ -446,28 +446,27 @@ document.addEventListener("DOMContentLoaded", () => {
         protocol: protocol,
         rel: rel.toLowerCase(),
         text: text,
-        visible: visible,
+        visible: link.offsetWidth > 0 && link.offsetHeight > 0, // Проверка видимости
         status: null // Статус будет заполняться позже
       };
     });
 
     return links;
   }
-
-  // Функция для отображения ссылок
   function displayLinks(linksToDisplay) {
     linksContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых ссылок
-
+  
     linksToDisplay.forEach(link => {
       const linkElement = document.createElement('div');
       linkElement.classList.add('link-detail');
       linkElement.innerHTML = `
-       <span>Анкор: ${link.text}</span>
+        <span>Анкор: ${link.text}</span>
         <span>Ссылка: <a href="${link.href}" target="_blank">${link.href}</a></span>
         <span>Протокол: ${link.protocol}</span>
         <span>Атрибут rel: ${link.rel}</span>
-        <span>Видимость: ${link.visible}</span>
+        <span>Видимость: ${link.visible ? 'Да' : 'Нет'}</span>
         <span>Код ответа: <span class="status-text">${link.status || "Не проверено"}</span></span>
+        ${link.redirectTo ? `<span class="redirect-url">Редирект на: <a href="${link.redirectTo}" target="_blank">${link.redirectTo}</a></span>` : ''}
       `;
       linksContainer.appendChild(linkElement);
     });
@@ -549,21 +548,26 @@ document.addEventListener("DOMContentLoaded", () => {
     500: [],
     error: []
   };
-  
   async function checkLinksStatus() {
     const statusElements = linksContainer.querySelectorAll(".link-detail");
   
     for (let i = 0; i < statusElements.length; i++) {
       const link = displayedLinks[i];
       const statusText = statusElements[i].querySelector(".status-text");
+      const redirectUrlElement = statusElements[i].querySelector(".redirect-url");
   
+      // Пропускаем ссылки, которые не нужно проверять (mailto, tel, javascript)
       if (link.href.startsWith("mailto:") || link.href.startsWith("tel:") || link.href.startsWith("javascript:void(0)")) {
         statusText.textContent = "Ссылка не проверяется";
         continue;
       }
   
+      // Если статус уже был определен, просто выводим его
       if (link.status) {
         statusText.textContent = `${link.status}`;
+        if (redirectUrlElement) {
+          redirectUrlElement.textContent = link.redirectTo || "Нет редиректа";
+        }
         updateLinkStatusClass(statusText, link.status);
         continue;
       }
@@ -571,12 +575,35 @@ document.addEventListener("DOMContentLoaded", () => {
       statusText.textContent = "Проверка...";
   
       try {
-        const response = await fetch(link.href, { method: 'HEAD' });
+        const response = await fetch(link.href, { method: 'HEAD', redirect: 'manual' });
         const status = response.status;
+  
         link.status = status;
-        statusText.textContent = `${status}`;
+  
+        // Если код ответа 301 или 302, проверяем редирект
+        if (status === 301 || status === 302) {
+          const redirectedUrl = response.headers.get("Location");
+          if (redirectedUrl) {
+            link.redirectTo = redirectedUrl;  // Сохраняем адрес редиректа
+          }
+        }
+  
+        // Если код ответа 0 (ошибка или редирект), то предполагаем, что это редирект
+        if (status === 0) {
+          statusText.textContent = "301/302";
+          if (redirectUrlElement) {
+            redirectUrlElement.innerHTML = `Редирект на: <a href="${link.redirectTo}" target="_blank">${link.redirectTo}</a>`;
+          }
+        } else {
+          statusText.textContent = `${status}`;
+          if (redirectUrlElement) {
+            redirectUrlElement.textContent = link.redirectTo || "Нет редиректа";
+          }
+        }
+  
         updateLinkStatusClass(statusText, status);
   
+        // Сортировка по статусу для статистики
         if (status >= 200 && status < 300) {
           linkStatuses[200].push(link);
           updateStatusButton(200);
@@ -593,11 +620,15 @@ document.addEventListener("DOMContentLoaded", () => {
   
       } catch (error) {
         statusText.textContent = "Ошибка";
+        if (redirectUrlElement) {
+          redirectUrlElement.textContent = "";
+        }
         linkStatuses.error.push(link);
       }
     }
   }
-
+  
+  
   function updateStatusButton(statusCode) {
     const button = document.getElementById(`status-${statusCode}-links`);
     const count = linkStatuses[statusCode].length;
