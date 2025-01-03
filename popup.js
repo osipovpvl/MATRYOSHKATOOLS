@@ -654,8 +654,52 @@ document.getElementById("show-status-200").addEventListener("click", () => filte
 document.getElementById("show-status-300").addEventListener("click", () => filterLinksByStatus(300));
 document.getElementById("show-status-400").addEventListener("click", () => filterLinksByStatus(400));
 document.getElementById("show-status-500").addEventListener("click", () => filterLinksByStatus(500));
-  // Загрузка ссылок при старте
-  fetchLinks();
+  
+// Функция для копирования всех ссылок в буфер обмена
+function copyLinksToClipboard() {
+  const linksText = displayedLinks.map(link => link.href).join("\n");
+
+  navigator.clipboard.writeText(linksText)
+    .then(() => {
+      alert("Ссылки скопированы в буфер обмена!");
+    })
+    .catch(err => {
+      console.error("Ошибка при копировании ссылок: ", err);
+    });
+}
+
+// Функция для экспорта ссылок в CSV файл с кодировкой UTF-8
+function exportLinksToCSV() {
+  const csvRows = [];
+  const headers = ["Анкор", "Ссылка", "Протокол", "Атрибут rel", "Видимость", "Код ответа"];
+  csvRows.push(headers.join(","));
+
+  displayedLinks.forEach(link => {
+    const row = [
+      link.text,
+      link.href,
+      link.protocol,
+      link.rel,
+      link.visible ? "Да" : "Нет",
+      link.status || "Не проверено"
+    ];
+    csvRows.push(row.join(","));
+  });
+
+  const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(csvRows.join("\n"));
+  const downloadLink = document.createElement("a");
+  downloadLink.setAttribute("href", csvContent);
+  downloadLink.setAttribute("download", "links.csv");
+  downloadLink.click();
+}
+
+// Добавляем обработчики для кнопок
+document.getElementById("copy-links").addEventListener("click", copyLinksToClipboard);
+document.getElementById("export-links").addEventListener("click", exportLinksToCSV);
+
+// Загрузка ссылок при старте
+fetchLinks();
+
 });
 
 
