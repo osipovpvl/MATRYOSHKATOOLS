@@ -1717,16 +1717,16 @@ function fetchSslInfoAndUpdatePopup() {
       const host = new URL(origin).hostname;
       hostname = host;
 
-      console.log("Current hostname: ", hostname); // Лог для проверки текущего домена
+      //console.log("Current hostname: ", hostname); // Лог для проверки текущего домена
 
       // Формируем URL для запроса к API
       const url = `https://majento.ru/pages/seo-analize/read-ssl/search.php?url=${origin}`;
-      console.log("API URL: ", url); // Лог для проверки URL
+      //console.log("API URL: ", url); // Лог для проверки URL
 
       // Выполняем запрос на API
       fetch(url)
         .then((response) => {
-          console.log("Response status: ", response.status); // Лог статуса ответа
+          //console.log("Response status: ", response.status); // Лог статуса ответа
 
           if (!response.ok) {
             throw new Error(`Ошибка запроса: ${response.statusText}`);
@@ -1735,7 +1735,7 @@ function fetchSslInfoAndUpdatePopup() {
           return response.json();  // Парсим ответ как JSON
         })
         .then((data) => {
-          console.log("API response (JSON): ", data); // Лог для проверки JSON-ответа
+          //console.log("API response (JSON): ", data); // Лог для проверки JSON-ответа
 
           // Извлекаем HTML-контент из JSON-ответа
           const html = data.json.ssl;
@@ -1767,7 +1767,7 @@ function fetchSslInfoAndUpdatePopup() {
           });
 
           if (sslExpiryDate) {
-            console.log("SSL Expiry Date: ", sslExpiryDate); // Лог для проверки даты
+            //console.log("SSL Expiry Date: ", sslExpiryDate); // Лог для проверки даты
             document.getElementById("ssl-expiry-date").textContent = sslExpiryDate;
           } else {
             document.getElementById("ssl-expiry-date").textContent = "Дата не найдена";
