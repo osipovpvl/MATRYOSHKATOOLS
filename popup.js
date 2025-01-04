@@ -1229,7 +1229,7 @@ const cmsLinks = {
 
   
 const html = document.documentElement.innerHTML.toLowerCase(); // Приводим в нижний регистр для более точного поиска
-let cmsInfo = "Неизвестная CMS"; // Значение по умолчанию
+let cmsInfo = "Неизвестная CMS/WYSI/WYG"; // Значение по умолчанию
 
 // Поиск CMS по шаблонам
 for (const key in cmsPatterns) {
@@ -1263,7 +1263,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
   }, (results) => {
     if (results && results[0]) {
       const cmsData = results[0].result;
-      document.getElementById('cms-data').textContent = cmsData || 'Неизвестная CMS';
+      document.getElementById('cms-data').textContent = cmsData || 'Неизвестная CMS/WYSI/WYG';
     }
   });
 });
@@ -1705,7 +1705,7 @@ function checkMetaRobots(doc, container) {
           `;
       } else {
           container.innerHTML = `
-              <span class="fas fa-question-circle" style="color: orange;"></span>
+              <span class="fas fa-exclamation-circle" style="color: orange;"></span>
               Meta robots указан, но содержит нестандартные значения (meta: ${content})
           `;
       }
@@ -1839,6 +1839,89 @@ async function checkSitemap(tabUrl, container) {
     console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Функция для проверки HTTP-заголовков
+  function checkRobotsTag() {
+      chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+          const tab = tabs[0];
+          const url = tab.url;
+
+          // Меняем статус на "Загрузка"
+          document.getElementById('meta-x-Robots-Tag-result').classList.add('loading');
+          document.getElementById('meta-x-Robots-Tag-result').textContent = 'Загрузка...';
+
+          fetch(url)
+              .then(response => {
+                  // Получаем заголовки X-Robots-Tag
+                  const xRobotsTag = response.headers.get('X-Robots-Tag');
+                  if (xRobotsTag) {
+                      // Ищем директивы
+                      const directives = ['noindex', 'nofollow', 'none', 'noarchive'];
+                      let found = false;
+                      let statusText = '';
+                      let statusClass = '';
+                      let icon = '';
+
+                      directives.forEach(directive => {
+                          if (xRobotsTag.toLowerCase().includes(directive)) {
+                              found = true;
+                              statusText = `Обнаружен заголовок X-Robots-Tag с директивой: ${directive}.`;
+                              icon = '<span class="fa fa-times-circle" style="color: red;"></span>';  // Красный крестик
+                              statusClass = 'error';
+                              // Объяснение каждой директивы
+                              let explanation = '';
+                              switch (directive) {
+                                  case 'noindex':
+                                      explanation = 'Этот сайт не должен индексироваться в поисковых системах.';
+                                      break;
+                                  case 'nofollow':
+                                      explanation = 'Ссылки на этом сайте не должны быть проиндексированы.';
+                                      break;
+                                  case 'none':
+                                      explanation = 'Этот сайт не должен индексироваться и не следует следовать за ссылками.';
+                                      break;
+                                  case 'noarchive':
+                                      explanation = 'Поисковая система не должна сохранять кэш этого сайта.';
+                                      break;
+                              }
+                              statusText += '\n' + explanation;
+                          }
+                      });
+
+                      if (!found) {
+                          statusText = 'Заголовок X-Robots-Tag не содержит нежелательных директив (Индексация разрешена)';
+                          icon = '<span class="fas fa-check-circle" style="color: green;"></span>';  // Зеленая галочка
+                          statusClass = 'success';
+                      }
+
+                      // Обновляем DOM с результатом
+                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = `${icon} <span style="color: gray;">${statusText}</span>`;
+                      document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
+                      document.getElementById('meta-x-Robots-Tag-result').classList.add(statusClass);
+                  } else {
+                      // Если заголовок не найден, считаем, что все в порядке
+                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span style="color: gray;">Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
+                      document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
+                      document.getElementById('meta-x-Robots-Tag-result').classList.add('success');
+                  }
+              })
+              .catch(error => {
+                  console.error('Ошибка при получении заголовков:', error);
+                  document.getElementById('meta-x-Robots-Tag-result').textContent = 'Ошибка при запросе сайта';
+                  document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
+                  document.getElementById('meta-x-Robots-Tag-result').classList.add('error');
+              });
+      });
+  }
+
+  // Запуск проверки при загрузке popup
+  checkRobotsTag();
+});
+
+
+
 
 // Функция для обновления URL и количества символов
 function updateUrl() {
