@@ -64,7 +64,7 @@
 
     /* Main table styles */
     table {
-      width: 99%;
+      width: 100%;
       border-collapse: collapse;
       margin-bottom: 20px;
     }
@@ -283,6 +283,7 @@
   .links-summary,
 .links-protocols,
 .links-attributes,
+.links-others,
 .links-check,
 .links-actions {
   margin: 10px 0;
@@ -376,7 +377,7 @@ input[type="number"] {
     color: white;
   }
 
-  .links-summary, .links-protocols, .links-attributes, .links-check, .links-actions {
+  .links-summary, .links-protocols, .links-others, .links-attributes, .links-check, .links-actions {
     margin-bottom: 20px;
   }
 
@@ -729,7 +730,7 @@ input[type="text"] {
             <th></th>
         </tr>
         <tr>
-          <td>Title <strong><div id="title-length" class="meta-length">-</div></strong></td>
+          <td>Title <strong><div id="title-length" class="meta-length">-</div></strong><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 30-70. Допустимо: 10-29, 71-90. Плохо: 0-9,91+"></i></td>
             <td>
                 <div id="title">Загрузка...</div>
             </td>
@@ -740,7 +741,7 @@ input[type="text"] {
             </td>
         </tr>
         <tr>
-           <td>Description   <strong><div id="description-length" class="meta-length">-</div></strong></td>
+           <td>Description <strong><div id="description-length" class="meta-length">-</div></strong><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 150-250. Допустимо: 75-149, 251-300. Плохо: 0-74,301+"></i></td>
             <td>
                 <div id="description">Загрузка...</div>
             </td>
@@ -751,7 +752,7 @@ input[type="text"] {
             </td>
         </tr>
         <tr>
-          <td>H1 <strong><div id="h1-length" class="meta-length">-</div></strong></td>
+          <td>H1 <strong><div id="h1-length" class="meta-length">-</div></strong><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 20-60. Допустимо: 5-19, 61-70. Плохо: 0-4,71+"></i></td>
             <td>
                 <div id="h1">Загрузка...</div>
             </td>

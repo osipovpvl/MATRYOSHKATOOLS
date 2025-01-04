@@ -520,7 +520,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Объединяем все ссылки
     const allLinks = [...links, ...scriptLinks, ...cssLinks];
   
-    console.log("Собранные ссылки:", allLinks);  // Диагностика
+    //console.log("Собранные ссылки:", allLinks);  // Диагностика
     return allLinks;
   }
   
