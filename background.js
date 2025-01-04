@@ -22,3 +22,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keeps the message channel open for async response
   }
 });
+
+
+chrome.browserAction.onClicked.addListener(function (tab) {
+  // Получаем заголовок страницы
+  let pageTitle = tab.title;
+
+  // Получаем домен сайта
+  let currentDomain = new URL(tab.url).hostname;
+
+  // Формируем поисковый запрос
+  let searchQuery = `title:("${pageTitle}") site:${currentDomain}`;
+
+  // Формируем URL для поиска в Яндексе
+  let searchUrl = `https://yandex.ru/search/?text=${encodeURIComponent(searchQuery)}`;
+
+  // Открываем поиск в Яндексе в новой вкладке
+  chrome.tabs.create({ url: searchUrl });
+});

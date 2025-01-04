@@ -350,33 +350,72 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('operator-host-yandex').addEventListener('click', () => {
-      getCurrentUrl((url) => {
-          openTab(`https://yandex.ru/search/?text=host:${encodeURIComponent(url)}`);
-      });
-  });
-
-  document.getElementById('operator-title-yandex').addEventListener('click', () => {
-      const title = prompt('Введите заголовок страницы (title):', 'Пример заголовка');
-      if (title) {
-          getCurrentUrl((url) => {
-              openTab(`https://yandex.ru/search/?text=title:(\"${title}\") site:${encodeURIComponent(url)}`);
-          });
-      }
-  });
-
-  document.getElementById('search-yandex-maps').addEventListener('click', () => {
-    const organization = prompt('Введите название организации для поиска в Яндекс.Картах:');
-    if (organization) {
-        openTab(`https://yandex.ru/maps/?text=${encodeURIComponent(organization)}`);
-    }
+    getCurrentUrl((url) => {
+        openTab(`https://yandex.ru/search/?text=host:${encodeURIComponent(url)}`);
+    });
 });
 
+  // Обработчик клика на кнопку
+  document.getElementById('operator-title-yandex').addEventListener('click', function() {
+    // Получаем информацию о текущей вкладке
+    chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        let tab = tabs[0];
+        let pageTitle = tab.title;  // Заголовок страницы
+        let currentDomain = new URL(tab.url).hostname;  // Домен сайта
+
+        // Формируем запрос для поиска в Яндексе
+        let searchQuery = `title:("${pageTitle}") site:${currentDomain}`;
+
+        // Формируем URL для поиска в Яндексе
+        let searchUrl = `https://yandex.ru/search/?text=${encodeURIComponent(searchQuery)}`;
+
+        // Открываем поиск в новой вкладке
+        chrome.tabs.create({ url: searchUrl });
+    });
+});
+
+ 
+// Обработчик кнопки "Я" для Яндекс.Карт
+document.getElementById('search-yandex-maps').addEventListener('click', () => {
+  // Показываем блок с вводом для Яндекс
+  document.getElementById('yandex-search-input').style.display = 'block';
+  // Скрываем блок для Google
+  document.getElementById('google-search-input').style.display = 'none';
+});
+
+// Обработчик кнопки "G" для Google.Карт
 document.getElementById('search-google-maps').addEventListener('click', () => {
-    const organization = prompt('Введите название организации для поиска в Google.Картах:');
-    if (organization) {
-        openTab(`https://www.google.com/maps/search/${encodeURIComponent(organization)}`);
-    }
+  // Показываем блок с вводом для Google
+  document.getElementById('google-search-input').style.display = 'block';
+  // Скрываем блок для Яндекс
+  document.getElementById('yandex-search-input').style.display = 'none';
 });
+
+// Обработчик кнопки "Проверить" для Яндекс.Карт
+document.getElementById('yandex-check').addEventListener('click', () => {
+  const organization = document.getElementById('yandex-input').value;
+  if (organization) {
+    openTab(`https://yandex.ru/maps/?text=${encodeURIComponent(organization)}`);
+  } else {
+  }
+});
+
+// Обработчик кнопки "Проверить" для Google.Карт
+document.getElementById('google-check').addEventListener('click', () => {
+  const organization = document.getElementById('google-input').value;
+  if (organization) {
+    openTab(`https://www.google.com/maps/search/${encodeURIComponent(organization)}`);
+  } else {
+  }
+});
+
+// Функция для открытия новой вкладки
+function openTab(url) {
+  window.open(url, '_blank');
+}
+
+
+
 
   // Функция для получения текущего URL
   function getCurrentUrl(callback) {
@@ -1119,12 +1158,11 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       // Если подсветка отключена, включаем её
       headings.forEach((heading) => {
-        heading.style.outline = "2px dashed red"; // Добавляем стиль
+        heading.style.outline = "2px dashed black"; // Добавляем стиль
       });
     }
   }
 });
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".tab-buttons");

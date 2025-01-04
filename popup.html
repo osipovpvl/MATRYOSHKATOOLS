@@ -183,6 +183,12 @@
 .search-item span {
   font-size: 14px;
   color: #333;
+  margin-right: 10px; /* Отступ между текстом и кнопками */
+}
+
+.search-buttons {
+  display: flex;
+  gap: 10px; /* Расстояние между кнопками */
 }
 
 .search-button {
@@ -676,6 +682,25 @@ a:hover {
         color: #000000;
         text-decoration: underline;
     }
+
+    .search-input-container {
+  margin-top: 10px;
+}
+
+input[type="text"] {
+  margin-top: 15px;
+  padding: 8px;
+  width: 47%;
+  margin-right: 10px;
+}
+
+.check-button {
+  padding: 8px 12px;
+  background-color: #000000;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
   </style>
 </head>
 <body>
@@ -689,7 +714,7 @@ a:hover {
       <button class="tab-button" data-tab="microdata">МИКРОРАЗМЕТКА</button>
       <button class="tab-button" data-tab="search">ПОИСК</button>
       <button class="tab-button" data-tab="tools">ИНСТРУМЕНТЫ</button>
-      <button class="tab-button" data-tab="others">ПОЛЕЗНЫЕ СЕРВИСЫ</button>
+      <button class="tab-button" data-tab="others">ПОЛЕЗНОЕ</button>
     </div>
 
     <!-- Tab Content -->
@@ -865,34 +890,61 @@ a:hover {
         </table>
       </div>
 
-
       <div id="search" class="tab">
         <h1>АНАЛИЗ ПОИСКА</h1>
         <div class="search-panel">
           <div class="search-item">
-            <span>Поиск по оператору site:</span>
-            <button id="operator-site-yandex" class="search-button yandex">Я</button>
-            <button id="check-index-google" class="search-button google">G</button>
+            <span>Поиск по оператору<br>
+              <span style="color: #555;">site:domain.ru</span></span>
+            <div class="search-buttons">
+              <button id="operator-site-yandex" class="search-button yandex">Я</button>
+              <button id="check-index-google" class="search-button google">G</button>
+            </div>
           </div>
           <div class="search-item">
-            <span>Поиск по оператору url:</span>
-            <button id="operator-url-yandex" class="search-button yandex">Я</button>
+            <span>Поиск по оператору
+              <br>
+              <span style="color: #555;">host:domain.ru</span>
+            </span>
+            <div class="search-buttons">
+              <button id="operator-host-yandex" class="search-button yandex">Я</button>
+            </div>
           </div>
           <div class="search-item">
-            <span>Поиск по оператору host:</span>
-            <button id="operator-host-yandex" class="search-button yandex">Я</button>
+            <span>Поиск по оператору<br>
+              <span style="color: #555;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
+            <div class="search-buttons">
+              <button id="operator-url-yandex" class="search-button yandex">Я</button>
+            </div>
           </div>
           <div class="search-item">
-            <span>Поиск дублей title:</span>
-            <button id="operator-title-yandex" class="search-button yandex">Я</button>
+            <span>Поиск дублей<br>
+              <span style="color: #555;">title:("Title страницы") site:domain.ru</span></span>
+            <div class="search-buttons">
+              <button id="operator-title-yandex" class="search-button yandex">Я</button>
+            </div>
           </div>
           <div class="search-item">
             <span>Искать на картах</span>
-            <button id="search-yandex-maps" class="search-button yandex">Я</button>
-            <button id="search-google-maps" class="search-button google">G</button>
+            <div class="search-buttons">
+              <button id="search-yandex-maps" class="search-button yandex">Я</button>
+              <button id="search-google-maps" class="search-button google">G</button>
+            </div>
+             <!-- Блок для ввода для Яндекс.Карт -->
+  <div id="yandex-search-input" class="search-input-container" style="display: none;">
+    <input type="text" id="yandex-input" placeholder="Название или домен" />
+    <button id="yandex-check" class="check-button">Проверить</button>
+  </div>
+
+  <!-- Блок для ввода для Google.Карт -->
+  <div id="google-search-input" class="search-input-container" style="display: none;">
+    <input type="text" id="google-input" placeholder="Название или домен" />
+    <button id="google-check" class="check-button">Проверить</button>
+  </div>
           </div>
         </div>
       </div>
+      
 
       <div id="links-info" class="tab">
         <h1>АНАЛИЗ ССЫЛОК</h1>
@@ -1048,7 +1100,7 @@ a:hover {
     </div>
     
       <div id="others" class="tab">
-        <h1>ПОЛЕЗНЫЕ СЕРВИСЫ</h1>
+        <h1>ПОЛЕЗНОЕ</h1>
         <div class="service-container">
           <ul class="service-list">
             <div class="section-title">АНАЛИТИКА:</div>
@@ -1176,7 +1228,7 @@ a:hover {
 
       <div id="tools" class="tab">
         <i class="fa fa-cog" aria-hidden="true" style="float: right; font-size: 20px;"></i>
-        <h1>ПОЛЕЗНЫЕ ИНСТРУМЕНТЫ</h1>
+        <h1>ИНСТРУМЕНТЫ</h1>
         <div class="page-panel">
              <!-- Кнопка для перезагрузки страницы с очисткой кеша -->
    <div class="page-item">
@@ -1212,7 +1264,7 @@ a:hover {
         <a title="GitHub" alt="GitHub" href="https://github.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #333; text-decoration: none;">
           <i class="fab fa-github" style="font-size: 24px;"></i>
         </a>
-        <a title="Donate" alt="Donate" href="https://github.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #333; text-decoration: none;">
+        <a title="Donate" alt="Donate" href="/donate.html" target="_blank" style="margin: 0 10px; color: #333; text-decoration: none;">
           <i class="fa fa-usd" aria-hidden="true" style="font-size: 24px;"></i>
         </a>
       </div>
