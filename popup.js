@@ -465,21 +465,21 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Функция для сбора ссылок с текущей страницы
   function collectLinks() {
+    // Сбор ссылок из всех ссылок <a>
     const links = Array.from(document.querySelectorAll("a")).map(link => {
       const href = link.getAttribute("href") || "";
       let fullHref = href;
-
+  
       if (!href.startsWith("http") && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
         fullHref = new URL(href, window.location.origin).href;
       }
-
+  
       const protocol = new URL(fullHref).protocol.split(":")[0]; 
       const rel = link.getAttribute("rel") || ""; 
       const text = link.innerText.trim() || link.querySelector("img")?.alt || "Без анкора"; 
       const visible = link.offsetParent !== null && getComputedStyle(link).display !== "none"; 
-
+  
       return {
         href: fullHref,
         protocol: protocol,
@@ -489,9 +489,42 @@ document.addEventListener("DOMContentLoaded", () => {
         status: null // Статус будет заполняться позже
       };
     });
-
-    return links;
+  
+    // Теперь добавим ссылки для .js и .css
+    const scriptLinks = Array.from(document.querySelectorAll("script[src]")).map(script => {
+      const href = script.getAttribute("src");
+      const fullHref = new URL(href, window.location.origin).href;
+      return {
+        href: fullHref,
+        protocol: new URL(fullHref).protocol.split(":")[0],
+        rel: '',
+        text: "Script",
+        visible: true,
+        status: null
+      };
+    });
+  
+    const cssLinks = Array.from(document.querySelectorAll("link[rel='stylesheet'][href]")).map(link => {
+      const href = link.getAttribute("href");
+      const fullHref = new URL(href, window.location.origin).href;
+      return {
+        href: fullHref,
+        protocol: new URL(fullHref).protocol.split(":")[0],
+        rel: link.getAttribute("rel"),
+        text: "CSS",
+        visible: true,
+        status: null
+      };
+    });
+  
+    // Объединяем все ссылки
+    const allLinks = [...links, ...scriptLinks, ...cssLinks];
+  
+    console.log("Собранные ссылки:", allLinks);  // Диагностика
+    return allLinks;
   }
+  
+
   function displayLinks(linksToDisplay) {
     linksContainer.innerHTML = ''; // Очищаем контейнер перед добавлением новых ссылок
   
@@ -515,6 +548,11 @@ document.addEventListener("DOMContentLoaded", () => {
   function updateCounts() {
     const internalLinks = allLinks.filter((link) => isInternal(link));
     const externalLinks = allLinks.filter((link) => !isInternal(link));
+    const jsLinks = allLinks.filter((link) => /\.(js|mjs|min\.js|jsx|ts|tsx)(\?|$)/i.test(link.href));
+  const cssLinks = allLinks.filter((link) => /\.css(\?|$)/i.test(link.href));
+  const pdfLinks = allLinks.filter((link) => /\.pdf($|\?)/i.test(link.href));
+  const excelLinks = allLinks.filter((link) => /\.(xls|xlsx)($|\?)/i.test(link.href));
+  const wordLinks = allLinks.filter((link) => /\.(doc|docx)($|\?)/i.test(link.href));
 
     document.getElementById("total-links").textContent = allLinks.length;
     document.getElementById("internal-links").textContent = internalLinks.length;
@@ -527,6 +565,15 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("follow-links").textContent = allLinks.filter((link) => !link.rel.includes("nofollow")).length;
     document.getElementById("nofollow-links").textContent = allLinks.filter((link) => link.rel.includes("nofollow")).length;
     document.getElementById("other-attributes").textContent = allLinks.filter((link) => link.rel && !link.rel.includes("nofollow") && !link.rel.includes("follow")).length;
+  
+
+
+    // Обновляем количество для каждого типа ссылки
+    document.getElementById("js-links").textContent = jsLinks.length;
+    document.getElementById("css-links").textContent = cssLinks.length;
+    document.getElementById("pdf-links").textContent = pdfLinks.length;
+    document.getElementById("excel-links").textContent = excelLinks.length;
+    document.getElementById("word-links").textContent = wordLinks.length;
   }
 
   // Проверка, является ли ссылка внутренней
@@ -573,6 +620,29 @@ document.addEventListener("DOMContentLoaded", () => {
           !link.rel.includes("nofollow")
         );
         break;
+        case "js":
+  // Фильтрация .js ссылок (также учитываем возможные параметры в URL)
+  displayedLinks = allLinks.filter((link) => {
+    const isJs = /\.(js|mjs|min\.js)(\?|$)/i.test(link.href);
+    return isJs;
+  });
+  break;
+  case "css":
+    // Фильтрация .css ссылок
+    displayedLinks = allLinks.filter((link) => {
+      const isCss = /\.css(\?|$)/i.test(link.href);
+      return isCss;
+    });
+    break;
+        case "pdf":
+          displayedLinks = allLinks.filter((link) => /\.pdf($|\?)/i.test(link.href)); // Регулярное выражение для .pdf
+          break;
+        case "excel":
+          displayedLinks = allLinks.filter((link) => /\.(xls|xlsx)($|\?)/i.test(link.href)); // Регулярное выражение для .xls и .xlsx
+          break;
+        case "word":
+          displayedLinks = allLinks.filter((link) => /\.(doc|docx)($|\?)/i.test(link.href)); // Регулярное выражение для .doc и .docx
+          break;
       default:
         displayedLinks = [];
         break;
@@ -728,6 +798,12 @@ document.getElementById("show-status-200").addEventListener("click", () => filte
 document.getElementById("show-status-300").addEventListener("click", () => filterLinksByStatus(300));
 document.getElementById("show-status-400").addEventListener("click", () => filterLinksByStatus(400));
 document.getElementById("show-status-500").addEventListener("click", () => filterLinksByStatus(500));
+
+document.getElementById("show-js-links").addEventListener("click", () => filterLinks("js"));
+  document.getElementById("show-css-links").addEventListener("click", () => filterLinks("css"));
+  document.getElementById("show-pdf-links").addEventListener("click", () => filterLinks("pdf"));
+  document.getElementById("show-excel-links").addEventListener("click", () => filterLinks("excel"));
+  document.getElementById("show-word-links").addEventListener("click", () => filterLinks("word"));
   
 // Функция для копирования всех ссылок в буфер обмена
 function copyLinksToClipboard() {
