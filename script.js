@@ -15,9 +15,9 @@ function copyText(id) {
         button.classList.add('copied');
         setTimeout(() => {
             button.classList.remove('copied');
-        }, 2000);
+        }, 300);
     } catch (err) {
-        console.error('Copy error:', err);
+        //console.error('Copy error:', err);
         alert('Failed to copy text. Please try again.');
     }
 }

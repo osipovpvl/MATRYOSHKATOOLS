@@ -178,7 +178,7 @@ function getImagesData() {
         sizeInBytes = parseInt(xhr.getResponseHeader("Content-Length"), 10) || 0;
       }
     } catch (error) {
-      console.warn(`Не удалось получить вес изображения: ${src}`, error);
+      //console.warn(`Не удалось получить вес изображения: ${src}`, error);
     }
 
     return {

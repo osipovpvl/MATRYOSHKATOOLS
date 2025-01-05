@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ trust: data.trust, spam: data.spam });
       })
       .catch((error) => {
-        console.error("Error fetching domain data:", error);
+        //console.error("Error fetching domain data:", error);
         sendResponse(null);
       });
 
@@ -23,8 +23,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-
-chrome.browserAction.onClicked.addListener(function (tab) {
+chrome.action.onClicked.addListener(function (tab) {
   // Получаем заголовок страницы
   let pageTitle = tab.title;
 

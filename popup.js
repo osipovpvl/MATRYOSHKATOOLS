@@ -47,20 +47,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       populateMicrodata("rdfa", seoData.rdfa, "");
       populateMicrodata("microdata-check", seoData.microdata, "");
 
-      // Add event listeners for copy buttons
-      document.querySelectorAll(".copy-button").forEach((button) => {
-        button.addEventListener("click", () => {
-          const targetId = button.getAttribute("data-target");
-          const textToCopy = document.getElementById(targetId).textContent;
-
-          navigator.clipboard.writeText(textToCopy).then(() => {
-            const status = document.getElementById("copy-status");
-            status.classList.remove("hidden");
-            status.textContent = `${targetId.charAt(0).toUpperCase() + targetId.slice(1)} copied!`;
-            setTimeout(() => status.classList.add("hidden"), 2000);
-          });
-        });
-      });
+     
     }
   );
 
@@ -242,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
           },
           (results) => {
               if (!results || results.length === 0 || !results[0].result) {
-                  console.error("Данные не получены из scrapeSEOData.");
+                  //console.error("Данные не получены из scrapeSEOData.");
                   return;
               }
 
@@ -258,20 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
               document.getElementById("current-url").textContent = tab.url || "N/A";
               document.getElementById("lang").textContent = seoData.lang || "N/A";
 
-              // Добавляем обработчики для кнопок копирования
-              document.querySelectorAll(".copy-button").forEach((button) => {
-                  button.addEventListener("click", () => {
-                      const targetId = button.getAttribute("data-target");
-                      const textToCopy = document.getElementById(targetId).textContent;
-
-                      navigator.clipboard.writeText(textToCopy).then(() => {
-                          const status = document.getElementById("copy-status");
-                          status.classList.remove("hidden");
-                          status.textContent = `${targetId.charAt(0).toUpperCase() + targetId.slice(1)} copied!`;
-                          setTimeout(() => status.classList.add("hidden"), 2000);
-                      });
-                  });
-              });
+              
           }
       );
   });
@@ -452,7 +426,7 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         (results) => {
           if (chrome.runtime.lastError || !results || !results[0]) {
-            console.error("Ошибка при сборе ссылок.");
+            //console.error("Ошибка при сборе ссылок.");
             return;
           }
 
@@ -840,7 +814,7 @@ function copyLinksToClipboard() {
       alert("Ссылки скопированы в буфер обмена!");
     })
     .catch(err => {
-      console.error("Ошибка при копировании ссылок: ", err);
+      //console.error("Ошибка при копировании ссылок: ", err);
     });
 }
 
@@ -929,6 +903,7 @@ document.addEventListener("DOMContentLoaded", function () {
       const imgPreview = document.createElement("img");
       imgPreview.src = img.src;
       imgPreview.alt = img.alt || "Нет атрибута alt";
+      imgPreview.title = img.title;
       imgPreview.style.maxWidth = "50px";
       imgPreview.style.maxHeight = "50px";
       imgPreview.style.marginRight = "10px";
@@ -941,19 +916,19 @@ document.addEventListener("DOMContentLoaded", function () {
       // Информация о alt
       const altText = document.createElement("span");
       if (img.alt === "") {
-        altText.textContent = 'Alt: Пустой';
+        altText.textContent = 'Атрибут alt: Пустой';
       } else if (img.alt) {
-        altText.textContent = `Alt: "${img.alt}"`;
+        altText.textContent = `Атрибут alt: "${img.alt}"`;
       } else {
-        altText.textContent = "Alt: Отсутствует";
+        altText.textContent = "Атрибут alt: Отсутствует";
       }
 
       // Проверяем наличие свойства title
     const titleText = document.createElement("span");
     if (img.title) {
-      titleText.textContent = `Title: ${img.title}`;
+      titleText.textContent = `Атрибут title: ${img.title}`;
     } else {
-      titleText.textContent = "Title: Отсутствует";
+      titleText.textContent = "Атрибут title: Отсутствует";
     }
 
       const formatText = document.createElement("span");
@@ -1053,7 +1028,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (response && response.images) {
           checkStatus(response.images);
         } else {
-          console.error("Не удалось получить данные об изображениях.");
+          //console.error("Не удалось получить данные об изображениях.");
         }
       });
     });
@@ -1065,7 +1040,7 @@ document.addEventListener("DOMContentLoaded", function () {
         cachedImages = response.images; // Сохраняем данные в кэш при загрузке
         updateImageDetails("all", cachedImages);
       } else {
-        console.error("Не удалось получить данные об изображениях.");
+        //console.error("Не удалось получить данные об изображениях.");
       }
     });
   });
@@ -1091,7 +1066,7 @@ document.addEventListener("DOMContentLoaded", () => {
             button.classList.remove("copied");
           }, 300);
         }).catch(err => {
-          console.error("Ошибка при копировании: ", err);
+          //console.error("Ошибка при копировании: ", err);
         });
       }
     });
@@ -1106,7 +1081,7 @@ function fetchMetrics() {
         updateMetricStatus("google-tag-manager", response.googleTagManager);
         updateMetricStatus("google-analytics", response.googleAnalytics);
       } else {
-        console.error("Не удалось получить данные о метриках.");
+        //console.error("Не удалось получить данные о метриках.");
       }
     });
   });
@@ -1782,7 +1757,7 @@ document.addEventListener("DOMContentLoaded", async () => {
           await checkSitemap(tab.url, sitemapResult);
       });
   } catch (error) {
-      console.error("Ошибка выполнения: ", error);
+      //console.error("Ошибка выполнения: ", error);
   }
 });
 
@@ -1902,7 +1877,7 @@ async function checkRobotsTxt(tabUrl, container) {
           <span class="fa fa-times-circle" style="color:red;"></span>
           Не удалось загрузить robots.txt
       `;
-      console.error("Ошибка при загрузке robots.txt:", error);
+      //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
 
@@ -1949,7 +1924,7 @@ async function checkSitemap(tabUrl, container) {
         resultHtml += `<div><a href="${sitemapUrl}" target="_blank">${sitemapUrl}</a></div>`;
       } catch (error) {
         resultHtml += `<div style="color: red;">Ошибка: ${sitemapUrl}</div>`;
-        console.error("Ошибка при проверке sitemap:", error);
+        //console.error("Ошибка при проверке sitemap:", error);
       }
     }
 
@@ -1961,7 +1936,7 @@ async function checkSitemap(tabUrl, container) {
       <span class="fa fa-times-circle" style="color:red;"></span>
       robots.txt не найден или ошибка в запросе
     `;
-    console.error("Ошибка при загрузке robots.txt:", error);
+    //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
 
@@ -2033,7 +2008,7 @@ document.addEventListener('DOMContentLoaded', function () {
                   }
               })
               .catch(error => {
-                  console.error('Ошибка при получении заголовков:', error);
+                  //console.error('Ошибка при получении заголовков:', error);
                   document.getElementById('meta-x-Robots-Tag-result').textContent = 'Ошибка при запросе сайта';
                   document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
                   document.getElementById('meta-x-Robots-Tag-result').classList.add('error');
@@ -2181,7 +2156,7 @@ document.addEventListener("DOMContentLoaded", function () {
         timeCodeElement.textContent = `${responseTime} мс`; 
       })
       .catch(error => {
-        console.error(error);
+        //console.error(error);
         responseCodeElement.textContent = "Ошибка";
         timeCodeElement.textContent = "Ошибка"; // Если ошибка, то выводим ошибку
       });
@@ -2255,11 +2230,11 @@ function fetchSslInfoAndUpdatePopup() {
           }
         })
         .catch((error) => {
-          console.error("Ошибка при получении данных о SSL:", error);
+          //console.error("Ошибка при получении данных о SSL:", error);
           document.getElementById("ssl-expiry-date").textContent = `Ошибка: ${error.message}`;
         });
     } else {
-      console.error("Не удалось получить информацию о текущей вкладке");
+      //console.error("Не удалось получить информацию о текущей вкладке");
       document.getElementById("ssl-expiry-date").textContent = "Ошибка при получении данных";
     }
   });
@@ -2310,7 +2285,7 @@ async function loadDomainData(domain) {
           document.getElementById("domain-age").textContent = "Информация не доступна";
       }
   } catch (error) {
-      console.error('Ошибка при получении данных:', error);
+      //console.error('Ошибка при получении данных:', error);
       document.getElementById("domain-registration-date").textContent = "Ошибка загрузки";
       document.getElementById("domain-age").textContent = "Ошибка загрузки";
   }
@@ -2324,7 +2299,7 @@ function getCurrentDomain() {
       const host = new URL(origin).hostname;
       loadDomainData(host); // Загружаем данные по домену текущей вкладки
     } else {
-      console.log('Не удалось получить URL текущей вкладки');
+      //console.log('Не удалось получить URL текущей вкладки');
     }
   });
 }
