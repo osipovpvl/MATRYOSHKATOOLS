@@ -854,6 +854,7 @@ fetchLinks();
 
 
 
+
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
   const imageList = document.getElementById("image-list");
@@ -913,8 +914,15 @@ document.addEventListener("DOMContentLoaded", function () {
       infoContainer.style.display = "flex";
       infoContainer.style.flexDirection = "column";
 
+      // Информация о alt
       const altText = document.createElement("span");
-      altText.textContent = img.alt ? `Alt: "${img.alt}"` : "Alt: Отсутствует";
+      if (img.alt === "") {
+        altText.textContent = 'Alt: Пустой';
+      } else if (img.alt) {
+        altText.textContent = `Alt: "${img.alt}"`;
+      } else {
+        altText.textContent = "Alt: Отсутствует";
+      }
 
       const formatText = document.createElement("span");
       formatText.textContent = `Формат: ${img.format}`;
@@ -1029,6 +1037,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+
 
 
 document.addEventListener("DOMContentLoaded", () => {
