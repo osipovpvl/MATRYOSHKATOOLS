@@ -67,6 +67,46 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+function getImagesData() {
+  const images = Array.from(document.images);
+
+  return images.map(img => {
+    const src = img.src || "";
+    const format = src.split('.').pop().split('?')[0].toUpperCase(); // Извлекаем формат изображения
+    let sizeInBytes = 0;
+
+    // Получаем вес изображения
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open("HEAD", src, false); // Синхронный запрос
+      xhr.send(null);
+
+      if (xhr.status === 200) {
+        sizeInBytes = parseInt(xhr.getResponseHeader("Content-Length"), 10) || 0;
+      }
+    } catch (error) {
+      //console.warn(`Не удалось получить вес изображения: ${src}`, error);
+    }
+
+    return {
+      src: src,
+      alt: img.getAttribute("alt"),
+      title: img.title,
+      hasAlt: img.hasAttribute("alt"),
+      width: img.naturalWidth,
+      height: img.naturalHeight,
+      format: format || "Неизвестно",
+      sizeInKB: (sizeInBytes / 1024).toFixed(2) // Вес в КБ
+    };
+  });
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "getImages") {
+    const imagesData = getImagesData();
+    sendResponse({ images: imagesData });
+  }
+});
 
 
 // Функция для получения цвета по значению Trust
@@ -160,45 +200,4 @@ async function updateSiteInfo() {
 // Запускаем скрипт после загрузки страницы
 window.addEventListener("load", () => {
   updateSiteInfo();
-});
-
-function getImagesData() {
-  const images = Array.from(document.images);
-
-  return images.map(img => {
-    const src = img.src || "";
-    const format = src.split('.').pop().split('?')[0].toUpperCase(); // Извлекаем формат изображения
-    let sizeInBytes = 0;
-
-    // Получаем вес изображения
-    try {
-      const xhr = new XMLHttpRequest();
-      xhr.open("HEAD", src, false); // Синхронный запрос
-      xhr.send(null);
-
-      if (xhr.status === 200) {
-        sizeInBytes = parseInt(xhr.getResponseHeader("Content-Length"), 10) || 0;
-      }
-    } catch (error) {
-      //console.warn(`Не удалось получить вес изображения: ${src}`, error);
-    }
-
-    return {
-      src: src,
-      alt: img.getAttribute("alt"),
-      title: img.title,
-      hasAlt: img.hasAttribute("alt"),
-      width: img.naturalWidth,
-      height: img.naturalHeight,
-      format: format || "Неизвестно",
-      sizeInKB: (sizeInBytes / 1024).toFixed(2) // Вес в КБ
-    };
-  });
-}
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "getImages") {
-    const imagesData = getImagesData();
-    sendResponse({ images: imagesData });
-  }
 });
