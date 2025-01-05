@@ -616,7 +616,7 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case "other-attributes":
         displayedLinks = allLinks.filter((link) => 
-          (link.rel.includes("noopener") || link.rel.includes("noreferrer")) &&
+          (link.rel.includes("noopener") || link.rel.includes("noreferrer") || link.rel.includes("stylesheet")) &&
           !link.rel.includes("nofollow")
         );
         break;
@@ -884,6 +884,12 @@ document.addEventListener("DOMContentLoaded", function () {
       case "status-404":
         filteredImages = images.filter(img => img.status === 404);
         break;
+        case "up-500":
+        filteredImages = images.filter(img => img.sizeInKB > 500);
+        break;
+      case "low-500":
+        filteredImages = images.filter(img => img.sizeInKB <= 500);
+        break;
       default:
         filteredImages = images;
     }
@@ -956,11 +962,14 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("filled-alt-count").textContent = images.filter(img => img.alt && img.alt !== "").length;
     document.getElementById("status-200-count").textContent = images.filter(img => img.status === 200).length;
     document.getElementById("status-404-count").textContent = images.filter(img => img.status === 404).length;
+    document.getElementById("up-500-count").textContent = images.filter(img => img.sizeInKB > 500).length;  // Обновляем счетчик для "больше 500 КБ"
+    document.getElementById("low-500-count").textContent = images.filter(img => img.sizeInKB <= 500).length;  // Обновляем счетчик для "меньше 500 КБ"
+  
   }
 
   function fetchImages(filter = "all") {
     const imagesToUse = cachedImages.length > 0 ? cachedImages : []; // Используем кэшированные данные, если они есть
-    updateImageDetails(filter, imagesToUse);
+    updateImageDetails(filter, imagesToUse);  // Обновляем список изображений с фильтром
   }
 
   function checkStatus(images) {
@@ -993,7 +1002,7 @@ document.addEventListener("DOMContentLoaded", function () {
   imageSummaryButtons.forEach(button => {
     button.addEventListener("click", () => {
       const filter = button.getAttribute("data-filter");
-      fetchImages(filter);
+      fetchImages(filter);  // Фильтруем изображения при нажатии на кнопку
     });
   });
 
