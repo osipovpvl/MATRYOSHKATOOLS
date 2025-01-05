@@ -4,7 +4,7 @@
   "name": "MATRYOSHKA TOOLS",
   "description": "Инструменты для анализа и оптимизации сайта: метатеги, анализ текста, анализ изображений, анализ ссылок, анализ микроразметки, полезные инструменты, сервисы и другое!",
   "version": "1.0",
-  "permissions": ["activeTab", "tabs", "scripting", "storage"],
+  "permissions": ["activeTab", "tabs", "scripting", "storage", "contentSettings"],
   "background": {
     "service_worker": "background.js"
   },

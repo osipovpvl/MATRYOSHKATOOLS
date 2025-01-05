@@ -616,9 +616,35 @@ document.addEventListener("DOMContentLoaded", () => {
         break;
       case "other-attributes":
         displayedLinks = allLinks.filter((link) => 
-          (link.rel.includes("noopener") || link.rel.includes("noreferrer") || link.rel.includes("stylesheet")) &&
+          (
+            link.rel.includes("noopener") || 
+            link.rel.includes("noreferrer") || 
+            link.rel.includes("sponsored") || 
+            link.rel.includes("ugc") || 
+            link.rel.includes("stylesheet") ||
+            link.rel.includes("alternate") ||
+            link.rel.includes("author") ||
+            link.rel.includes("bookmark") ||
+            link.rel.includes("canonical") ||
+            link.rel.includes("dns-prefetch") ||
+            link.rel.includes("external") ||
+            link.rel.includes("help") ||
+            link.rel.includes("icon") ||
+            link.rel.includes("license") ||
+            link.rel.includes("manifest") ||
+            link.rel.includes("modulepreload") ||
+            link.rel.includes("pingback") ||
+            link.rel.includes("preconnect") ||
+            link.rel.includes("prefetch") ||
+            link.rel.includes("preload") ||
+            link.rel.includes("prerender") ||
+            link.rel.includes("search") ||
+            link.rel.includes("tag") ||
+            link.rel.includes("next") ||
+            link.rel.includes("prev")
+          ) &&
           !link.rel.includes("nofollow")
-        );
+        );        
         break;
         case "js":
   // Фильтрация .js ссылок (также учитываем возможные параметры в URL)
