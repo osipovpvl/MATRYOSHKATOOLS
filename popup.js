@@ -445,7 +445,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const href = link.getAttribute("href") || "";
       let fullHref = href;
   
-      if (!href.startsWith("http") && !href.startsWith("mailto:") && !href.startsWith("tel:")) {
+      if (!href.startsWith("mailto:") && !href.startsWith("tel:")) {
         fullHref = new URL(href, window.location.origin).href;
       }
   
@@ -550,13 +550,16 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("word-links").textContent = wordLinks.length;
   }
 
-  // Проверка, является ли ссылка внутренней
   function isInternal(link) {
     if (link.protocol === "mailto:" || link.protocol === "tel:") {
       return true;
     }
     try {
-      return new URL(link.href).origin === currentHost;
+      const linkUrl = new URL(link.href);
+      const currentUrl = new URL(currentHost);
+  
+      // Сравниваем хосты, игнорируя различия в протоколе
+      return linkUrl.host === currentUrl.host;
     } catch {
       return false;
     }
