@@ -879,8 +879,6 @@ fetchLinks();
 });
 
 
-
-
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
   const imageList = document.getElementById("image-list");
@@ -950,6 +948,14 @@ document.addEventListener("DOMContentLoaded", function () {
         altText.textContent = "Alt: Отсутствует";
       }
 
+      // Проверяем наличие свойства title
+    const titleText = document.createElement("span");
+    if (img.title) {
+      titleText.textContent = `Title: ${img.title}`;
+    } else {
+      titleText.textContent = "Title: Отсутствует";
+    }
+
       const formatText = document.createElement("span");
       formatText.textContent = `Формат: ${img.format}`;
 
@@ -977,6 +983,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       // Добавляем информацию в контейнер
       infoContainer.appendChild(altText);
+      infoContainer.appendChild(titleText); 
       infoContainer.appendChild(formatText);
       infoContainer.appendChild(sizeText);
       infoContainer.appendChild(weightText);
@@ -1063,9 +1070,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
-
-
-
 
 document.addEventListener("DOMContentLoaded", () => {
   const copyButtons = document.querySelectorAll(".copy-button");
