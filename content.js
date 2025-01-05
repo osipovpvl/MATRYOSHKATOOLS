@@ -1,3 +1,74 @@
+
+function getMetricsData() {
+  const metrics = {
+    yandexMetrika: new Set(),
+    googleTagManager: new Set(),
+    googleAnalytics: new Set(),
+  };
+
+  // Проверяем все скрипты на странице
+  const scripts = Array.from(document.scripts);
+  scripts.forEach(script => {
+    const src = script.src || "";
+    const innerContent = script.innerHTML || "";
+
+    // Яндекс Метрика
+    if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(")) {
+      const matchSrc = src.match(/watch\/(\d+)/); // ID в src
+      const matchYM = innerContent.match(/ym\((\d+),/); // ID в ym()
+      if (matchSrc) metrics.yandexMetrika.add(matchSrc[1]);
+      if (matchYM) metrics.yandexMetrika.add(matchYM[1]);
+
+      // Поиск window.mainMetrikaId
+      const mainMetrikaMatch = innerContent.match(/window\.mainMetrikaId\s*=\s*['"](\d+)['"]/);
+      if (mainMetrikaMatch) metrics.yandexMetrika.add(mainMetrikaMatch[1]);
+    }
+
+    // Google Tag Manager
+    if (src.includes("googletagmanager.com/gtm.js")) {
+      const match = src.match(/id=GTM-[A-Z0-9]+/);
+      if (match) metrics.googleTagManager.add(match[0].split("=")[1]);
+    }
+
+    // Google Analytics
+    if (src.includes("google-analytics.com/analytics.js") || src.includes("gtag/js") || innerContent.includes("ga(")) {
+      const match = src.match(/UA-\d+-\d+/) || src.match(/G-[A-Z0-9]+/) || innerContent.match(/['"]UA-\d+-\d+['"]/);
+      if (match) metrics.googleAnalytics.add(match[0].replace(/['"]/g, ""));
+    }
+  });
+
+  // Проверка переменной window.mainMetrikaId
+  if (window.mainMetrikaId) {
+    metrics.yandexMetrika.add(window.mainMetrikaId);
+  }
+
+  return {
+    yandexMetrika: Array.from(metrics.yandexMetrika),
+    googleTagManager: Array.from(metrics.googleTagManager),
+    googleAnalytics: Array.from(metrics.googleAnalytics),
+  };
+}
+
+// Функция для отслеживания динамических изменений
+function observeDOM() {
+  const observer = new MutationObserver(() => {
+    const metricsData = getMetricsData();
+    chrome.runtime.sendMessage({ action: "updateMetrics", metrics: metricsData });
+  });
+
+  observer.observe(document, { childList: true, subtree: true });
+}
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "getMetrics") {
+    const metricsData = getMetricsData();
+    sendResponse(metricsData);
+    observeDOM(); // Начинаем отслеживать изменения DOM
+  }
+});
+
+
+
 // Функция для получения цвета по значению Trust
 function getTrustColor(trust) {
   if (trust >= 0 && trust <= 30) return "red";
@@ -90,75 +161,6 @@ async function updateSiteInfo() {
 window.addEventListener("load", () => {
   updateSiteInfo();
 });
-
-function getMetricsData() {
-  const metrics = {
-    yandexMetrika: new Set(),
-    googleTagManager: new Set(),
-    googleAnalytics: new Set(),
-  };
-
-  // Проверяем все скрипты на странице
-  const scripts = Array.from(document.scripts);
-  scripts.forEach(script => {
-    const src = script.src || "";
-    const innerContent = script.innerHTML || "";
-
-    // Яндекс Метрика
-    if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(")) {
-      const matchSrc = src.match(/watch\/(\d+)/); // ID в src
-      const matchYM = innerContent.match(/ym\((\d+),/); // ID в ym()
-      if (matchSrc) metrics.yandexMetrika.add(matchSrc[1]);
-      if (matchYM) metrics.yandexMetrika.add(matchYM[1]);
-
-      // Поиск window.mainMetrikaId
-      const mainMetrikaMatch = innerContent.match(/window\.mainMetrikaId\s*=\s*['"](\d+)['"]/);
-      if (mainMetrikaMatch) metrics.yandexMetrika.add(mainMetrikaMatch[1]);
-    }
-
-    // Google Tag Manager
-    if (src.includes("googletagmanager.com/gtm.js")) {
-      const match = src.match(/id=GTM-[A-Z0-9]+/);
-      if (match) metrics.googleTagManager.add(match[0].split("=")[1]);
-    }
-
-    // Google Analytics
-    if (src.includes("google-analytics.com/analytics.js") || src.includes("gtag/js") || innerContent.includes("ga(")) {
-      const match = src.match(/UA-\d+-\d+/) || src.match(/G-[A-Z0-9]+/) || innerContent.match(/['"]UA-\d+-\d+['"]/);
-      if (match) metrics.googleAnalytics.add(match[0].replace(/['"]/g, ""));
-    }
-  });
-
-  // Проверка переменной window.mainMetrikaId
-  if (window.mainMetrikaId) {
-    metrics.yandexMetrika.add(window.mainMetrikaId);
-  }
-
-  return {
-    yandexMetrika: Array.from(metrics.yandexMetrika),
-    googleTagManager: Array.from(metrics.googleTagManager),
-    googleAnalytics: Array.from(metrics.googleAnalytics),
-  };
-}
-
-// Функция для отслеживания динамических изменений
-function observeDOM() {
-  const observer = new MutationObserver(() => {
-    const metricsData = getMetricsData();
-    chrome.runtime.sendMessage({ action: "updateMetrics", metrics: metricsData });
-  });
-
-  observer.observe(document, { childList: true, subtree: true });
-}
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.action === "getMetrics") {
-    const metricsData = getMetricsData();
-    sendResponse(metricsData);
-    observeDOM(); // Начинаем отслеживать изменения DOM
-  }
-});
-
 
 function getImagesData() {
   const images = Array.from(document.images);
