@@ -2348,3 +2348,44 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       });
   }
 });
+
+
+
+document.getElementById('toggle-js').addEventListener('click', async () => {
+  // Получаем текущую активную вкладку
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+
+  if (tab && tab.id) {
+    // Отправляем команду на вкладку для переключения состояния JavaScript
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: toggleJavaScriptOnPage
+    });
+  }
+});
+
+// Функция, которая будет выполняться на странице
+function toggleJavaScriptOnPage() {
+  const isJsDisabled = localStorage.getItem('jsDisabled') === 'true';
+
+  if (isJsDisabled) {
+    // Включаем JavaScript
+    localStorage.removeItem('jsDisabled');
+    alert('JavaScript включен');
+    // Восстанавливаем теги <script>
+    document.querySelectorAll('script').forEach(script => {
+      script.type = 'application/javascript';
+    });
+  } else {
+    // Отключаем JavaScript
+    localStorage.setItem('jsDisabled', 'true');
+    alert('JavaScript отключен');
+    // Блокируем выполнение скриптов
+    document.querySelectorAll('script').forEach(script => {
+      script.type = 'text/plain';
+    });
+  }
+
+  // Перезагружаем страницу, чтобы изменения вступили в силу
+  location.reload();
+}
