@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MATRYOSHKA TOOLS v1.0</title>
+  <title>MATRYOSHKA TOOLS</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -658,8 +658,9 @@ a:hover {
         margin-bottom: 20px;
     }
 
+    
+
     .service-container {
-        display: flex;  /* Используем Flexbox для горизонтального расположения */
         justify-content: space-between;  /* Места между списками */
         gap: 40px;  /* Расстояние между списками */
     }
@@ -702,6 +703,16 @@ input[type="text"] {
   border: none;
   cursor: pointer;
 }
+
+.hiddenli {
+            display: none;
+        }
+
+        .section-title {
+            cursor: pointer;
+            font-weight: bold;
+            margin: 10px 0;
+        }
   </style>
 </head>
 <body>
@@ -1005,15 +1016,15 @@ input[type="text"] {
       <div id="images" class="tab">
         <h1>АНАЛИЗ ИЗОБРАЖЕНИЙ</h1>
         <div id="image-summary">
-          <button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
-          <button data-filter="imagecss">Размещены в CSS(<span id="image-css">0</span>)</button>
+          <span><button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
+          <button data-filter="imagecss">Размещены в CSS (<span id="image-css">0</span>)</button>
           <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
           <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button>
-          <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
-          <button data-filter="up-500">Больше 500 КБ (<span id="up-500-count">0</span>)</button>
-            <button data-filter="low-500">Меньше 500 КБ (<span id="low-500-count">0</span>)</button>
-          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button>
-            <button data-filter="status-404">Код ответа 4xx (<span id="status-404-count">0</span>)</button>
+          <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button></span>
+          <span> <button data-filter="up-500">Больше 500 КБ (<span id="up-500-count">0</span>)</button>
+          <button data-filter="low-500">Меньше 500 КБ (<span id="low-500-count">0</span>)</button>
+          <button data-filter="status-404">Код ответа 4xx (<span id="status-404-count">0</span>)</button>
+          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button></span>
         </div>
         <button id="check-status">Проверить код ответа</button>
         <div id="image-details">
@@ -1120,125 +1131,125 @@ input[type="text"] {
         <div class="service-container">
           <ul class="service-list">
             <div class="section-title">АНАЛИТИКА:</div>
-            <li><a href="https://webmaster.yandex.ru/sites/" target="_blank">Yandex Web Master</a></li>
-            <li><a href="https://metrika.yandex.ru/list" target="_blank">Yandex Metrika</a></li>
-            <li><a href="https://search.google.com/search-console" target="_blank">Google Search Console</a></li>
-            <li><a href="https://analytics.google.com/analytics/" target="_blank">Google Analytics</a></li>
-            <li><a href="https://topvisor.com/ru/" target="_blank">Top Visor</a></li>   
-            <li><a href="https://wordstat-2.yandex.ru/" target="_blank">Yandex Word Stat</a></li>
-            <li><a href="https://ads.google.com/intl/ru/home/" target="_blank">Google Keyword Planner</a></li>
-            <li><a href="https://trends.google.ru/trends/" target="_blank">Google Trends</a></li>
+            <li class="hiddenli"><a href="https://webmaster.yandex.ru/sites/" target="_blank">Yandex Web Master</a></li>
+            <li class="hiddenli"><a href="https://metrika.yandex.ru/list" target="_blank">Yandex Metrika</a></li>
+            <li class="hiddenli"><a href="https://search.google.com/search-console" target="_blank">Google Search Console</a></li>
+            <li class="hiddenli"><a href="https://analytics.google.com/analytics/" target="_blank">Google Analytics</a></li>
+            <li class="hiddenli"><a href="https://topvisor.com/ru/" target="_blank">Top Visor</a></li>   
+            <li class="hiddenli"><a href="https://wordstat-2.yandex.ru/" target="_blank">Yandex Word Stat</a></li>
+            <li class="hiddenli"><a href="https://ads.google.com/intl/ru/home/" target="_blank">Google Keyword Planner</a></li>
+            <li class="hiddenli"><a href="https://trends.google.ru/trends/" target="_blank">Google Trends</a></li>
             </ul>
             <ul class="service-list">
               <div class="section-title">ТЕКСТ:</div>
-              <li><a href="https://www.etxt.ru/" target="_blank">Etxt</a></li>
-              <li><a href="https://text.ru/" target="_blank">Text</a></li>
-              <li><a href="https://turgenev.ashmanov.com/" target="_blank">Turgenev</a></li>
-              <li><a href="https://miratext.ru/" target="_blank">Mira Text</a></li>
-              <li><a href="https://simvoli.net/" target="_blank">Simvoli</a></li>
+              <li class="hiddenli"><a href="https://www.etxt.ru/" target="_blank">Etxt</a></li>
+              <li class="hiddenli"><a href="https://text.ru/" target="_blank">Text</a></li>
+              <li class="hiddenli"><a href="https://turgenev.ashmanov.com/" target="_blank">Turgenev</a></li>
+              <li class="hiddenli"><a href="https://miratext.ru/" target="_blank">Mira Text</a></li>
+              <li class="hiddenli"><a href="https://simvoli.net/" target="_blank">Simvoli</a></li>
             </ul>
             <ul class="service-list">
               <div class="section-title">ССЫЛКИ:</div>
-              <li><a href="https://ahrefs.com/" target="_blank">Ahrefs</a></li>
-              <li><a href="https://gogetlinks.net/" target="_blank">Go Get Links</a></li>
-              <li><a href="https://links.sape.ru/" target="_blank">Link Sape</a></li>
-              <li><a href="https://pr.sape.ru/" target="_blank">Pr Sape</a></li>
-              <li><a href="https://www.semrush.com/" target="_blank">Sem Rush</a></li>
-              <li><a href="https://majestic.com/" target="_blank">Majestic</a></li>
-              <li><a href="https://www.miralinks.ru/" target="_blank">Mira Links</a></li>
-              <li><a href="https://xtool.ru/" target="_blank">Xtool</a></li>
-              <li><a href="https://checktrust.ru/" target="_blank">Check Trust</a></li>
-              <li><a href="https://search.google.com/search-console/disavow-links" target="_blank">Google Disavow Links</a></li>
+              <li class="hiddenli"><a href="https://ahrefs.com/" target="_blank">Ahrefs</a></li>
+              <li class="hiddenli"><a href="https://gogetlinks.net/" target="_blank">Go Get Links</a></li>
+              <li class="hiddenli"><a href="https://links.sape.ru/" target="_blank">Link Sape</a></li>
+              <li class="hiddenli"><a href="https://pr.sape.ru/" target="_blank">Pr Sape</a></li>
+              <li class="hiddenli"><a href="https://www.semrush.com/" target="_blank">Sem Rush</a></li>
+              <li class="hiddenli"><a href="https://majestic.com/" target="_blank">Majestic</a></li>
+              <li class="hiddenli"><a href="https://www.miralinks.ru/" target="_blank">Mira Links</a></li>
+              <li class="hiddenli"><a href="https://xtool.ru/" target="_blank">Xtool</a></li>
+              <li class="hiddenli"><a href="https://checktrust.ru/" target="_blank">Check Trust</a></li>
+              <li class="hiddenli"><a href="https://search.google.com/search-console/disavow-links" target="_blank">Google Disavow Links</a></li>
             </ul>
             <ul class="service-list">
               <div class="section-title">ИЗОБРАЖЕНИЯ:</div>
-              <li><a href="https://imagecompressor.com/ru/" target="_blank">Image Compressor</a></li>
+              <li class="hiddenli"><a href="https://imagecompressor.com/ru/" target="_blank">Image Compressor</a></li>
             </ul>
             </div>
             <div class="service-container">
               <ul class="service-list">
                 <div class="section-title">АУДИТ:</div>
-                <li><a href="https://labrika.ru/" target="_blank">Labrika</a></li>
-                <li><a href="https://pr-cy.ru/" target="_blank">Pr-Cy</a></li>
-                <li><a href="https://www.keys.so/" target="_blank">Keys</a></li>
-                <li><a href="https://be1.ru/" target="_blank">Be1</a></li>
-                <li><a href="https://ru.megaindex.com/" target="_blank">Mega Index</a></li>
-                <li><a href="https://tools.pixelplus.ru/" target="_blank">Pixel Plus</a></li>
-                <li><a href="https://www.rush-analytics.ru/" target="_blank">Rush Analytics</a></li>
-                <li><a href="https://arsenkin.ru/tools/" target="_blank">Arsenkin Tools</a></li>
+                <li class="hiddenli"><a href="https://labrika.ru/" target="_blank">Labrika</a></li>
+                <li class="hiddenli"><a href="https://pr-cy.ru/" target="_blank">Pr-Cy</a></li>
+                <li class="hiddenli"><a href="https://www.keys.so/" target="_blank">Keys</a></li>
+                <li class="hiddenli"><a href="https://be1.ru/" target="_blank">Be1</a></li>
+                <li class="hiddenli"><a href="https://ru.megaindex.com/" target="_blank">Mega Index</a></li>
+                <li class="hiddenli"><a href="https://tools.pixelplus.ru/" target="_blank">Pixel Plus</a></li>
+                <li class="hiddenli"><a href="https://www.rush-analytics.ru/" target="_blank">Rush Analytics</a></li>
+                <li class="hiddenli"><a href="https://arsenkin.ru/tools/" target="_blank">Arsenkin Tools</a></li>
               </ul>
               <ul class="service-list">
                 <div class="section-title">ИИ:</div>
-                <li><a href="https://a.ya.ru/" target="_blank">Yandex Gpt</a></li>
-                <li><a href="https://chatgpt.com/" target="_blank">Chat Gpt</a></li>
-                <li><a href="https://giga.chat/" target="_blank">Giga Chat</a></li>
-                <li><a href="https://gemini.google.com/" target="_blank">Gemini</a></li>
-                <li><a href="https://huggingface.co/" target="_blank">Hugging Face</a></li>
-                <li><a href="https://www.midjourney.com/" target="_blank">Midjourney</a></li>
+                <li class="hiddenli"><a href="https://a.ya.ru/" target="_blank">Yandex Gpt</a></li>
+                <li class="hiddenli"><a href="https://chatgpt.com/" target="_blank">Chat Gpt</a></li>
+                <li class="hiddenli"><a href="https://giga.chat/" target="_blank">Giga Chat</a></li>
+                <li class="hiddenli"><a href="https://gemini.google.com/" target="_blank">Gemini</a></li>
+                <li class="hiddenli"><a href="https://huggingface.co/" target="_blank">Hugging Face</a></li>
+                <li class="hiddenli"><a href="https://www.midjourney.com/" target="_blank">Midjourney</a></li>
               </ul>
             <ul class="service-list">
               <div class="section-title">ХОСТИНГИ:</div>
-              <li><a href="https://www.netangels.ru/" target="_blank">Net Angels</a></li>
-              <li><a href="https://beget.com/" target="_blank">Beget</a></li>
-              <li><a href="https://timeweb.com/" target="_blank">Time Web</a></li>
-              <li><a href="https://www.reg.ru/" target="_blank">Reg</a></li>
+              <li class="hiddenli"><a href="https://www.netangels.ru/" target="_blank">Net Angels</a></li>
+              <li class="hiddenli"><a href="https://beget.com/" target="_blank">Beget</a></li>
+              <li class="hiddenli"><a href="https://timeweb.com/" target="_blank">Time Web</a></li>
+              <li class="hiddenli"><a href="https://www.reg.ru/" target="_blank">Reg</a></li>
             </ul>
             <ul class="service-list">
               <div class="section-title">РАЗРАБОТКА:</div>
-              <li><a href="https://github.com/" target="_blank">Git Hub</a></li>
-              <li><a href="http://localhost/" target="_blank">Local Host</a></li>
-              <li><a href="https://validator.w3.org/" target="_blank">W3 Validator</a></li>
-              <li><a href="https://snipp.ru/handbk/emoji" target="_blank">Snippet Emoji</a></li>
-              <li><a href="https://jsbin.com/?js,console" target="_blank">Js Bin</a></li>
-              <li><a href="https://playcode.io/" target="_blank">Play Code</a></li>
-              <li><a href="https://www.w3schools.com/php/phptryit.asp?filename=tryphp_compiler" target="_blank">Php Try It</a></li>
-              <li><a href="https://onlinephp.io/" target="_blank">Online Php</a></li>
+              <li class="hiddenli"><a href="https://github.com/" target="_blank">Git Hub</a></li>
+              <li class="hiddenli"><a href="http://localhost/" target="_blank">Local Host</a></li>
+              <li class="hiddenli"><a href="https://validator.w3.org/" target="_blank">W3 Validator</a></li>
+              <li class="hiddenli"><a href="https://snipp.ru/handbk/emoji" target="_blank">Snippet Emoji</a></li>
+              <li class="hiddenli"><a href="https://jsbin.com/?js,console" target="_blank">Js Bin</a></li>
+              <li class="hiddenli"><a href="https://playcode.io/" target="_blank">Play Code</a></li>
+              <li class="hiddenli"><a href="https://www.w3schools.com/php/phptryit.asp?filename=tryphp_compiler" target="_blank">Php Try It</a></li>
+              <li class="hiddenli"><a href="https://onlinephp.io/" target="_blank">Online Php</a></li>
             </ul>
             </div>
             <div class="service-container">
               <ul class="service-list">
                 <div class="section-title">ОСТАЛЬНОЕ:</div>
-                <li><a href="https://redirectchecker.com/" target="_blank">Redirect Checker</a></li>
-                <li><a href="http://iloveadaptive.com/ru/" target="_blank">I Love Adaptive</a></li>
-                <li><a href="https://pagespeed.web.dev/" target="_blank">Page Speed Insights</a></li>
-                <li><a href="https://suip.biz/ru/?act=findomain" target="_blank">Suip Biz Find Domain</a></li>
-                <li><a href="https://web.archive.org/" target="_blank">Web Archive</a></li>
-                <li><a href="https://seo-reports.ru/" target="_blank">Seo Reports</a></li>
-                <li><a href="https://www.mindmeister.com/ru" target="_blank">Mind Meister</a></li>
-                <li><a href="https://seospeciali.st/meta/" target="_blank">Seo Specialist Meta</a></li>
-                <li><a href="https://www.google.com/webmasters/markup-helper/u/0/?sjid=16785763949033922468-EU" target="_blank">Google Markup Helper</a></li>
-                <li><a href="https://search.google.com/test/rich-results?hl=ru" target="_blank">Google Rich Results</a></li>
-                <li><a href="https://validator.schema.org/" target="_blank">Validator Schema</a></li>
-                <li><a href="https://www.maxim-m.ru/tools/y-turbo" target="_blank">Maxim-M Yandex Turbo Page</a></li>
-                <li><a href="https://www.mysitemapgenerator.com/ru/yml/index.html" target="_blank">Feeds Generator</a></li>
-                <li><a href="https://valentin.app/" target="_blank">Valentin Local & International Checker</a></li>
-                <li><a href="https://merchants.google.com/noaccess/?continue=https://merchants.google.com/mc/" target="_blank">Google Merchants Center</a></li>
-                <li><a href="https://merchants.yandex.ru/?utm_source=webmaster&utm_medium=menu" target="_blank">Yandex Merchants</a></li>
-                <li><a href="https://console.cloud.google.com/welcome?organizationId=0&supportedpurview=project" target="_blank">Google Cloud Platform</a></li>
-                <li><a href="https://business.yandex.ru/" target="_blank">Yandex Business</a></li>
-                <li><a href="https://www.google.com/intl/ru_ru/business/" target="_blank">Google Business</a></li>
+                <li class="hiddenli"><a href="https://redirectchecker.com/" target="_blank">Redirect Checker</a></li>
+                <li class="hiddenli"><a href="http://iloveadaptive.com/ru/" target="_blank">I Love Adaptive</a></li>
+                <li class="hiddenli"><a href="https://pagespeed.web.dev/" target="_blank">Page Speed Insights</a></li>
+                <li class="hiddenli"><a href="https://suip.biz/ru/?act=findomain" target="_blank">Suip Biz Find Domain</a></li>
+                <li class="hiddenli"><a href="https://web.archive.org/" target="_blank">Web Archive</a></li>
+                <li class="hiddenli"><a href="https://seo-reports.ru/" target="_blank">Seo Reports</a></li>
+                <li class="hiddenli"><a href="https://www.mindmeister.com/ru" target="_blank">Mind Meister</a></li>
+                <li class="hiddenli"><a href="https://seospeciali.st/meta/" target="_blank">Seo Specialist Meta</a></li>
+                <li class="hiddenli"><a href="https://www.google.com/webmasters/markup-helper/u/0/?sjid=16785763949033922468-EU" target="_blank">Google Markup Helper</a></li>
+                <li class="hiddenli"><a href="https://search.google.com/test/rich-results?hl=ru" target="_blank">Google Rich Results</a></li>
+                <li class="hiddenli"><a href="https://validator.schema.org/" target="_blank">Validator Schema</a></li>
+                <li class="hiddenli"><a href="https://www.maxim-m.ru/tools/y-turbo" target="_blank">Maxim-M Yandex Turbo Page</a></li>
+                <li class="hiddenli"><a href="https://www.mysitemapgenerator.com/ru/yml/index.html" target="_blank">Feeds Generator</a></li>
+                <li class="hiddenli"><a href="https://valentin.app/" target="_blank">Valentin Local & International Checker</a></li>
+                <li class="hiddenli"><a href="https://merchants.google.com/noaccess/?continue=https://merchants.google.com/mc/" target="_blank">Google Merchants Center</a></li>
+                <li class="hiddenli"><a href="https://merchants.yandex.ru/?utm_source=webmaster&utm_medium=menu" target="_blank">Yandex Merchants</a></li>
+                <li class="hiddenli"><a href="https://console.cloud.google.com/welcome?organizationId=0&supportedpurview=project" target="_blank">Google Cloud Platform</a></li>
+                <li class="hiddenli"><a href="https://business.yandex.ru/" target="_blank">Yandex Business</a></li>
+                <li class="hiddenli"><a href="https://www.google.com/intl/ru_ru/business/" target="_blank">Google Business</a></li>
             </ul>
             <ul class="service-list">
                 <div class="section-title">ПРОГРАММЫ:</div>
-                <li><a href="https://github.com/apps/desktop" target="_blank">Git Hub Desktop</a></li>
-                <li><a href="https://kapeli.com/dash" target="_blank">Dash</a></li>
-                <li><a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a></li>
-                <li><a href="https://www.screamingfrog.co.uk/seo-spider/" target="_blank">Screaming Frog Seo Spider</a></li>
-                <li><a href="https://www.key-collector.ru/" target="_blank">Key Collector</a></li>
-                <li><a href="https://www.apachefriends.org/" target="_blank">Xampp</a></li>
-                <li><a href="https://www.filezilla.ru/" target="_blank">File Zilla</a></li>
-                <li><a href="https://anydesk.com/ru" target="_blank">Any Desk</a></li>
-                <li><a href="https://www.microsoft.com/ru-ru/microsoft-365/powerpoint" target="_blank">Microsoft Power Point</a></li>
-                <li><a href="https://www.microsoft.com/ru-ru/microsoft-365/word" target="_blank">Microsoft Word</a></li>
-                <li><a href="https://www.microsoft.com/ru-ru/microsoft-365/excel" target="_blank">Microsoft Excel</a></li>
-                <li><a href="https://www.figma.com/" target="_blank">Figma</a></li>
-                <li><a href="https://www.adobe.com/products/illustrator.html" target="_blank">Adobe Illustrator</a></li>
-                <li><a href="https://www.adobe.com/ru/products/photoshop.html" target="_blank">Adobe Photoshop</a></li>
-                <li><a href="https://www.adobe.com/products/animate.html" target="_blank">Adobe Animate</a></li>
-                <li><a href="https://www.adobe.com/products/aftereffects.html" target="_blank">Adobe After Effects</a></li>
-                <li><a href="https://www.adobe.com/products/premiere.html" target="_blank">Adobe Premiere Pro</a></li>
-                <li><a href="https://www.adobe.com/products/audition.html" target="_blank">Adobe Audition</a></li>
-                <li><a href="https://www.maxon.net/en/cinema-4d" target="_blank">Cinema 4D</a></li>
+                <li class="hiddenli"><a href="https://github.com/apps/desktop" target="_blank">Git Hub Desktop</a></li>
+                <li class="hiddenli"><a href="https://kapeli.com/dash" target="_blank">Dash</a></li>
+                <li class="hiddenli"><a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a></li>
+                <li class="hiddenli"><a href="https://www.screamingfrog.co.uk/seo-spider/" target="_blank">Screaming Frog Seo Spider</a></li>
+                <li class="hiddenli"><a href="https://www.key-collector.ru/" target="_blank">Key Collector</a></li>
+                <li class="hiddenli"><a href="https://www.apachefriends.org/" target="_blank">Xampp</a></li>
+                <li class="hiddenli"><a href="https://www.filezilla.ru/" target="_blank">File Zilla</a></li>
+                <li class="hiddenli"><a href="https://anydesk.com/ru" target="_blank">Any Desk</a></li>
+                <li class="hiddenli"><a href="https://www.microsoft.com/ru-ru/microsoft-365/powerpoint" target="_blank">Microsoft Power Point</a></li>
+                <li class="hiddenli"><a href="https://www.microsoft.com/ru-ru/microsoft-365/word" target="_blank">Microsoft Word</a></li>
+                <li class="hiddenli"><a href="https://www.microsoft.com/ru-ru/microsoft-365/excel" target="_blank">Microsoft Excel</a></li>
+                <li class="hiddenli"><a href="https://www.figma.com/" target="_blank">Figma</a></li>
+                <li class="hiddenli"><a href="https://www.adobe.com/products/illustrator.html" target="_blank">Adobe Illustrator</a></li>
+                <li class="hiddenli"><a href="https://www.adobe.com/ru/products/photoshop.html" target="_blank">Adobe Photoshop</a></li>
+                <li class="hiddenli"><a href="https://www.adobe.com/products/animate.html" target="_blank">Adobe Animate</a></li>
+                <li class="hiddenli"><a href="https://www.adobe.com/products/aftereffects.html" target="_blank">Adobe After Effects</a></li>
+                <li class="hiddenli"><a href="https://www.adobe.com/products/premiere.html" target="_blank">Adobe Premiere Pro</a></li>
+                <li class="hiddenli"><a href="https://www.adobe.com/products/audition.html" target="_blank">Adobe Audition</a></li>
+                <li class="hiddenli"><a href="https://www.maxon.net/en/cinema-4d" target="_blank">Cinema 4D</a></li>
             </ul>
             
         <ul class="service-list">

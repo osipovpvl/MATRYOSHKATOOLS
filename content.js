@@ -67,10 +67,78 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+function getImageSize(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = function () {
+      resolve({ width: img.width, height: img.height });
+    };
+    img.onerror = function () {
+      reject("Не удалось загрузить изображение");
+    };
+    img.src = url;
+  });
+}
+
+function getImageSizeAndWeight(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = function () {
+      // Получаем размеры изображения
+      const width = img.width;
+      const height = img.height;
+
+      // Получаем размер изображения (в байтах)
+      const xhr = new XMLHttpRequest();
+      xhr.open("HEAD", url, true); // асинхронный запрос
+      xhr.onload = function () {
+        const sizeInBytes = parseInt(xhr.getResponseHeader("Content-Length"), 10) || 0;
+        const sizeInKB = (sizeInBytes / 1024).toFixed(2); // Преобразуем в КБ
+        resolve({ width, height, sizeInKB });
+      };
+      xhr.onerror = function () {
+        reject("Не удалось получить размер изображения");
+      };
+      xhr.send();
+    };
+    img.onerror = function () {
+      reject("Не удалось загрузить изображение");
+    };
+    img.src = url;
+  });
+}
+
 function getImagesData() {
   const images = Array.from(document.images);
 
-  return images.map(img => {
+  // Извлекаем изображения, используемые в background-image в CSS
+  const cssImages = [];
+  const allElements = document.querySelectorAll('*'); // Все элементы на странице
+
+  allElements.forEach(el => {
+    const style = getComputedStyle(el);
+    const backgroundImage = style.backgroundImage;
+
+    // Если background-image не пустой и он содержит URL
+    if (backgroundImage && backgroundImage !== 'none') {
+      const match = backgroundImage.match(/url\(["']?(.*?)["']?\)/);
+      if (match) {
+        const url = match[1]; // Извлекаем URL изображения из CSS
+        cssImages.push({
+          src: url,
+          isInCSS: true,
+          alt: '', // Пустой alt, так как это не реальный тег <img>
+          title: '',
+          width: 0,
+          height: 0,
+          format: url.split('.').pop().toUpperCase(),
+          sizeInKB: 0 // Здесь будет обновляться размер
+        });
+      }
+    }
+  });
+
+  const allImages = images.map(img => {
     const src = img.src || "";
     const format = src.split('.').pop().split('?')[0].toUpperCase(); // Извлекаем формат изображения
     let sizeInBytes = 0;
@@ -96,17 +164,41 @@ function getImagesData() {
       width: img.naturalWidth,
       height: img.naturalHeight,
       format: format || "Неизвестно",
-      sizeInKB: (sizeInBytes / 1024).toFixed(2) // Вес в КБ
+      sizeInKB: (sizeInBytes / 1024).toFixed(2),
+      isInCSS: false // Эти изображения не из CSS, а с тега <img>
     };
+  });
+
+  // Асинхронно получаем данные для изображений, используемых в background-image
+  const cssImagesWithSizePromises = cssImages.map(image => {
+    return getImageSizeAndWeight(image.src).then(sizeData => {
+      image.width = sizeData.width;
+      image.height = sizeData.height;
+      image.sizeInKB = sizeData.sizeInKB;
+      return image;
+    }).catch(() => {
+      image.width = 0;
+      image.height = 0;
+      image.sizeInKB = 0;
+      return image;
+    });
+  });
+
+  // Дожидаемся, пока все изображения будут обработаны
+  return Promise.all(cssImagesWithSizePromises).then(updatedCssImages => {
+    return [...allImages, ...updatedCssImages]; // Возвращаем объединенный список изображений
   });
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "getImages") {
-    const imagesData = getImagesData();
-    sendResponse({ images: imagesData });
+    getImagesData().then(imagesData => {
+      sendResponse({ images: imagesData });
+    });
+    return true; // Возвращаем true, чтобы обработать асинхронный ответ
   }
 });
+
 
 
 // Функция для получения цвета по значению Trust

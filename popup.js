@@ -922,6 +922,11 @@ document.addEventListener("DOMContentLoaded", function () {
       case "low-500":
         filteredImages = images.filter(img => img.sizeInKB <= 500);
         break;
+        case "imagecss":
+      // Фильтрация изображений, найденных в CSS
+      filteredImages = images.filter(img => img.isInCSS);
+      //console.log("Изображения в CSS:", filteredImages); 
+      break;
       default:
         filteredImages = images;
     }
@@ -1013,7 +1018,7 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById("status-404-count").textContent = images.filter(img => img.status === 404).length;
     document.getElementById("up-500-count").textContent = images.filter(img => img.sizeInKB > 500).length;  // Обновляем счетчик для "больше 500 КБ"
     document.getElementById("low-500-count").textContent = images.filter(img => img.sizeInKB <= 500).length;  // Обновляем счетчик для "меньше 500 КБ"
-  
+    document.getElementById("image-css").textContent = images.filter(img => img.isInCSS).length;  // Добавляем фильтр для CSS
   }
 
   function fetchImages(filter = "all") {
@@ -1078,6 +1083,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   });
 });
+
+
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const copyButtons = document.querySelectorAll(".copy-button");
@@ -1931,7 +1939,7 @@ async function checkSitemap(tabUrl, container) {
     
     // Ищем все строки, начинающиеся с "Sitemap:"
     const sitemapUrls = [];
-    const sitemapRegex = /Sitemap:\s*(https?:\/\/[^\s]+)/g;
+    const sitemapRegex = /sitemap:\s*(https?:\/\/[^\s]+)/gi;
     let match;
     while ((match = sitemapRegex.exec(robotsText)) !== null) {
       sitemapUrls.push(match[1]);  // Добавляем каждый найденный sitemap URL в список
@@ -2377,6 +2385,27 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         ipAddressElement.innerHTML = "Ошибка получения IP";
       });
   }
+});
+
+
+document.addEventListener("DOMContentLoaded", function() {
+  // Находим все заголовки секций
+  const sectionTitles = document.querySelectorAll('.section-title');
+
+  sectionTitles.forEach(function(title) {
+      title.addEventListener('click', function() {
+          // Находим родительский <ul> для текущего заголовка
+          let list = title.closest('ul');
+          
+          // Если <ul> найден, то переключаем видимость элементов <li>
+          if (list) {
+              const listItems = list.querySelectorAll('li');
+              listItems.forEach(function(item) {
+                  item.style.display = (item.style.display === 'none' || item.style.display === '') ? 'block' : 'none';
+              });
+          }
+      });
+  });
 });
 
 
