@@ -438,16 +438,24 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     });
   }
-
   function collectLinks() {
     // Сбор ссылок из всех ссылок <a>
     const links = Array.from(document.querySelectorAll("a")).map(link => {
       const href = link.getAttribute("href") || "";
       let fullHref = href;
   
+      // Пропускаем ссылки, которые начинаются с "mailto:" или "tel:"
       if (!href.startsWith("mailto:") && !href.startsWith("tel:")) {
-        fullHref = new URL(href, window.location.origin).href;
+        // Проверка на валидность URL
+        try {
+          fullHref = new URL(href, window.location.origin).href;
+        } catch (e) {
+          // Если ошибка, значит URL невалидный, пропускаем его
+          fullHref = null;
+        }
       }
+  
+      if (fullHref === null) return null;  // Пропускаем некорректные ссылки
   
       const protocol = new URL(fullHref).protocol.split(":")[0]; 
       const rel = link.getAttribute("rel") || ""; 
@@ -462,12 +470,22 @@ document.addEventListener("DOMContentLoaded", () => {
         visible: link.offsetWidth > 0 && link.offsetHeight > 0, // Проверка видимости
         status: null // Статус будет заполняться позже
       };
-    });
+    }).filter(link => link !== null);  // Фильтруем все ссылки, которые равны null
   
     // Теперь добавим ссылки для .js и .css
     const scriptLinks = Array.from(document.querySelectorAll("script[src]")).map(script => {
       const href = script.getAttribute("src");
-      const fullHref = new URL(href, window.location.origin).href;
+      let fullHref = href;
+  
+      // Проверка на валидность URL
+      try {
+        fullHref = new URL(href, window.location.origin).href;
+      } catch (e) {
+        fullHref = null;
+      }
+  
+      if (fullHref === null) return null;  // Пропускаем некорректные ссылки
+  
       return {
         href: fullHref,
         protocol: new URL(fullHref).protocol.split(":")[0],
@@ -476,11 +494,21 @@ document.addEventListener("DOMContentLoaded", () => {
         visible: true,
         status: null
       };
-    });
+    }).filter(script => script !== null);
   
     const cssLinks = Array.from(document.querySelectorAll("link[rel='stylesheet'][href]")).map(link => {
       const href = link.getAttribute("href");
-      const fullHref = new URL(href, window.location.origin).href;
+      let fullHref = href;
+  
+      // Проверка на валидность URL
+      try {
+        fullHref = new URL(href, window.location.origin).href;
+      } catch (e) {
+        fullHref = null;
+      }
+  
+      if (fullHref === null) return null;  // Пропускаем некорректные ссылки
+  
       return {
         href: fullHref,
         protocol: new URL(fullHref).protocol.split(":")[0],
@@ -489,7 +517,7 @@ document.addEventListener("DOMContentLoaded", () => {
         visible: true,
         status: null
       };
-    });
+    }).filter(css => css !== null);
   
     // Объединяем все ссылки
     const allLinks = [...links, ...scriptLinks, ...cssLinks];
@@ -856,12 +884,14 @@ fetchLinks();
 });
 
 
+
 document.addEventListener("DOMContentLoaded", function () {
   const imageSummaryButtons = document.querySelectorAll("#image-summary button");
   const imageList = document.getElementById("image-list");
   const checkStatusButton = document.getElementById("check-status");
 
   let cachedImages = []; // Храним изображения с их статусами
+  
 
   function updateImageDetails(filter, images) {
     imageList.innerHTML = ""; // Очистка списка изображений
