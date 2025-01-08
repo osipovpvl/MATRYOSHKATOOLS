@@ -31,11 +31,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ trust: data.trust, spam: data.spam });
       })
       .catch((error) => {
-        //console.error("Error fetching domain data:", error);
         sendResponse(null);
       });
 
-    return true; // Keeps the message channel open for async response
+    return true;
   }
 });
 
@@ -54,4 +53,86 @@ chrome.action.onClicked.addListener(function (tab) {
 
   // Открываем поиск в Яндексе в новой вкладке
   chrome.tabs.create({ url: searchUrl });
+});
+
+
+// Отключение/включение Java Script
+class ToggleJSWorker {
+  constructor() {
+    chrome.action.onClicked.addListener(this.toggleState.bind(this));  // Привязка события к кнопке
+    chrome.windows.onFocusChanged.addListener(this.onWinFocusChanged.bind(this));  // Обработчик смены фокуса окна
+  }
+
+  // Получаем текущее состояние JavaScript для окна
+  async getState(win) {
+    try {
+      const data = {
+        'primaryUrl': 'http://*',
+        'incognito': win.incognito || false
+      };
+      const state = await chrome.contentSettings.javascript.get(data);
+      state.enabled = (state.setting === 'allow');
+      return state;
+    } catch (error) {
+      console.error('Ошибка при получении состояния JavaScript:', error);
+    }
+  }
+
+  // Устанавливаем состояние JavaScript (разрешить или заблокировать)
+  async setState(win, enabled) {
+    try {
+      const data = {
+        'primaryPattern': '<all_urls>',
+        'setting': enabled ? 'allow' : 'block',
+        'scope': win.incognito ? 'incognito_session_only' : 'regular'
+      };
+      await chrome.contentSettings.javascript.set(data);
+    } catch (error) {
+      console.error('Ошибка при установке состояния JavaScript:', error);
+    }
+  }
+
+  // Переключаем состояние JavaScript
+  async toggleState() {
+    const win = await chrome.windows.getCurrent();
+    const state = await this.getState(win);
+    await this.setState(win, !state.enabled);  // Переключаем состояние
+    await this.reloadCurrentTab();  // Перезагружаем вкладку
+  }
+
+  // Обрабатываем смену окна, но иконка теперь не обновляется
+  async onWinFocusChanged() {
+    // Никаких действий с иконкой не выполняем
+  }
+
+  // Перезагружаем текущую вкладку
+  async reloadCurrentTab() {
+    try {
+      const tabs = await chrome.tabs.query({ currentWindow: true, active: true });
+      const tab = tabs[0];
+      if (tab) {
+        chrome.tabs.reload(tab.id);  // Перезагружаем вкладку
+      }
+    } catch (error) {
+      console.error('Ошибка при перезагрузке вкладки:', error);
+    }
+  }
+}
+
+const jsWorker = new ToggleJSWorker();
+
+// Обработчик нажатия на кнопку для переключения JavaScript
+async function toggleJavaScript() {
+  const win = await chrome.windows.getCurrent();
+  const state = await jsWorker.getState(win);
+  await jsWorker.setState(win, !state.enabled);
+  await jsWorker.reloadCurrentTab();
+}
+
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === 'toggleJavaScript') {
+    const jsWorker = new ToggleJSWorker();
+    jsWorker.toggleState();
+  }
 });

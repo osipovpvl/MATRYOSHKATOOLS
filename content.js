@@ -234,7 +234,7 @@ function getSpamColor(spam) {
 
 // Функция для проверки домена через API
 async function fetchDomainData(domain) {
-  const apiKey = "c32b4abd558dbff2397e17546a77bc65";
+  const apiKey = "c2a054b1e1c353f14e89849bccd2b45f";
   const apiUrl = `https://checktrust.ru/app.php?r=host/app/summary/basic&applicationKey=${apiKey}&host=${domain}&parameterList=trust,spam`;
 
   try {

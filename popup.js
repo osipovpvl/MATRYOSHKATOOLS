@@ -15,17 +15,13 @@
  */
 
 document.addEventListener("DOMContentLoaded", async () => {
-  // Handle tabs
   const tabs = document.querySelectorAll(".tab-button");
   const tabContents = document.querySelectorAll(".tab");
 
   tabs.forEach((tab) => {
     tab.addEventListener("click", () => {
-      // Toggle active tab
       tabs.forEach((t) => t.classList.remove("active"));
       tab.classList.add("active");
-
-      // Toggle tab content
       tabContents.forEach((content) => {
         content.classList.remove("active");
       });
@@ -33,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   });
 
-  // Load SEO Data
+  // Загрузка SEO данных
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
 
   chrome.scripting.executeScript(
@@ -44,7 +40,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     (results) => {
       const seoData = results[0].result;
 
-      // Populate SEO data
       populateMetaData("title", seoData.title);
       populateMetaData("description", seoData.description);
       populateMetaData("keywords", seoData.keywords);
@@ -56,7 +51,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       document.getElementById("lang").textContent = seoData.lang || "Не удалось определить";
 
       
-      // Populate microdata
       populateMicrodata("open-graph", seoData.openGraph, "");
       populateMicrodata("twitter-cards", seoData.twitterCards, "");
       populateMicrodata("schema-org", seoData.schemaOrg, "");
@@ -74,7 +68,7 @@ document.getElementById("toggle-css").addEventListener("click", () => {
 });
 });
 
-// Function to toggle CSS
+// Отключение/включение CSS
 function toggleStyles(tabId) {
   chrome.scripting.executeScript({
     target: { tabId },
@@ -267,10 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Function to populate microdata content
+// Функция микроразметки
 function populateMicrodata(elementId, data, label) {
   const container = document.getElementById(elementId);
-  container.innerHTML = ""; // Clear previous content
+  container.innerHTML = ""; 
 
   if (data && data.length > 0) {
     data.forEach((item) => {
@@ -284,7 +278,6 @@ function populateMicrodata(elementId, data, label) {
   }
 }
 
-// Function to scrape SEO data from the page
 // Функция для извлечения SEO данных
 function scrapeSEOData() {
   // Функция для извлечения структурированных данных, таких как OpenGraph, Twitter и т. д.
@@ -2424,43 +2417,11 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
-
-
-document.getElementById('toggle-js').addEventListener('click', async () => {
-  // Получаем текущую активную вкладку
-  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
-  if (tab && tab.id) {
-    // Отправляем команду на вкладку для переключения состояния JavaScript
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: toggleJavaScriptOnPage
-    });
-  }
+// Кнопка отключения/включения Java Script
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleButton = document.getElementById('toggle-js');
+  
+  toggleButton.addEventListener('click', function() {
+    chrome.runtime.sendMessage({ action: 'toggleJavaScript' });
+  });
 });
-
-// Функция, которая будет выполняться на странице
-function toggleJavaScriptOnPage() {
-  const isJsDisabled = localStorage.getItem('jsDisabled') === 'true';
-
-  if (isJsDisabled) {
-    // Включаем JavaScript
-    localStorage.removeItem('jsDisabled');
-    alert('JavaScript включен');
-    // Восстанавливаем теги <script>
-    document.querySelectorAll('script').forEach(script => {
-      script.type = 'application/javascript';
-    });
-  } else {
-    // Отключаем JavaScript
-    localStorage.setItem('jsDisabled', 'true');
-    alert('JavaScript отключен');
-    // Блокируем выполнение скриптов
-    document.querySelectorAll('script').forEach(script => {
-      script.type = 'text/plain';
-    });
-  }
-
-  // Перезагружаем страницу, чтобы изменения вступили в силу
-  location.reload();
-}
