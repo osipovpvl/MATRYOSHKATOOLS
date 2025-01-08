@@ -1958,7 +1958,7 @@ async function checkSitemap(tabUrl, container) {
     if (sitemapUrls.length === 0) {
       container.innerHTML = `
         <span class="fa fa-times-circle" style="color:red;"></span>
-        Ссылок на файл sitemap.xml не найдено
+        Ссылок на sitemap.xml не найдено
       `;
       return;
     }
