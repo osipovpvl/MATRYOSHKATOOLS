@@ -74,7 +74,7 @@ class ToggleJSWorker {
       state.enabled = (state.setting === 'allow');
       return state;
     } catch (error) {
-      console.error('Ошибка при получении состояния JavaScript:', error);
+      //console.error('Ошибка при получении состояния JavaScript:', error);
     }
   }
 
@@ -88,7 +88,7 @@ class ToggleJSWorker {
       };
       await chrome.contentSettings.javascript.set(data);
     } catch (error) {
-      console.error('Ошибка при установке состояния JavaScript:', error);
+      //console.error('Ошибка при установке состояния JavaScript:', error);
     }
   }
 
@@ -114,7 +114,7 @@ class ToggleJSWorker {
         chrome.tabs.reload(tab.id);  // Перезагружаем вкладку
       }
     } catch (error) {
-      console.error('Ошибка при перезагрузке вкладки:', error);
+      //console.error('Ошибка при перезагрузке вкладки:', error);
     }
   }
 }
