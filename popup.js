@@ -1984,7 +1984,7 @@ async function checkSitemap(tabUrl, container) {
   } catch (error) {
     container.innerHTML = `
       <span class="fa fa-times-circle" style="color:red;"></span>
-      robots.txt не найден или ошибка в запросе, ссылок на файл sitemap.xml не найдено
+      Ссылок на файл sitemap.xml не найдено
     `;
     //console.error("Ошибка при загрузке robots.txt:", error);
   }
