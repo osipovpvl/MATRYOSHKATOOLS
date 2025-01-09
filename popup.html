@@ -136,6 +136,16 @@
     background-color: #000000;
 }
 
+#image-details{
+  margin-top: 20px;
+  background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
 
 #image-details ul {
     list-style: none;
@@ -1060,7 +1070,7 @@ input[type="text"] {
             <span>Длина текста (без пробелов):</span>
             <strong id="clean-text-length">0</strong>
           </div>
-          <div class="info-block">
+          <div style="display: none;" class="info-block">
             <span>Водность текста:</span>
             <strong id="text-wateriness">0%</strong>
           </div>
