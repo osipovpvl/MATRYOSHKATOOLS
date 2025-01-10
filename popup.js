@@ -1789,8 +1789,14 @@ document.addEventListener("DOMContentLoaded", async () => {
               throw new Error("Не удалось получить текущую вкладку.");
           }
 
-          const response = await fetch(tab.url);
-          const html = await response.text();
+        
+            // Используем chrome.scripting.executeScript
+            const [injectionResult] = await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: () => document.documentElement.outerHTML,
+          });
+
+          const html = injectionResult.result;
           const parser = new DOMParser();
           const doc = parser.parseFromString(html, "text/html");
 
@@ -2453,7 +2459,6 @@ document.addEventListener('DOMContentLoaded', function() {
     chrome.runtime.sendMessage({ action: 'toggleJavaScript' });
   });
 });
-
 
 
 document.addEventListener("DOMContentLoaded", async () => {
