@@ -144,6 +144,7 @@
     padding: 10px;
     max-height: 300px;
     overflow-y: auto;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 
@@ -760,8 +761,10 @@ input[type="text"] {
         <table>
           <tr>
             <th>Мета-теги</th>
-            <th>Значение</th>
-            <th></th>
+            <th>Значения</th>
+            <th><button class="copy-button" data-target="allmeta">
+              <i class="fas fa-clone"></i>
+          </button></th>
         </tr>
         <tr>
           <td>Title <strong><div id="title-length" class="meta-length">-</div></strong><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 30-70. Допустимо: 10-29, 71-90. Плохо: 0-9,91+"></i></td>

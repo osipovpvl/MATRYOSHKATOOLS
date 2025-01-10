@@ -851,7 +851,7 @@ function copyLinksToClipboard() {
 
   navigator.clipboard.writeText(linksText)
     .then(() => {
-      alert("Ссылки скопированы в буфер обмена!");
+      //alert("Ссылки скопированы в буфер обмена!");
     })
     .catch(err => {
       //console.error("Ошибка при копировании ссылок: ", err);
@@ -1098,6 +1098,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 document.addEventListener("DOMContentLoaded", () => {
   const copyButtons = document.querySelectorAll(".copy-button");
+  
 
   copyButtons.forEach(button => {
     button.addEventListener("click", () => {
@@ -1943,7 +1944,7 @@ async function checkRobotsTxt(tabUrl, container) {
       };
 
       let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
-      htmlContent += "<p>Список User-agent и их статус:</p>";
+      htmlContent += "<p>Список User-Agent и их статус:</p>";
       htmlContent += "<ul>";
 
       const currentPath = new URL(tabUrl).pathname + new URL(tabUrl).search;
@@ -2508,4 +2509,45 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
       //console.error("Ошибка при выполнении скрипта:", error);
   }
+});
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  // Функция для копирования текста
+  function copyToClipboard(text, button) {
+    navigator.clipboard.writeText(text).then(() => {
+      // Меняем цвет иконки при копировании
+      button.classList.add("copied");
+
+      // Возвращаем исходный цвет через 1.5 секунды
+      setTimeout(() => {
+        button.classList.remove("copied");
+      }, 300);
+    }).catch(err => {
+      //console.error("Ошибка при копировании: ", err);
+    });
+  }
+
+  // Обработчик для кнопки с allmeta
+  document.querySelector('[data-target="allmeta"]').addEventListener('click', () => {
+    const title = document.getElementById('title').textContent.trim();
+    const description = document.getElementById('description').textContent.trim();
+    const h1 = document.getElementById('h1').textContent.trim();
+    const keywords = document.getElementById('keywords').textContent.trim();
+    const url = document.getElementById('current-url').textContent.trim();
+
+    const allMeta = `URL: ${url}\nTitle: ${title}\nDescription: ${description}\nH1: ${h1}\nKeywords: ${keywords}`;
+    copyToClipboard(allMeta, event.currentTarget);
+    });
+
+    // Обработчики для отдельных кнопок копирования
+    document.querySelectorAll('.copy-button').forEach(button => {
+      button.addEventListener('click', (event) => {
+        const targetId = button.getAttribute('data-target');
+        if (targetId !== 'allmeta') {
+          const content = document.getElementById(targetId).textContent.trim();
+          copyToClipboard(content, event.currentTarget);
+        }
+    });
+  });
 });
