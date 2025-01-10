@@ -1868,7 +1868,7 @@ function checkMetaRobots(doc, container) {
 }
 
 
-// Проверка robots.txt
+// Проверка robots.txt с использованием регулярных выражений
 async function checkRobotsTxt(tabUrl, container) {
   const robotsUrl = new URL("/robots.txt", tabUrl).href;
 
@@ -1883,50 +1883,78 @@ async function checkRobotsTxt(tabUrl, container) {
       const userAgents = {};
       let currentAgent = null;
 
+      // Функция для преобразования шаблонов robots.txt в регулярные выражения
+      const convertRobotsTxtToRegex = (robotsTxtPattern) => {
+          // Экранируем все спецсимволы и заменяем '*' на '.*' для универсального соответствия
+          const regexPattern = robotsTxtPattern
+              .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")  // Экранируем спецсимволы
+              .replace(/\\\*/g, ".*")  // Заменяем * на .*
+              .replace(/\\\$/g, "$");  // Заменяем $ на конец строки
+
+          // Также проверяем параметр "?" в пути и разрешаем соответствие любому месту в URL
+          return new RegExp(`^${regexPattern}`);
+      };
+
+      const checkPathAgainstRobotsRegex = (pattern, path) => {
+          return convertRobotsTxtToRegex(pattern).test(path);
+      };
+
+      // Разбираем строки robots.txt
       lines.forEach((line) => {
           const trimmed = line.trim();
           if (trimmed.toLowerCase().startsWith("user-agent:")) {
               currentAgent = trimmed.split(":")[1].trim();
-              userAgents[currentAgent] = [];
+              if (!userAgents[currentAgent]) {
+                  userAgents[currentAgent] = [];
+              }
           } else if (
               currentAgent &&
               (trimmed.toLowerCase().startsWith("disallow:") ||
                   trimmed.toLowerCase().startsWith("allow:"))
           ) {
-              userAgents[currentAgent].push(trimmed);
+              const rule = trimmed.split(":")[1].trim();
+              userAgents[currentAgent].push({
+                  type: trimmed.toLowerCase().startsWith("disallow:") ? "Disallow" : "Allow",
+                  path: rule,
+                  original: trimmed, // Сохраняем оригинальную строку
+              });
           }
       });
+
+      // Проверяем, разрешен ли путь для текущего user-agent с помощью регулярных выражений
+      const isPathAllowed = (rules, path) => {
+          let allowed = true; // Разрешено по умолчанию
+          let ruleMatched = null; // Запоминаем правило
+
+          rules.forEach(({ type, path: rulePath, original }) => {
+              if (checkPathAgainstRobotsRegex(rulePath, path)) {
+                  allowed = type === "Allow";
+                  ruleMatched = original;
+              }
+          });
+
+          return { allowed, ruleMatched };
+      };
 
       let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
       htmlContent += "<p>Список User-agent и их статус:</p>";
       htmlContent += "<ul>";
 
+      const currentPath = new URL(tabUrl).pathname + new URL(tabUrl).search;
+
       for (const [agent, rules] of Object.entries(userAgents)) {
-          let isDisallowed = false;
-
-          rules.forEach((rule) => {
-              if (
-                  rule.toLowerCase().startsWith("disallow:") &&
-                  rule.split(":")[1].trim() === "/"
-              ) {
-                  isDisallowed = true;
-              }
-          });
-
-          if (isDisallowed) {
-              htmlContent += `<li>User-Agent: ${agent} <span class="fa fa-times-circle" style="color:red;"></span> Запрещено</li>`;
-          } else {
-              htmlContent += `<li>User-Agent: ${agent} <span class="fas fa-check-circle" style="color: green;"></span> Разрешено</li>`;
-          }
+          const { allowed, ruleMatched } = isPathAllowed(rules, currentPath);
+          htmlContent += `<li>User-Agent: ${agent} 
+              <span class="${allowed ? 'fas fa-check-circle' : 'fa fa-times-circle'}" 
+              style="color: ${allowed ? 'green' : 'red'};"></span> 
+              ${allowed ? "Разрешено" : `Запрещено правилом: <code>${ruleMatched}</code>`}</li>`;
       }
 
       htmlContent += "</ul>";
       container.innerHTML = htmlContent;
   } catch (error) {
-      container.innerHTML = `
-          <span class="fa fa-times-circle" style="color:red;"></span>
-          Не удалось загрузить robots.txt
-      `;
+      container.innerHTML = 
+          `<span class="fa fa-times-circle" style="color:red;"></span> Не удалось загрузить robots.txt`;
       //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
@@ -2424,4 +2452,55 @@ document.addEventListener('DOMContentLoaded', function() {
   toggleButton.addEventListener('click', function() {
     chrome.runtime.sendMessage({ action: 'toggleJavaScript' });
   });
+});
+
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const executeScriptInActiveTab = (script) => {
+      return new Promise((resolve, reject) => {
+          chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+              if (!tabs || tabs.length === 0) {
+                  reject("Нет активной вкладки.");
+                  return;
+              }
+              chrome.scripting.executeScript(
+                  {
+                      target: { tabId: tabs[0].id },
+                      func: script,
+                  },
+                  (results) => {
+                      if (chrome.runtime.lastError) {
+                          reject(chrome.runtime.lastError.message);
+                      } else {
+                          resolve(results[0]?.result);
+                      }
+                  }
+              );
+          });
+      });
+  };
+
+  const updateCharset = async () => {
+      const charset = await executeScriptInActiveTab(() => document.characterSet || document.charset);
+      document.getElementById("charset").textContent = charset || "Не удалось определить";
+  };
+
+  const updateHreflang = async () => {
+      const hreflangs = await executeScriptInActiveTab(() => {
+          return Array.from(document.querySelectorAll('link[rel="alternate"]'))
+              .map(link => link.getAttribute("hreflang"))
+              .filter(Boolean)
+              .join(", ");
+      });
+      document.getElementById("hreflang").textContent = hreflangs || "Отсутствует";
+  };
+
+
+  try {
+      await updateCharset();
+      await updateHreflang();
+  } catch (error) {
+      //console.error("Ошибка при выполнении скрипта:", error);
+  }
 });
