@@ -1892,13 +1892,12 @@ async function checkRobotsTxt(tabUrl, container) {
 
       // Функция для преобразования шаблонов robots.txt в регулярные выражения
       const convertRobotsTxtToRegex = (robotsTxtPattern) => {
-          // Экранируем все спецсимволы и заменяем '*' на '.*' для универсального соответствия
+          // Экранируем спецсимволы и заменяем '*' на '.*'
           const regexPattern = robotsTxtPattern
-              .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")  // Экранируем спецсимволы
-              .replace(/\\\*/g, ".*")  // Заменяем * на .*
-              .replace(/\\\$/g, "$");  // Заменяем $ на конец строки
+              .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+              .replace(/\\\*/g, ".*")
+              .replace(/\\\$/g, "$");
 
-          // Также проверяем параметр "?" в пути и разрешаем соответствие любому месту в URL
           return new RegExp(`^${regexPattern}`);
       };
 
@@ -1919,21 +1918,26 @@ async function checkRobotsTxt(tabUrl, container) {
               (trimmed.toLowerCase().startsWith("disallow:") ||
                   trimmed.toLowerCase().startsWith("allow:"))
           ) {
-              const rule = trimmed.split(":")[1].trim();
+              const rule = trimmed.split(":")[1].trim(); // Извлекаем правило
+              // Добавляем только непустые правила
               userAgents[currentAgent].push({
                   type: trimmed.toLowerCase().startsWith("disallow:") ? "Disallow" : "Allow",
-                  path: rule,
+                  path: rule || "", // Если путь пустой, храним пустую строку
                   original: trimmed, // Сохраняем оригинальную строку
               });
           }
       });
 
-      // Проверяем, разрешен ли путь для текущего user-agent с помощью регулярных выражений
+      // Проверяем, разрешен ли путь для текущего user-agent
       const isPathAllowed = (rules, path) => {
           let allowed = true; // Разрешено по умолчанию
           let ruleMatched = null; // Запоминаем правило
 
           rules.forEach(({ type, path: rulePath, original }) => {
+              // Пустой Disallow не запрещает индексацию
+              if (type === "Disallow" && rulePath === "") {
+                  return;
+              }
               if (checkPathAgainstRobotsRegex(rulePath, path)) {
                   allowed = type === "Allow";
                   ruleMatched = original;
@@ -1944,7 +1948,7 @@ async function checkRobotsTxt(tabUrl, container) {
       };
 
       let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
-      htmlContent += "<p>Список User-Agent и их статус:</p>";
+      htmlContent += "<p>Список User-agent и их статус:</p>";
       htmlContent += "<ul>";
 
       const currentPath = new URL(tabUrl).pathname + new URL(tabUrl).search;
@@ -1965,6 +1969,7 @@ async function checkRobotsTxt(tabUrl, container) {
       //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
+
 
 
 // Проверка sitemap.xml
