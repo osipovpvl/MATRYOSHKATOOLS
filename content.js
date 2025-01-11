@@ -214,7 +214,55 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.action === 'toggleDisplayNone') {
+    // Находим все элементы с style="display:none"
+    let elements = document.querySelectorAll('[style="display:none"]');
+    
+    // Проходим по всем найденным элементам
+    elements.forEach(function(element) {
+        // Убираем display: none, чтобы элемент стал видимым
+        element.style.display = 'block'; // или 'inline-block', в зависимости от контекста
 
+        // Добавляем черный фон для этих элементов
+        element.style.backgroundColor = 'black';
+        element.style.color = 'white';  // Белый текст для контраста
+        element.style.padding = '10px';  // Немного отступов для элементов
+    });
+  }
+});
+
+
+
+// Изначально функции отключены
+let functionsEnabled = false;
+
+// Функция для включения/выключения функций
+function toggleFunctions(enable) {
+  functionsEnabled = enable;
+
+  if (functionsEnabled) {
+    console.log("Functions enabled");
+    updateSiteInfo(); // Включаем функциональность (если чекбокс включен)
+  } else {
+    console.log("Functions disabled");
+    // Отключаем все функции (если чекбокс выключен)
+    stopUpdatingSiteInfo(); // Останавливаем обновление, если функции отключены
+  }
+}
+
+// Функция для получения API ключа из storage
+function getApiKey() {
+  return new Promise((resolve, reject) => {
+    chrome.storage.sync.get('apiKey', (data) => {
+      if (data.apiKey) {
+        resolve(data.apiKey);
+      } else {
+        reject('API ключ не найден');
+      }
+    });
+  });
+}
 
 // Функция для получения цвета по значению Trust
 function getTrustColor(trust) {
@@ -234,10 +282,10 @@ function getSpamColor(spam) {
 
 // Функция для проверки домена через API
 async function fetchDomainData(domain) {
-  const apiKey = "c2a054b1e1c353f14e89849bccd2b45f";
-  const apiUrl = `https://checktrust.ru/app.php?r=host/app/summary/basic&applicationKey=${apiKey}&host=${domain}&parameterList=trust,spam`;
-
   try {
+    const apiKey = await getApiKey(); // Получаем API ключ
+    const apiUrl = `https://checktrust.ru/app.php?r=host/app/summary/basic&applicationKey=${apiKey}&host=${domain}&parameterList=trust,spam`;
+
     const response = await fetch(apiUrl);
     if (!response.ok) {
       throw new Error(`Не удалось проверить: ${response.status}`);
@@ -251,60 +299,69 @@ async function fetchDomainData(domain) {
       };
     } 
   } catch (error) {
+    console.error("Ошибка при получении данных:", error);
     return null;
   }
 }
 
 // Функция для обновления информации о доменах
 async function updateSiteInfo() {
-  const observer = new MutationObserver(() => {
-    const siteLinks = document.querySelectorAll("span.site-link a");
+  console.log("Обновление информации о сайте...");
+  const siteLinks = document.querySelectorAll("span.site-link a");
 
-    siteLinks.forEach(async (link) => {
-      const domain = new URL(link.href).hostname;
+  siteLinks.forEach(async (link) => {
+    const domain = new URL(link.href).hostname;
 
-      // Проверяем, есть ли уже добавленный Trust/Spam, чтобы не дублировать
-      if (link.nextElementSibling && link.nextElementSibling.classList.contains("trust-spam-info")) {
-        return;
-      }
+    // Проверяем, есть ли уже добавленный Trust/Spam, чтобы не дублировать
+    if (link.nextElementSibling && link.nextElementSibling.classList.contains("trust-spam-info")) {
+      return;
+    }
 
-      // Создаем контейнер для Trust/Spam
-      const infoSpan = document.createElement("span");
-      infoSpan.classList.add("trust-spam-info");
-      infoSpan.style.marginLeft = "10px";
-      infoSpan.textContent = "Проверка...";
+    // Если функции отключены, то ничего не добавляем
+    if (!functionsEnabled) return;
 
-      link.parentElement.appendChild(infoSpan);
+    // Создаем контейнер для Trust/Spam
+    const infoSpan = document.createElement("span");
+    infoSpan.classList.add("trust-spam-info");
+    infoSpan.style.marginLeft = "10px";
+    infoSpan.textContent = "Проверка...";
 
-      // Получаем данные через API
-      const data = await fetchDomainData(domain);
-      if (data) {
-        const trustColor = getTrustColor(data.trust);
-        const spamColor = getSpamColor(data.spam);
+    link.parentElement.appendChild(infoSpan);
 
-        infoSpan.innerHTML = `
-          ТРАСТ: <span style="color: ${trustColor};">${data.trust}</span>,
-          СПАМ: <span style="color: ${spamColor};">${data.spam}</span>
-        `;
-      } else {
-        infoSpan.textContent = "Не удалось проверить";
-        infoSpan.style.color = "red";
-      }
-    });
-  });
+    // Получаем данные через API
+    const data = await fetchDomainData(domain);
+    if (data) {
+      const trustColor = getTrustColor(data.trust);
+      const spamColor = getSpamColor(data.spam);
 
-  // Наблюдаем за изменениями в DOM
-  observer.observe(document.body, { childList: true, subtree: true });
-
-  // Обновляем информацию для уже существующих элементов
-  const initialLinks = document.querySelectorAll("span.site-link a");
-  initialLinks.forEach((link) => {
-    const event = new Event("DOMNodeInserted");
-    link.dispatchEvent(event);
+      infoSpan.innerHTML = `ТРАСТ: <span style="color: ${trustColor};">${data.trust}</span>, СПАМ: <span style="color: ${spamColor};">${data.spam}</span>`;
+    } else {
+      infoSpan.textContent = "Не удалось проверить";
+      infoSpan.style.color = "red";
+    }
   });
 }
 
-// Запускаем скрипт после загрузки страницы
+// Останавливаем обновление информации, если функции отключены
+function stopUpdatingSiteInfo() {
+  console.log("Обновление информации остановлено.");
+  // Очистка всех добавленных элементов (если они есть)
+  const allInfoSpans = document.querySelectorAll(".trust-spam-info");
+  allInfoSpans.forEach(span => span.remove());
+}
+
+// Запускаем скрипт после загрузки страницы, но только если функции активированы
 window.addEventListener("load", () => {
-  updateSiteInfo();
+  if (functionsEnabled) {
+    updateSiteInfo();
+  }
+});
+
+// Обработчик сообщений от popup.js
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+  if (request.action === 'enable') {
+    toggleFunctions(true);
+  } else if (request.action === 'disable') {
+    toggleFunctions(false);
+  }
 });

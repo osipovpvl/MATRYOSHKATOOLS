@@ -79,6 +79,12 @@ function toggleStyles(tabId) {
   });
 }
 
+document.getElementById('toggle-none').addEventListener('click', function() {
+  // Отправляем сообщение в контентный скрипт
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleDisplayNone' });
+  });
+});
 
 let noIndexActive = false; // Состояние подсветки для noindex
 let noFollowActive = false; // Состояние подсветки для nofollow
@@ -2555,5 +2561,73 @@ document.addEventListener('DOMContentLoaded', () => {
           copyToClipboard(content, event.currentTarget);
         }
     });
+  });
+});
+
+
+document.getElementById("open-settings").addEventListener("click", function() {
+  document.getElementById("settings-panel").style.display = "block";
+});
+
+document.getElementById("close-settings").addEventListener("click", function() {
+  document.getElementById("settings-panel").style.display = "none";
+});
+
+// Получаем ссылки на элементы
+const apiKeyInput = document.getElementById('apiKey');
+const saveButton = document.getElementById('saveKey');
+const statusMessage = document.getElementById('status');
+const disableCheck = document.getElementById('enableCheck');
+
+// Загружаем сохраненные настройки при открытии popup
+chrome.storage.sync.get(['apiKey', 'disableCheck'], (data) => {
+  if (data.apiKey) {
+    apiKeyInput.value = data.apiKey;
+  }
+  if (data.disableCheck) {
+    disableCheck.checked = data.disableCheck;
+  }
+});
+
+// Сохраняем API ключ
+saveButton.addEventListener('click', () => {
+  const apiKey = apiKeyInput.value.trim();
+
+  if (apiKey) {
+    chrome.storage.sync.set({ apiKey: apiKey }, () => {
+      statusMessage.textContent = 'API ключ сохранен!';
+      statusMessage.style.color = 'green';
+    });
+  } else {
+    statusMessage.textContent = 'Введите валидный API ключ!';
+    statusMessage.style.color = 'red';
+  }
+});
+// Проверяем состояние чекбокса при загрузке popup
+document.addEventListener('DOMContentLoaded', function() {
+  var enabledCheck = document.getElementById('enabledCheck');
+  
+  // Извлекаем состояние чекбокса из localStorage
+  var isChecked = localStorage.getItem('checkboxState') === 'true';
+  
+  // Устанавливаем состояние чекбокса
+  enabledCheck.checked = isChecked;
+
+  // Отправляем сообщение в content.js для включения или отключения функций на основе состояния чекбокса
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { action: isChecked ? 'enable' : 'disable' });
+  });
+});
+
+// Сохраняем состояние чекбокса в localStorage и отправляем сообщение в content.js
+document.getElementById('enabledCheck').addEventListener('change', function() {
+  var enabledCheck = document.getElementById('enabledCheck');
+  
+  // Сохраняем состояние чекбокса в localStorage
+  localStorage.setItem('checkboxState', enabledCheck.checked);
+
+  // Отправляем сообщение в content.js для включения или отключения функций
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, { action: enabledCheck.checked ? 'enable' : 'disable' });
   });
 });

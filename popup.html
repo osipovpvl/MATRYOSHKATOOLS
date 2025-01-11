@@ -737,6 +737,42 @@ input[type="text"] {
   font-size: 0.9em;
   color: #555;
 }
+
+#settings-panel {
+    position: fixed;
+    top: 10%;
+    right: 10%;
+    width: 300px;
+    height: 400px;
+    background-color: white;
+    border: 1px solid #ccc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    z-index: 1000;
+}
+
+#settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+}
+
+#settings-header button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+#settings-content {
+    padding: 10px;
+    overflow-y: auto;
+}
+
   </style>
 </head>
 <body>
@@ -1303,10 +1339,9 @@ input[type="text"] {
       </div>
 
       <div id="tools" class="tab">
-        <i class="fa fa-cog" aria-hidden="true" style="float: right; font-size: 20px;"></i>
         <h1>ИНСТРУМЕНТЫ</h1>
         <div class="page-panel">
-             <!-- Кнопка для перезагрузки страницы с очисткой кеша -->
+          <div class="section-title">ОСНОВНЫЕ ИНСТРУМЕНТЫ:</div>
    <div class="page-item">
     <span>Перезагрузить страницу с очисткой кеша</span>
     <button id="reload-btn" class="page-button action-button"><i class="fa fa-refresh" aria-hidden="true"></i></button>
@@ -1320,6 +1355,10 @@ input[type="text"] {
             <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-adjust" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
+            <span>Показать элементы none</span>
+            <button id="toggle-none" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
+          </div>
+          <div class="page-item">
             <span>Отключение/включение Java Script</span>
             <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
@@ -1327,6 +1366,30 @@ input[type="text"] {
             <span>Отключение/включение CSS</span>
             <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
+          <div class="section-title">ДОПОЛНИТЕЛЬНЫЕ ИНСТРУМЕНТЫ:<div id="settings-panel" style="display: none;">
+            <div id="settings-header">
+                <span style="font-size: 15px;">Настройки дополнительных инструментов</span>
+                <button id="close-settings">X</button>
+            </div>
+            <div id="settings-content">
+              <label for="enableCheck">
+                <input type="checkbox" id="enabledCheck" />
+              Проверка API Check Trust
+              </label>
+            </div>
+        </div>
+        <i title="Настройки дополнительных инструментов" class="fa fa-cog" aria-hidden="true" style="float: right; font-size: 20px;" id="open-settings"></i>
+        </div>
+          <h2 style="margin: 0px;">Подключение API Check Trust</h2>
+          <p style="margin: 0px;">Включив в настройках проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</p>
+    <ul style="margin: 0px;">
+        <li><strong>ТРАСТ</strong> сайтов — уровень доверия к ресурсу.</li>
+        <li><strong>СПАМ</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
+    </ul>
+          <label for="apiKey">Ваш API ключ:</label>
+          <input style="margin: 0px;" type="text" id="apiKey" placeholder="Введите API ключ" />
+          <button id="saveKey">Сохранить</button>
+          <p id="status"></p>
         </div>
       </div>
     </div>
