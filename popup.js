@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 PAVEL OSIPOV (MATRYOSHKA TOOLS)
+ * Copyright 2025 PAVEL OSIPOV (osTOOLS)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,107 +61,117 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   );
 
+  let cssEnabled = true; // По умолчанию стили включены
 
+// Загружаем сохраненное состояние при старте
+chrome.storage.local.get(['cssEnabled'], function(result) {
+  cssEnabled = result.cssEnabled !== undefined ? result.cssEnabled : true; // Восстанавливаем состояние из памяти
+  updateButtonState(cssEnabled); // Обновляем состояние кнопки при загрузке
+});
 
+// Обработчик для кнопки включения/отключения CSS
 document.getElementById("toggle-css").addEventListener("click", () => {
-  toggleStyles(tab.id);
-});
+  cssEnabled = !cssEnabled; // Переключаем состояние CSS
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+    toggleStyles(tabs[0].id); // Применяем изменения на активной вкладке
+  });
+  updateButtonState(cssEnabled); // Обновляем состояние кнопки
+  // Сохраняем состояние в памяти
+  chrome.storage.local.set({ cssEnabled });
 });
 
-// Отключение/включение CSS
+// Функция для отключения/включения CSS
 function toggleStyles(tabId) {
   chrome.scripting.executeScript({
     target: { tabId },
     func: () => {
       const links = document.querySelectorAll("link[rel='stylesheet']");
-      links.forEach((link) => (link.disabled = !link.disabled));
+      links.forEach((link) => {
+        link.disabled = !link.disabled; // Переключаем свойство disabled у стилей
+      });
     },
   });
 }
 
-document.getElementById('toggle-none').addEventListener('click', function() {
-  // Отправляем сообщение в контентный скрипт
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleDisplayNone' });
-  });
+// Функция для обновления состояния кнопки
+function updateButtonState(isEnabled) {
+  const button = document.getElementById("toggle-css");
+  const icon = button.querySelector('i');
+
+  if (isEnabled) {
+    button.classList.add("active");
+    icon.classList.remove("fa-toggle-off");
+    icon.classList.add("fa-toggle-on");
+  } else {
+    button.classList.remove("active");
+    icon.classList.remove("fa-toggle-on");
+    icon.classList.add("fa-toggle-off");
+  }
+}
+
 });
 
-let noIndexActive = false; // Состояние подсветки для noindex
-let noFollowActive = false; // Состояние подсветки для nofollow
+let noIndexActive = false;
+let noFollowActive = false;
+
+// Загружаем сохраненные значения при старте
+chrome.storage.local.get(['noIndexActive', 'noFollowActive'], function (result) {
+  noIndexActive = result.noIndexActive || false;
+  noFollowActive = result.noFollowActive || false;
+
+  // Обновляем состояние кнопок
+  updateButtonState("highlight-noindex", noIndexActive);
+  updateButtonState("highlight-nofollow", noFollowActive);
+});
 
 // Обработчик для кнопки подсветки noindex
 document.getElementById("highlight-noindex").addEventListener("click", () => {
-  noIndexActive = !noIndexActive; // Переключаем состояние подсветки
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    toggleHighlight(tabs[0].id, "noindex", noIndexActive); // Отправляем на активную вкладку
+  noIndexActive = !noIndexActive;
+  updateButtonState("highlight-noindex", noIndexActive);
+  chrome.storage.local.set({ noIndexActive });
+
+  // Применяем изменения на текущей вкладке
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      type: "updateHighlight",
+      highlightType: "noindex",
+      isEnabled: noIndexActive,
+    });
   });
-  updateButtonState("highlight-noindex", noIndexActive); // Обновляем состояние кнопки
 });
 
 // Обработчик для кнопки подсветки nofollow
 document.getElementById("highlight-nofollow").addEventListener("click", () => {
-  noFollowActive = !noFollowActive; // Переключаем состояние подсветки
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    toggleHighlight(tabs[0].id, "nofollow", noFollowActive); // Отправляем на активную вкладку
+  noFollowActive = !noFollowActive;
+  updateButtonState("highlight-nofollow", noFollowActive);
+  chrome.storage.local.set({ noFollowActive });
+
+  // Применяем изменения на текущей вкладке
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      type: "updateHighlight",
+      highlightType: "nofollow",
+      isEnabled: noFollowActive,
+    });
   });
-  updateButtonState("highlight-nofollow", noFollowActive); // Обновляем состояние кнопки
 });
-
-// Функция для подсветки элементов
-function toggleHighlight(tabId, type, isEnabled) {
-  chrome.scripting.executeScript({
-    target: { tabId },
-    func: highlightElements,
-    args: [type, isEnabled]
-  });
-}
-
-// Функция для выделения элементов на странице
-function highlightElements(type, isEnabled) {
-  let elements;
-
-  if (type === "noindex") {
-    // Поиск всех тегов <noindex> на странице
-    const noIndexElements = document.querySelectorAll('noindex');
-
-    noIndexElements.forEach((el) => {
-      // Ищем первый контейнер внутри <noindex>
-      const firstContainer = el.querySelector('div, section, article, main, nav'); // Подставьте контейнеры, которые вам нужны
-
-      if (firstContainer) {
-        if (isEnabled) {
-          // Подсвечиваем только первый контейнер внутри <noindex>
-          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)"; // Фон для контейнера
-          firstContainer.style.border = "2px solid black"; // Рамка для контейнера
-        } else {
-          firstContainer.style.backgroundColor = ""; // Убираем фон
-          firstContainer.style.border = ""; // Убираем рамку
-        }
-      }
-    });
-  } else if (type === "nofollow") {
-    elements = document.querySelectorAll('a[rel="nofollow"]');
-    elements.forEach((el) => {
-      if (isEnabled) {
-        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)"; // Фон для nofollow
-        el.style.border = "2px solid black"; // Рамка для nofollow
-      } else {
-        el.style.backgroundColor = ""; // Убираем фон
-        el.style.border = ""; // Убираем рамку
-      }
-    });
-  }
-}
 
 // Функция для обновления состояния кнопок
 function updateButtonState(buttonId, isActive) {
   const button = document.getElementById(buttonId);
+  const icon = button.querySelector("i");
+
   if (isActive) {
     button.classList.add("active");
+    icon.classList.remove("fa-toggle-off");
+    icon.classList.add("fa-toggle-on");
   } else {
     button.classList.remove("active");
+    icon.classList.remove("fa-toggle-on");
+    icon.classList.add("fa-toggle-off");
   }
 }
+
 
 
 

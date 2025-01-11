@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "MATRYOSHKA TOOLS",
+  "name": "osTOOLS",
   "description": "Полезные инструменты и сервисы для анализа и оптимизации сайта.",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "permissions": ["activeTab", "tabs", "contentSettings", "scripting", "storage"],
   "background": {
     "service_worker": "background.js"
@@ -15,7 +15,7 @@
   "48": "img/icon48.png",
   "128": "img/icon128.png"
   },
-  "default_title": "MATRYOSHKA TOOLS"
+  "default_title": "osTOOLS"
 },
   "content_scripts": [
     {

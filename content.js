@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 PAVEL OSIPOV (MATRYOSHKA TOOLS)
+ * Copyright 2025 PAVEL OSIPOV (osTOOLS)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -214,23 +214,74 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-  if (request.action === 'toggleDisplayNone') {
-    // Находим все элементы с style="display:none"
-    let elements = document.querySelectorAll('[style="display:none"]');
-    
-    // Проходим по всем найденным элементам
-    elements.forEach(function(element) {
-        // Убираем display: none, чтобы элемент стал видимым
-        element.style.display = 'block'; // или 'inline-block', в зависимости от контекста
 
-        // Добавляем черный фон для этих элементов
-        element.style.backgroundColor = 'black';
-        element.style.color = 'white';  // Белый текст для контраста
-        element.style.padding = '10px';  // Немного отступов для элементов
-    });
+// Проверяем сохраненное состояние при загрузке страницы
+chrome.storage.local.get(['cssEnabled'], function(result) {
+  const cssEnabled = result.cssEnabled !== undefined ? result.cssEnabled : true; // Восстанавливаем состояние из памяти
+
+  // Если стили выключены, сразу отключаем их
+  if (!cssEnabled) {
+    disableStyles();
   }
 });
+
+// Функция для отключения всех стилей
+function disableStyles() {
+  const links = document.querySelectorAll("link[rel='stylesheet']");
+  links.forEach((link) => {
+    link.disabled = true; // Отключаем все стили
+  });
+}
+
+// Функция для подсветки элементов на странице
+function applyHighlight(type, isEnabled) {
+  if (type === "noindex") {
+    const noIndexElements = document.querySelectorAll('noindex');
+    noIndexElements.forEach((el) => {
+      const firstContainer = el.querySelector('div, section, article, main, nav');
+      if (firstContainer) {
+        if (isEnabled) {
+          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+          firstContainer.style.border = "2px solid black";
+        } else {
+          firstContainer.style.backgroundColor = "";
+          firstContainer.style.border = "";
+        }
+      }
+    });
+  } else if (type === "nofollow") {
+    const noFollowElements = document.querySelectorAll('a[rel="nofollow"]');
+    noFollowElements.forEach((el) => {
+      if (isEnabled) {
+        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)";
+        el.style.border = "2px solid black";
+      } else {
+        el.style.backgroundColor = "";
+        el.style.border = "";
+      }
+    });
+  }
+}
+
+// Загружаем сохраненные настройки и применяем подсветку
+chrome.storage.local.get(['noIndexActive', 'noFollowActive'], function (result) {
+  const noIndexActive = result.noIndexActive || false;
+  const noFollowActive = result.noFollowActive || false;
+
+  // Применяем подсветку на основе сохраненных значений
+  applyHighlight("noindex", noIndexActive);
+  applyHighlight("nofollow", noFollowActive);
+});
+
+// Слушаем изменения состояния и динамически применяем подсветку
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "updateHighlight") {
+    applyHighlight(message.highlightType, message.isEnabled);
+  }
+});
+
+
+
 
 
 
