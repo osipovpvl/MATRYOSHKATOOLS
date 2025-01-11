@@ -862,7 +862,7 @@ function copyLinksToClipboard() {
 function exportLinksToCSV() {
   const csvRows = [];
   const headers = ["Анкор", "Ссылка", "Протокол", "Атрибут rel", "Видимость", "Код ответа"];
-  csvRows.push(headers.join(","));
+  csvRows.push(headers.join(";")); // Заменяем запятую на точку с запятой
 
   displayedLinks.forEach(link => {
     const row = [
@@ -873,10 +873,11 @@ function exportLinksToCSV() {
       link.visible ? "Да" : "Нет",
       link.status || "Не проверено"
     ];
-    csvRows.push(row.join(","));
+    csvRows.push(row.join(";")); // Заменяем запятую на точку с запятой
   });
 
-  const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent(csvRows.join("\n"));
+  // Добавляем BOM для корректного отображения UTF-8
+  const csvContent = "data:text/csv;charset=utf-8,\uFEFF" + encodeURIComponent(csvRows.join("\n"));
   const downloadLink = document.createElement("a");
   downloadLink.setAttribute("href", csvContent);
   downloadLink.setAttribute("download", "links.csv");
@@ -889,6 +890,7 @@ document.getElementById("export-links").addEventListener("click", exportLinksToC
 
 // Загрузка ссылок при старте
 fetchLinks();
+
 
 });
 
@@ -1645,16 +1647,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-
   exportButton.addEventListener("click", () => {
     // Заголовки CSV
     const csvHeader = ["#", "Слово", "Количество"];
     // Формируем данные таблицы для экспорта
     const csvRows = filteredData.map(
-      (item, index) => `${index + 1},${item.word},${item.count}`
+      (item, index) => `${index + 1};${item.word};${item.count}`
     );
     // Объединяем заголовки и строки данных
-    const csvContent = [csvHeader.join(","), ...csvRows].join("\n");
+    const csvContent = [csvHeader.join(";"), ...csvRows].join("\n");
   
     // Добавляем BOM в начале файла для корректного отображения UTF-8
     const bom = "\uFEFF"; // BOM для UTF-8
