@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 PAVEL OSIPOV (osTOOLS)
+ * Copyright 2025 PAVEL OSIPOV (MATRYOSHKA TOOLS)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2474,14 +2474,41 @@ document.addEventListener("DOMContentLoaded", function() {
   });
 });
 
-// Кнопка отключения/включения Java Script
-document.addEventListener('DOMContentLoaded', function() {
-  const toggleButton = document.getElementById('toggle-js');
-  
-  toggleButton.addEventListener('click', function() {
-    chrome.runtime.sendMessage({ action: 'toggleJavaScript' });
-  });
+let jsEnabled = true; // Состояние JavaScript (по умолчанию включено)
+
+// Загружаем сохраненное состояние при загрузке попапа
+chrome.storage.local.get(['jsEnabled'], function (result) {
+  jsEnabled = result.jsEnabled !== undefined ? result.jsEnabled : true;
+  updateButtonState("toggle-js", jsEnabled);
 });
+
+// Обработчик для кнопки отключения/включения JavaScript
+document.getElementById("toggle-js").addEventListener("click", () => {
+  jsEnabled = !jsEnabled;
+  updateButtonState("toggle-js", jsEnabled);
+
+  // Сохраняем состояние
+  chrome.storage.local.set({ jsEnabled });
+
+  // Отправляем сообщение для переключения JavaScript
+  chrome.runtime.sendMessage({ action: 'toggleJavaScript', jsEnabled });
+});
+
+// Функция для обновления состояния кнопки
+function updateButtonState(buttonId, isActive) {
+  const button = document.getElementById(buttonId);
+  const icon = button.querySelector("i");
+
+  if (isActive) {
+    button.classList.add("active");
+    icon.classList.remove("fa-toggle-off");
+    icon.classList.add("fa-toggle-on");
+  } else {
+    button.classList.remove("active");
+    icon.classList.remove("fa-toggle-on");
+    icon.classList.add("fa-toggle-off");
+  }
+}
 
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -2575,34 +2602,22 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
-document.getElementById("open-settings").addEventListener("click", function() {
-  document.getElementById("settings-panel").style.display = "block";
-});
-
-document.getElementById("close-settings").addEventListener("click", function() {
-  document.getElementById("settings-panel").style.display = "none";
-});
-
-// Получаем ссылки на элементы
+// Получаем ссылку на элементы
 const apiKeyInput = document.getElementById('apiKey');
 const saveButton = document.getElementById('saveKey');
 const statusMessage = document.getElementById('status');
-const disableCheck = document.getElementById('enableCheck');
 
-// Загружаем сохраненные настройки при открытии popup
-chrome.storage.sync.get(['apiKey', 'disableCheck'], (data) => {
+// Загружаем сохраненный API ключ при открытии popup
+chrome.storage.sync.get('apiKey', (data) => {
   if (data.apiKey) {
     apiKeyInput.value = data.apiKey;
   }
-  if (data.disableCheck) {
-    disableCheck.checked = data.disableCheck;
-  }
 });
 
-// Сохраняем API ключ
+// Сохраняем API ключ в хранилище
 saveButton.addEventListener('click', () => {
   const apiKey = apiKeyInput.value.trim();
-
+  
   if (apiKey) {
     chrome.storage.sync.set({ apiKey: apiKey }, () => {
       statusMessage.textContent = 'API ключ сохранен!';
@@ -2613,31 +2628,44 @@ saveButton.addEventListener('click', () => {
     statusMessage.style.color = 'red';
   }
 });
-// Проверяем состояние чекбокса при загрузке popup
-document.addEventListener('DOMContentLoaded', function() {
-  var enabledCheck = document.getElementById('enabledCheck');
-  
-  // Извлекаем состояние чекбокса из localStorage
-  var isChecked = localStorage.getItem('checkboxState') === 'true';
-  
-  // Устанавливаем состояние чекбокса
-  enabledCheck.checked = isChecked;
 
-  // Отправляем сообщение в content.js для включения или отключения функций на основе состояния чекбокса
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, { action: isChecked ? 'enable' : 'disable' });
+document.addEventListener('DOMContentLoaded', () => {
+  const checkTrustButton = document.getElementById('checktrustbutton');
+
+  // Устанавливаем начальное состояние кнопки
+  let isEnabled = false;
+
+  // Функция для обновления иконки
+  function updateButtonIcon() {
+    const icon = checkTrustButton.querySelector('i');
+    if (isEnabled) {
+      icon.classList.remove('fa-toggle-off');
+      icon.classList.add('fa-toggle-on');
+    } else {
+      icon.classList.remove('fa-toggle-on');
+      icon.classList.add('fa-toggle-off');
+    }
+  }
+
+  // Функция для сохранения состояния в chrome.storage
+  function saveStateToStorage(state) {
+    chrome.storage.sync.set({ functionsEnabled: state }, () => {
+      console.log('Состояние сохранено:', state);
+    });
+  }
+
+
+  // Обработчик клика по кнопке
+  checkTrustButton.addEventListener('click', () => {
+    isEnabled = !isEnabled; // Переключаем состояние
+    updateButtonIcon(); // Обновляем иконку
+    saveStateToStorage(isEnabled); // Сохраняем состояние
+
+    // Отправляем сообщение в content.js
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const action = isEnabled ? 'enable' : 'disable';
+      chrome.tabs.sendMessage(tabs[0].id, { action });
+    });
   });
-});
 
-// Сохраняем состояние чекбокса в localStorage и отправляем сообщение в content.js
-document.getElementById('enabledCheck').addEventListener('change', function() {
-  var enabledCheck = document.getElementById('enabledCheck');
-  
-  // Сохраняем состояние чекбокса в localStorage
-  localStorage.setItem('checkboxState', enabledCheck.checked);
-
-  // Отправляем сообщение в content.js для включения или отключения функций
-  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, { action: enabledCheck.checked ? 'enable' : 'disable' });
-  });
 });

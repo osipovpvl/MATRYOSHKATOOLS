@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="matryoshka.ico">
-  <title>osTOOLS</title>
+  <title>MATRYOSHKA TOOLS</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
@@ -1341,55 +1341,49 @@ input[type="text"] {
       <div id="tools" class="tab">
         <h1>ИНСТРУМЕНТЫ</h1>
         <div class="page-panel">
-          <div class="section-title">ОСНОВНЫЕ ИНСТРУМЕНТЫ:</div>
    <div class="page-item">
     <span>Перезагрузить страницу с очисткой кеша</span>
     <button id="reload-btn" class="page-button action-button"><i class="fa fa-refresh" aria-hidden="true"></i></button>
   </div>
           <div class="page-item">
-            <span>Подсветить элементы noindex</span>
+            <span>Подсветить элементы noindex<br>
+              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p></span>
             <button id="highlight-noindex" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Подсветить элементы nofollow</span>
+            <span>Подсветить элементы nofollow<br>
+              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p></span>
             <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Показать элементы none</span>
+            <span>Показать элементы none<br>
+              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p></span>
             <button id="toggle-none" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Отключение/включение Java Script</span>
-            <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
+            <span>Отключение/включение Java Script<br>
+              <p style="color: #555; font-size: 12px;">По умолчанию включено</p></span>
+            <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Отключение/включение CSS</span>
+            <span>Отключение/включение CSS<br>
+              <p style="color: #555; font-size: 12px;">По умолчанию включено</p></span>
             <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Проверка API Check Trust</span>
-            <button id="" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
+            <span>Проверка API Check Trust<br>
+              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p>
+              <p style="color: #555; font-size: 12px;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</p>
+              <ul style="color: #555; font-size: 12px;">
+                  <li><strong>ТРАСТ</strong> сайтов — уровень доверия к ресурсу.</li>
+                  <li><strong>СПАМ</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
+              </ul></span>
+              <button id="checktrustbutton" class="page-button action-button">
+                <i class="fa fa-toggle-off" aria-hidden="true"></i>
+              </button>              
           </div>
-          <div class="section-title">ДОПОЛНИТЕЛЬНЫЕ ИНСТРУМЕНТЫ:<div id="settings-panel" style="display: none;">
-            <div id="settings-header">
-                <span style="font-size: 15px;">Настройки дополнительных инструментов</span>
-                <button id="close-settings">X</button>
-            </div>
-            <div id="settings-content">
-              <label for="enableCheck">
-                <input type="checkbox" id="enabledCheck" />
-              Проверка API Check Trust
-              </label>
-            </div>
-        </div>
-        <i title="Настройки дополнительных инструментов" class="fa fa-cog" aria-hidden="true" style="float: right; font-size: 20px;" id="open-settings"></i>
-        </div>
+          <div class="section-title">ДОПОЛНЕНИЯ:</div>
           <h2 style="margin: 0px;">API Check Trust</h2>
-          <p style="margin: 0px;">Включив в настройках проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</p>
-    <ul style="margin: 0px;">
-        <li><strong>ТРАСТ</strong> сайтов — уровень доверия к ресурсу.</li>
-        <li><strong>СПАМ</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
-    </ul>
           <label for="apiKey">Ваш API ключ:</label>
           <input style="margin: 0px;" type="text" id="apiKey" placeholder="Введите API ключ" />
           <button id="saveKey">Сохранить</button>
@@ -1411,7 +1405,7 @@ input[type="text"] {
           <i class="fa fa-usd" aria-hidden="true" style="font-size: 24px;"></i>
         </a>
       </div>
-      <div style="color: #555;">osTOOLS</div>
+      <div style="color: #555;">MATRYOSHKA TOOLS</div>
       <div style="color: #555;">&copy; 2025</div>
     </footer>
   </div>

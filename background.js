@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 PAVEL OSIPOV (osTOOLS)
+ * Copyright 2025 PAVEL OSIPOV (MATRYOSHKA TOOLS)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,29 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             return response.json();
           })
           .then((data) => {
-            sendResponse({ trust: data.trust, spam: data.spam });
+            if (data && data.success && data.summary) {
+              sendResponse({ 
+                trust: data.summary.trust, 
+                spam: data.summary.spam 
+              });
+            } else {
+              sendResponse(null); // Ответ на случай ошибки API
+            }
           })
           .catch((error) => {
-            sendResponse(null);
+            console.error("Ошибка при запросе API:", error);
+            sendResponse(null); // Ответ при ошибке
           });
       } else {
-        sendResponse(null);
+        console.error("API ключ не найден");
+        sendResponse(null); // Ответ, если API ключ отсутствует
       }
     });
 
     return true; // Асинхронный запрос
   }
 });
+
 
 chrome.action.onClicked.addListener(function (tab) {
   // Получаем заголовок страницы
@@ -143,3 +153,48 @@ chrome.runtime.onMessage.addListener((message) => {
     jsWorker.toggleState();
   }
 });
+
+// Устанавливаем состояние JavaScript на основе сохраненного значения
+async function applySavedJavaScriptState() {
+  const result = await chrome.storage.local.get(['jsEnabled']);
+  const jsEnabled = result.jsEnabled !== undefined ? result.jsEnabled : true;
+
+  const windows = await chrome.windows.getAll({ populate: true });
+  for (const win of windows) {
+    await setJavaScriptState(win, jsEnabled);
+  }
+}
+
+// Устанавливаем состояние JavaScript
+async function setJavaScriptState(win, enabled) {
+  try {
+    const data = {
+      primaryPattern: '<all_urls>',
+      setting: enabled ? 'allow' : 'block',
+      scope: win.incognito ? 'incognito_session_only' : 'regular',
+    };
+    await chrome.contentSettings.javascript.set(data);
+  } catch (error) {
+    console.error('Ошибка при установке состояния JavaScript:', error);
+  }
+}
+
+// Обработчик сообщения из popup.js
+chrome.runtime.onMessage.addListener(async (message) => {
+  if (message.action === 'toggleJavaScript') {
+    const windows = await chrome.windows.getAll({ populate: true });
+    for (const win of windows) {
+      await setJavaScriptState(win, message.jsEnabled);
+    }
+
+    // Перезагружаем текущую вкладку
+    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tabs[0]) {
+      chrome.tabs.reload(tabs[0].id);
+    }
+  }
+});
+
+// Применяем сохраненное состояние при запуске
+chrome.runtime.onStartup.addListener(applySavedJavaScriptState);
+chrome.runtime.onInstalled.addListener(applySavedJavaScriptState);

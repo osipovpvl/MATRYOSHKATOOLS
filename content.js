@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 PAVEL OSIPOV (osTOOLS)
+ * Copyright 2025 PAVEL OSIPOV (MATRYOSHKA TOOLS)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -233,58 +233,6 @@ function disableStyles() {
   });
 }
 
-// Функция для подсветки элементов на странице
-function applyHighlight(type, isEnabled) {
-  if (type === "noindex") {
-    const noIndexElements = document.querySelectorAll('noindex');
-    noIndexElements.forEach((el) => {
-      const firstContainer = el.querySelector('div, section, article, main, nav');
-      if (firstContainer) {
-        if (isEnabled) {
-          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
-          firstContainer.style.border = "2px solid black";
-        } else {
-          firstContainer.style.backgroundColor = "";
-          firstContainer.style.border = "";
-        }
-      }
-    });
-  } else if (type === "nofollow") {
-    const noFollowElements = document.querySelectorAll('a[rel="nofollow"]');
-    noFollowElements.forEach((el) => {
-      if (isEnabled) {
-        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)";
-        el.style.border = "2px solid black";
-      } else {
-        el.style.backgroundColor = "";
-        el.style.border = "";
-      }
-    });
-  }
-}
-
-// Загружаем сохраненные настройки и применяем подсветку
-chrome.storage.local.get(['noIndexActive', 'noFollowActive'], function (result) {
-  const noIndexActive = result.noIndexActive || false;
-  const noFollowActive = result.noFollowActive || false;
-
-  // Применяем подсветку на основе сохраненных значений
-  applyHighlight("noindex", noIndexActive);
-  applyHighlight("nofollow", noFollowActive);
-});
-
-// Слушаем изменения состояния и динамически применяем подсветку
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "updateHighlight") {
-    applyHighlight(message.highlightType, message.isEnabled);
-  }
-});
-
-
-
-
-
-
 // Изначально функции отключены
 let functionsEnabled = false;
 
@@ -294,10 +242,10 @@ function toggleFunctions(enable) {
 
   if (functionsEnabled) {
     console.log("Functions enabled");
-    updateSiteInfo(); // Включаем функциональность (если чекбокс включен)
+    updateSiteInfo(); // Включаем функциональность (если функции активированы)
   } else {
     console.log("Functions disabled");
-    // Отключаем все функции (если чекбокс выключен)
+    // Отключаем все функции (если функции деактивированы)
     stopUpdatingSiteInfo(); // Останавливаем обновление, если функции отключены
   }
 }
@@ -403,9 +351,14 @@ function stopUpdatingSiteInfo() {
 
 // Запускаем скрипт после загрузки страницы, но только если функции активированы
 window.addEventListener("load", () => {
-  if (functionsEnabled) {
-    updateSiteInfo();
-  }
+  // Загружаем состояние из chrome.storage при перезагрузке страницы
+  chrome.storage.sync.get('functionsEnabled', (data) => {
+    functionsEnabled = data.functionsEnabled || false; // Получаем состояние
+
+    if (functionsEnabled) {
+      updateSiteInfo();
+    }
+  });
 });
 
 // Обработчик сообщений от popup.js
