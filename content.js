@@ -233,24 +233,106 @@ function disableStyles() {
   });
 }
 
+let highlightedElements = []; // Список подсвеченных элементов
+let displayNoneObserver = null; // Наблюдатель за изменениями DOM
+
+// Функция подсветки и показа элементов
+function toggleDisplayNoneElements(show) {
+  // Сбрасываем подсветку предыдущих элементов
+  highlightedElements.forEach((el) => {
+    el.style.outline = '';
+    el.style.backgroundColor = '';
+    el.style.display = 'none'; // Возвращаем исходное состояние
+  });
+  highlightedElements = [];
+
+  if (show) {
+    // Находим все элементы с display: none
+    const elements = Array.from(document.querySelectorAll('*')).filter((el) => {
+      const computedStyle = window.getComputedStyle(el);
+      return computedStyle.display === 'none';
+    });
+
+    // Подсвечиваем и показываем элементы
+    elements.forEach((el) => {
+      el.style.display = ''; // Показываем элемент
+      el.style.outline = '2px solid black';
+      el.style.backgroundColor = 'rgba(0, 0, 0, 0.1)';
+      highlightedElements.push(el);
+    });
+  }
+}
+
+// Настройка наблюдателя для отслеживания изменений в DOM
+function startDisplayNoneObserver() {
+  if (displayNoneObserver) displayNoneObserver.disconnect(); // Отключаем предыдущий наблюдатель
+
+  displayNoneObserver = new MutationObserver(() => {
+    chrome.storage.local.get(['toggleDisplayNone'], (result) => {
+      const isOn = result.toggleDisplayNone || false;
+      if (isOn) {
+        toggleDisplayNoneElements(true); // Повторно применяем подсветку
+      }
+    });
+  });
+
+  displayNoneObserver.observe(document.body, {
+    childList: true, // Следим за добавлением/удалением узлов
+    subtree: true,   // Следим за всеми уровнями вложенности
+  });
+}
+
+// Проверяем сохраненное состояние при загрузке страницы
+chrome.storage.local.get(['toggleDisplayNone'], (result) => {
+  const isOn = result.toggleDisplayNone !== undefined ? result.toggleDisplayNone : false;
+
+  // Применяем начальное состояние подсветки
+  toggleDisplayNoneElements(isOn);
+
+  // Запускаем наблюдатель за изменениями DOM
+  startDisplayNoneObserver();
+});
+
+// Слушаем изменения состояния от popup.js
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.toggle !== undefined) {
+    toggleDisplayNoneElements(message.toggle);
+
+    // Сохраняем новое состояние
+    chrome.storage.local.set({ toggleDisplayNone: message.toggle });
+
+    // Перезапускаем наблюдатель за изменениями DOM
+    if (message.toggle) {
+      startDisplayNoneObserver();
+    } else if (displayNoneObserver) {
+      displayNoneObserver.disconnect(); // Останавливаем наблюдатель
+    }
+  }
+});
+
+
+
+
 // Изначально функции отключены
 let functionsEnabled = false;
+
+// Наблюдатель для отслеживания изменений DOM
+let observer = null;
 
 // Функция для включения/выключения функций
 function toggleFunctions(enable) {
   functionsEnabled = enable;
 
   if (functionsEnabled) {
-    console.log("Functions enabled");
-    updateSiteInfo(); // Включаем функциональность (если функции активированы)
+    updateSiteInfo(); // Запускаем обновление информации
+    observeDOMChanges(); // Запускаем наблюдатель за изменениями DOM
   } else {
-    console.log("Functions disabled");
-    // Отключаем все функции (если функции деактивированы)
-    stopUpdatingSiteInfo(); // Останавливаем обновление, если функции отключены
+    stopUpdatingSiteInfo(); // Очищаем информацию
+    disconnectObserver(); // Останавливаем наблюдатель
   }
 }
 
-// Функция для получения API ключа из storage
+// Функция для получения API ключа из chrome.storage
 function getApiKey() {
   return new Promise((resolve, reject) => {
     chrome.storage.sync.get('apiKey', (data) => {
@@ -263,7 +345,7 @@ function getApiKey() {
   });
 }
 
-// Функция для получения цвета по значению Trust
+// Функция для определения цвета Trust
 function getTrustColor(trust) {
   if (trust >= 0 && trust <= 30) return "red";
   if (trust >= 31 && trust <= 50) return "orange";
@@ -271,7 +353,7 @@ function getTrustColor(trust) {
   return "black";
 }
 
-// Функция для получения цвета по значению Spam
+// Функция для определения цвета Spam
 function getSpamColor(spam) {
   if (spam >= 0 && spam <= 7) return "green";
   if (spam > 7 && spam <= 12) return "orange";
@@ -279,7 +361,7 @@ function getSpamColor(spam) {
   return "black";
 }
 
-// Функция для проверки домена через API
+// Функция для получения данных домена через API
 async function fetchDomainData(domain) {
   try {
     const apiKey = await getApiKey(); // Получаем API ключ
@@ -296,30 +378,29 @@ async function fetchDomainData(domain) {
         trust: parseFloat(data.summary.trust),
         spam: parseFloat(data.summary.spam),
       };
-    } 
+    }
   } catch (error) {
-    console.error("Ошибка при получении данных:", error);
+    //console.error(`Ошибка при получении данных для домена ${domain}:`, error);
     return null;
   }
 }
 
 // Функция для обновления информации о доменах
 async function updateSiteInfo() {
-  console.log("Обновление информации о сайте...");
+  if (!functionsEnabled) return; // Проверяем, активны ли функции
+
+  //console.log("Обновление информации о доменах...");
   const siteLinks = document.querySelectorAll("span.site-link a");
 
   siteLinks.forEach(async (link) => {
     const domain = new URL(link.href).hostname;
 
-    // Проверяем, есть ли уже добавленный Trust/Spam, чтобы не дублировать
+    // Проверяем, добавлена ли информация Trust/Spam
     if (link.nextElementSibling && link.nextElementSibling.classList.contains("trust-spam-info")) {
       return;
     }
 
-    // Если функции отключены, то ничего не добавляем
-    if (!functionsEnabled) return;
-
-    // Создаем контейнер для Trust/Spam
+    // Создаем элемент для отображения информации
     const infoSpan = document.createElement("span");
     infoSpan.classList.add("trust-spam-info");
     infoSpan.style.marginLeft = "10px";
@@ -341,28 +422,46 @@ async function updateSiteInfo() {
   });
 }
 
-// Останавливаем обновление информации, если функции отключены
+// Функция для остановки обновления информации
 function stopUpdatingSiteInfo() {
-  console.log("Обновление информации остановлено.");
-  // Очистка всех добавленных элементов (если они есть)
+  //console.log("Остановка обновления информации...");
   const allInfoSpans = document.querySelectorAll(".trust-spam-info");
-  allInfoSpans.forEach(span => span.remove());
+  allInfoSpans.forEach((span) => span.remove());
 }
 
-// Запускаем скрипт после загрузки страницы, но только если функции активированы
-window.addEventListener("load", () => {
-  // Загружаем состояние из chrome.storage при перезагрузке страницы
-  chrome.storage.sync.get('functionsEnabled', (data) => {
-    functionsEnabled = data.functionsEnabled || false; // Получаем состояние
+// Функция для наблюдения за изменениями DOM
+function observeDOMChanges() {
+  if (observer) observer.disconnect(); // Отключаем старый наблюдатель, если он существует
 
+  observer = new MutationObserver(() => {
     if (functionsEnabled) {
-      updateSiteInfo();
+      updateSiteInfo(); // Обновляем информацию при изменении DOM
     }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Отключение наблюдателя
+function disconnectObserver() {
+  if (observer) {
+    observer.disconnect();
+    observer = null;
+  }
+}
+
+// Загружаем сохраненное состояние функций при загрузке страницы
+window.addEventListener("load", () => {
+  chrome.storage.sync.get('functionsEnabled', (data) => {
+    functionsEnabled = data.functionsEnabled || false;
+
+    // Включаем или отключаем функции в зависимости от сохраненного состояния
+    toggleFunctions(functionsEnabled);
   });
 });
 
 // Обработчик сообщений от popup.js
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === 'enable') {
     toggleFunctions(true);
   } else if (request.action === 'disable') {

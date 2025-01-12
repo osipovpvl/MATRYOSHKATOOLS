@@ -2602,6 +2602,41 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+document.addEventListener('DOMContentLoaded', () => {
+  const toggleButton = document.getElementById('toggle-none');
+  const toggleIcon = toggleButton.querySelector('i');
+
+  // Загрузка состояния из storage
+  chrome.storage.sync.get(['toggleDisplayNone'], (result) => {
+    const isOn = result.toggleDisplayNone || false;
+    toggleIcon.classList.toggle('fa-toggle-on', isOn);
+    toggleIcon.classList.toggle('fa-toggle-off', !isOn);
+
+    // Отправка текущего состояния на контентную страницу
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { toggle: isOn });
+    });
+  });
+
+  // Обработчик нажатия на кнопку
+  toggleButton.addEventListener('click', () => {
+    const currentlyOn = toggleIcon.classList.contains('fa-toggle-on');
+
+    toggleIcon.classList.toggle('fa-toggle-on', !currentlyOn);
+    toggleIcon.classList.toggle('fa-toggle-off', currentlyOn);
+
+    // Сохранение состояния в storage
+    chrome.storage.sync.set({ toggleDisplayNone: !currentlyOn });
+
+    // Отправка команды контентному скрипту
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.sendMessage(tabs[0].id, { toggle: !currentlyOn });
+    });
+  });
+});
+
+
+
 // Получаем ссылку на элементы
 const apiKeyInput = document.getElementById('apiKey');
 const saveButton = document.getElementById('saveKey');
@@ -2628,15 +2663,11 @@ saveButton.addEventListener('click', () => {
     statusMessage.style.color = 'red';
   }
 });
-
 document.addEventListener('DOMContentLoaded', () => {
   const checkTrustButton = document.getElementById('checktrustbutton');
 
-  // Устанавливаем начальное состояние кнопки
-  let isEnabled = false;
-
-  // Функция для обновления иконки
-  function updateButtonIcon() {
+  // Функция для обновления иконки кнопки
+  function updateButtonIcon(isEnabled) {
     const icon = checkTrustButton.querySelector('i');
     if (isEnabled) {
       icon.classList.remove('fa-toggle-off');
@@ -2647,25 +2678,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Функция для сохранения состояния в chrome.storage
-  function saveStateToStorage(state) {
-    chrome.storage.sync.set({ functionsEnabled: state }, () => {
-      console.log('Состояние сохранено:', state);
-    });
-  }
-
+  // Инициализация состояния кнопки
+  chrome.storage.sync.get('functionsEnabled', (data) => {
+    const isEnabled = data.functionsEnabled || false; // Значение по умолчанию: false
+    updateButtonIcon(isEnabled); // Обновляем иконку кнопки
+  });
 
   // Обработчик клика по кнопке
   checkTrustButton.addEventListener('click', () => {
-    isEnabled = !isEnabled; // Переключаем состояние
-    updateButtonIcon(); // Обновляем иконку
-    saveStateToStorage(isEnabled); // Сохраняем состояние
+    chrome.storage.sync.get('functionsEnabled', (data) => {
+      const isEnabled = data.functionsEnabled || false; // Получаем текущее состояние
 
-    // Отправляем сообщение в content.js
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const action = isEnabled ? 'enable' : 'disable';
-      chrome.tabs.sendMessage(tabs[0].id, { action });
+      const newState = !isEnabled; // Переключаем состояние
+      updateButtonIcon(newState); // Обновляем иконку кнопки
+
+      // Сохраняем новое состояние в chrome.storage
+      chrome.storage.sync.set({ functionsEnabled: newState }, () => {
+        //console.log('Состояние сохранено:', newState);
+      });
+
+      // Отправляем сообщение в content.js для активации/деактивации функций
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const action = newState ? 'enable' : 'disable';
+        chrome.tabs.sendMessage(tabs[0].id, { action });
+      });
     });
   });
-
 });
