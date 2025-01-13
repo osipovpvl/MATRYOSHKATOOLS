@@ -232,6 +232,51 @@ function disableStyles() {
   });
 }
 
+
+// Функция для подсветки элементов на странице
+function applyHighlight(type, isEnabled) {
+  if (type === "noindex") {
+    const noIndexElements = document.querySelectorAll('noindex');
+    noIndexElements.forEach((el) => {
+      const firstContainer = el.querySelector('div, section, article, main, nav');
+      if (firstContainer) {
+        if (isEnabled) {
+          firstContainer.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+          firstContainer.style.border = "2px solid black";
+        } else {
+          firstContainer.style.backgroundColor = "";
+          firstContainer.style.border = "";
+        }
+      }
+    });
+  } else if (type === "nofollow") {
+    const noFollowElements = document.querySelectorAll('a[rel="nofollow"]');
+    noFollowElements.forEach((el) => {
+      if (isEnabled) {
+        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)";
+        el.style.border = "2px solid black";
+      } else {
+        el.style.backgroundColor = "";
+        el.style.border = "";
+      }
+    });
+  }
+}
+// Загружаем сохраненные настройки и применяем подсветку
+chrome.storage.local.get(['noIndexActive', 'noFollowActive'], function (result) {
+  const noIndexActive = result.noIndexActive || false;
+  const noFollowActive = result.noFollowActive || false;
+  // Применяем подсветку на основе сохраненных значений
+  applyHighlight("noindex", noIndexActive);
+  applyHighlight("nofollow", noFollowActive);
+});
+// Слушаем изменения состояния и динамически применяем подсветку
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.type === "updateHighlight") {
+    applyHighlight(message.highlightType, message.isEnabled);
+  }
+});
+
 let highlightedElements = []; // Список подсвеченных элементов
 let displayNoneObserver = null; // Наблюдатель за изменениями DOM
 

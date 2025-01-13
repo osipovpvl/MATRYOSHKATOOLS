@@ -276,6 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+
 // Функция микроразметки
 function populateMicrodata(elementId, data, label) {
   const container = document.getElementById(elementId);
@@ -285,7 +286,20 @@ function populateMicrodata(elementId, data, label) {
     data.forEach((item) => {
       const div = document.createElement("div");
       div.className = "microdata-item";
-      div.textContent = item;
+
+      // Проверка, если это JSON-LD или другие сложные данные
+      if (item.trim().startsWith("{") || item.trim().startsWith("[")) {
+        try {
+          const parsedData = JSON.parse(item);
+          const formattedJson = JSON.stringify(parsedData, null, 2);  // Форматируем JSON
+          div.textContent = formattedJson;  // Добавляем отформатированный JSON
+        } catch (e) {
+          div.textContent = item;  // Если не удалось распарсить, выводим как есть
+        }
+      } else {
+        div.textContent = item;  // Обычный текст
+      }
+
       container.appendChild(div);
     });
   } else {
@@ -323,7 +337,6 @@ function scrapeSEOData() {
     microdata: extractStructuredData('[itemscope]'),
   };
 }
-
 
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1252,7 +1265,7 @@ const cmsPatterns = {
     "Insales.money_format",
   ],
   InstantCMS: ["InstantCMS"],
-  "Joomla!": [
+  "Joomla": [
     "/css/template_css.css",
     "Joomla! 1.5 - Open Source Content Management",
     "/templates/system/css/system.css",
@@ -2348,7 +2361,6 @@ function fetchSslInfoAndUpdatePopup() {
 
 // Запускаем функцию после загрузки контента страницы
 document.addEventListener("DOMContentLoaded", fetchSslInfoAndUpdatePopup);
-
 // Функция для форматирования даты
 function formatDate(date) {
   const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -2358,17 +2370,22 @@ function formatDate(date) {
 // Функция для получения возраста домена
 function getAge(createdDate, currentDate) {
   const ageInMilliseconds = currentDate - createdDate;
-  const ageInDays = ageInMilliseconds / (1000 * 60 * 60 * 24);
-  return Math.floor(ageInDays / 365); // Возраст в годах
+  const ageInDays = Math.floor(ageInMilliseconds / (1000 * 60 * 60 * 24));
+
+  const years = Math.floor(ageInDays / 365); // Возраст в годах
+  const days = ageInDays % 365; // Остаток дней
+  return { years, days }; // Возвращаем объект с годами и днями
 }
 
 // Пример функции для перевода
 function translate(key) {
   const translations = {
-      "domainAgeAge": "лет"
+    "domainAgeYears": "лет",
+    "domainAgeDays": "дней"
   };
   return translations[key] || key;
 }
+
 
 // Функция для получения данных с API
 async function loadDomainData(domain) {
@@ -2384,8 +2401,10 @@ async function loadDomainData(domain) {
           document.getElementById("domain-registration-date").textContent = formatDate(created);
 
           // Отображение возраста домена
-          document.getElementById("domain-age").innerHTML =
-              `${getAge(created, new Date())} <span data-translation="domainAgeAge">${translate("domainAgeAge")}</span>`;
+const age = getAge(created, new Date());
+document.getElementById("domain-age").innerHTML = 
+    `${age.years} <span data-translation="domainAgeAge">${translate("domainAgeYears")}</span> и ${age.days} ${translate("domainAgeDays")}`;
+
       } else {
           document.getElementById("domain-registration-date").textContent = "Информация не доступна";
           document.getElementById("domain-age").textContent = "Информация не доступна";

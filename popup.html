@@ -64,7 +64,6 @@
     /* Main table styles */
     table {
       width: 100%;
-      border-collapse: collapse;
       margin-bottom: 20px;
     }
 
@@ -75,6 +74,7 @@
     }
 
     table th {
+      border-radius: 5px;
       background-color: #f2f2f2;
       color: #333;
     }
@@ -902,28 +902,29 @@ input[type="text"] {
       <!-- Microdata Tab -->
       <div id="microdata" class="tab">
         <h1>АНАЛИЗ МИКРОРАЗМЕТКИ</h1>
-        <table>
-          <tr>
-            <td>Open Graph</td>
-            <td id="open-graph">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>Twitter Cards</td>
-            <td id="twitter-cards">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>JSON-LD</td>
-            <td id="schema-org">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>RDFa</td>
-            <td id="rdfa">Загрузка...</td>
-          </tr>
-          <tr>
-            <td>Microdata</td>
-            <td id="microdata-check">Загрузка...</td>
-          </tr>
-        </table>
+        <div id="structured-data">
+          <section>
+            <div class="section-title">OPEN GRAPH</div>
+            <div id="open-graph">Загрузка...</div>
+          </section>
+          <section>
+            <div class="section-title">TWITTER CARDS</div>
+            <div id="twitter-cards">Загрузка...</div>
+          </section>
+          <section>
+            <div class="section-title">JSON-LD</div>
+            <div id="schema-org">Загрузка...</div>
+          </section>
+          <section>
+            <div class="section-title">RDFA</div>
+            <div id="rdfa">Загрузка...</div>
+          </section>
+          <section>
+            <div class="section-title">MICRODATA</div>
+            <div id="microdata-check">Загрузка...</div>
+          </section>
+        </div>
+        
       </div>
 
       <div id="search" class="tab">
@@ -931,7 +932,7 @@ input[type="text"] {
         <div class="search-panel">
           <div class="search-item">
             <span>Поиск по оператору<br>
-              <span style="color: #555;">site:domain.ru</span></span>
+              <span style="color: #555; font-size: 12px;">site:domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-site-yandex" class="search-button yandex">Я</button>
               <button id="check-index-google" class="search-button google">G</button>
@@ -940,7 +941,7 @@ input[type="text"] {
           <div class="search-item">
             <span>Поиск по оператору
               <br>
-              <span style="color: #555;">host:domain.ru</span>
+              <span style="color: #555; font-size: 12px;">host:domain.ru</span>
             </span>
             <div class="search-buttons">
               <button id="operator-host-yandex" class="search-button yandex">Я</button>
@@ -948,14 +949,14 @@ input[type="text"] {
           </div>
           <div class="search-item">
             <span>Поиск по оператору<br>
-              <span style="color: #555;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
+              <span style="color: #555; font-size: 12px;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-url-yandex" class="search-button yandex">Я</button>
             </div>
           </div>
           <div class="search-item">
             <span>Поиск дублей<br>
-              <span style="color: #555;">title:("Title страницы") site:domain.ru</span></span>
+              <span style="color: #555; font-size: 12px;">title:("Title страницы") site:domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-title-yandex" class="search-button yandex">Я</button>
             </div>
@@ -1290,33 +1291,33 @@ input[type="text"] {
   </div>
           <div class="page-item">
             <span>Подсветить элементы noindex<br>
-              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p></span>
+              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span></span>
             <button id="highlight-noindex" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Подсветить элементы nofollow<br>
-              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p></span>
+              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span></span>
             <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Показать элементы none<br>
-              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p></span>
+              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span></span>
             <button id="toggle-none" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Отключение/включение Java Script<br>
-              <p style="color: #555; font-size: 12px;">По умолчанию включено</p></span>
+            <span>Отключить/включить Java Script<br>
+              <span style="color: #555; font-size: 12px;">По умолчанию включено</span></span>
             <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Отключение/включение CSS<br>
-              <p style="color: #555; font-size: 12px;">По умолчанию включено</p></span>
+            <span>Отключить/включить CSS<br>
+              <span style="color: #555; font-size: 12px;">По умолчанию включено</span></span>
             <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Проверка API Check Trust<br>
-              <p style="color: #555; font-size: 12px;">По умолчанию выключено</p>
-              <p style="color: #555; font-size: 12px;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</p>
+              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span><br>
+              <span style="color: #555; font-size: 12px;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</span>
               <ul style="color: #555; font-size: 12px;">
                   <li><strong>ТРАСТ</strong> сайтов — уровень доверия к ресурсу.</li>
                   <li><strong>СПАМ</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
@@ -1329,8 +1330,7 @@ input[type="text"] {
           <h2 style="margin: 0px;">API Check Trust</h2>
           <label for="apiKey">Ваш API ключ:</label>
           <input style="margin: 0px;" type="text" id="apiKey" placeholder="Введите API ключ" />
-          <button id="saveKey">Сохранить</button>
-          <p id="status"></p>
+          <button id="saveKey"><span id="status">Сохранить</span></button>
         </div>
       </div>
     </div>
