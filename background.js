@@ -40,11 +40,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             }
           })
           .catch((error) => {
-            console.error("Ошибка при запросе API:", error);
+            //console.error("Ошибка при запросе API:", error);
             sendResponse(null); // Ответ при ошибке
           });
       } else {
-        console.error("API ключ не найден");
+        //console.error("API ключ не найден");
         sendResponse(null); // Ответ, если API ключ отсутствует
       }
     });
@@ -174,7 +174,7 @@ async function setJavaScriptState(win, enabled) {
     };
     await chrome.contentSettings.javascript.set(data);
   } catch (error) {
-    console.error('Ошибка при установке состояния JavaScript:', error);
+    //console.error('Ошибка при установке состояния JavaScript:', error);
   }
 }
 

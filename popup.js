@@ -2093,16 +2093,16 @@ document.addEventListener('DOMContentLoaded', function () {
                               let explanation = '';
                               switch (directive) {
                                   case 'noindex':
-                                      explanation = 'Этот сайт не должен индексироваться в поисковых системах.';
+                                      explanation = 'Этот сайт не должен индексироваться в поисковых системах';
                                       break;
                                   case 'nofollow':
-                                      explanation = 'Ссылки на этом сайте не должны быть проиндексированы.';
+                                      explanation = 'Ссылки на этом сайте не должны быть проиндексированы';
                                       break;
                                   case 'none':
-                                      explanation = 'Этот сайт не должен индексироваться и не следует следовать за ссылками.';
+                                      explanation = 'Этот сайт не должен индексироваться и не следует следовать за ссылками';
                                       break;
                                   case 'noarchive':
-                                      explanation = 'Поисковая система не должна сохранять кэш этого сайта.';
+                                      explanation = 'Поисковая система не должна сохранять кэш этого сайта';
                                       break;
                               }
                               statusText += '\n' + explanation;
