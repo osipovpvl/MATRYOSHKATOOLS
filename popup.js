@@ -181,23 +181,23 @@ function updateMetaLengthStyles(element, length, ranges, isMissing) {
   // Если данные отсутствуют, устанавливаем серый цвет и жирный шрифт
   if (isMissing) {
     element.style.color = "red";  // Серый цвет для отсутствующих данных
-    element.style.fontWeight = "bold";  // Жирный шрифт для отсутствующих данных
+    //element.style.fontWeight = "bold";  // Жирный шрифт для отсутствующих данных
     return;
   }
 
   // Если данные присутствуют, вычисляем цвет по диапазонам
   if (length >= ranges.good[0] && length <= ranges.good[1]) {
     element.style.color = "green";  // Хорошо
-    element.style.fontWeight = "bold";
+    //element.style.fontWeight = "bold";
   } else if (
     (length >= ranges.acceptable[0] && length <= ranges.acceptable[1]) ||
     (length >= ranges.acceptable[2] && length <= ranges.acceptable[3])
   ) {
     element.style.color = "orange";  // Приемлемо
-    element.style.fontWeight = "bold";
+    //element.style.fontWeight = "bold";
   } else {
     element.style.color = "red";  // Плохо
-    element.style.fontWeight = "bold";
+    //element.style.fontWeight = "bold";
   }
 }
 
@@ -1867,7 +1867,7 @@ function checkCanonical(doc, currentUrl, container) {
   } else {
       container.innerHTML = `
           <span class="fas fa-check-circle" style="color: green;"></span>
-          Каноничный адрес не указан
+          Каноничный адрес не указан (Индексация разрешена)
       `;
   }
 }
