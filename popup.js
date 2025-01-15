@@ -2723,3 +2723,124 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.getElementById('toggle-numbers');
+  const icon = button.querySelector('i');
+
+  // Загружаем состояние из хранилища
+  chrome.storage.local.get('showNumbers', (data) => {
+      const isEnabled = data.showNumbers || false;
+      icon.classList.toggle('fa-toggle-on', isEnabled);
+      icon.classList.toggle('fa-toggle-off', !isEnabled);
+
+      // Включаем или отключаем нумерацию в зависимости от состояния
+      toggleNumbering(isEnabled);
+  });
+
+  // Обработчик для кнопки
+  button.addEventListener('click', () => {
+      chrome.storage.local.get('showNumbers', (data) => {
+          const isEnabled = !(data.showNumbers || false); // Переключение состояния
+          chrome.storage.local.set({ showNumbers: isEnabled });
+          icon.classList.toggle('fa-toggle-on', isEnabled);
+          icon.classList.toggle('fa-toggle-off', !isEnabled);
+
+          // Включаем или отключаем нумерацию в зависимости от состояния
+          toggleNumbering(isEnabled);
+      });
+  });
+});
+
+// Функция для включения и отключения нумерации
+let isNumberingActive = false;
+
+function toggleNumbering(isEnabled) {
+  isNumberingActive = isEnabled;
+
+  if (isNumberingActive) {
+    // Включаем нумерацию
+    observeSearchResults();
+  } else {
+    // Отключаем нумерацию
+    clearNumbering();
+  }
+}
+
+// Функция наблюдения за результатами поиска
+function observeSearchResults() {
+  const observer = new MutationObserver(() => {
+      if (window.location.hostname.includes('google')) {
+          numberGoogleResults();
+      } else if (window.location.hostname.includes('yandex')) {
+          numberYandexResults();
+      }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true });
+}
+
+// Функция для очистки нумерации
+function clearNumbering() {
+  document.querySelectorAll('[data-numbered]').forEach((element) => {
+      const numberElement = element.querySelector('div');
+      if (numberElement && numberElement.textContent.match(/^\d+$/)) {
+          numberElement.remove();
+      }
+      element.removeAttribute('data-numbered');
+  });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  const button = document.getElementById('hide-reklama');
+  const icon = button.querySelector('i');
+
+  // Загрузка текущего состояния из chrome.storage
+  chrome.storage.sync.get('hideAdsEnabled', (data) => {
+    const isEnabled = data.hideAdsEnabled || false;
+    updateButtonState(isEnabled);
+  });
+
+  // Обработчик нажатия на кнопку
+  button.addEventListener('click', () => {
+    chrome.storage.sync.get('hideAdsEnabled', (data) => {
+      const currentState = data.hideAdsEnabled || false;
+      const newState = !currentState;
+
+      // Сохраняем новое состояние
+      chrome.storage.sync.set({ hideAdsEnabled: newState }, () => {
+        updateButtonState(newState);
+
+        // Отправляем сообщение content.js для обновления поведения
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          chrome.tabs.sendMessage(tabs[0].id, { action: 'toggleHideAds', enabled: newState });
+        });
+      });
+    });
+  });
+
+  // Обновление состояния кнопки
+  function updateButtonState(isEnabled) {
+    if (isEnabled) {
+      icon.className = 'fa fa-toggle-on';
+    } else {
+      icon.className = 'fa fa-toggle-off';
+    }
+  }
+});

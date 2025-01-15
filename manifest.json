@@ -7,7 +7,8 @@
   "background": {
     "service_worker": "background.js"
   },
-  "host_permissions": ["<all_urls>","https://*/*", "http://*/*", "https://gogetlinks.net/*","https://checktrust.ru/*",  "https://wordstat.yandex.ru/*"],
+  "host_permissions": ["<all_urls>","https://*/*", "http://*/*", "https://gogetlinks.net/*","https://checktrust.ru/*",  "https://wordstat.yandex.ru/*", "https://www.google.com/*",
+    "https://yandex.ru/*"],
   "action": {
   "default_popup": "popup.html",
   "default_icon": {
@@ -19,7 +20,7 @@
 },
   "content_scripts": [
     {
-      "matches": ["<all_urls>","https://gogetlinks.net/*", "https://wordstat.yandex.ru/*"],
+      "matches": ["<all_urls>","https://gogetlinks.net/*", "https://wordstat.yandex.ru/*","*://*.yandex.ru/*", "*://*.google.com/*"],
       "js": ["content.js"]
     }
   ]
