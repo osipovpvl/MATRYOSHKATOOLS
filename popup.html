@@ -11,7 +11,7 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Noto Sans, sans-serif;
       margin: 0;
       padding: 0;
       width: 750px;
@@ -27,6 +27,10 @@
     #tabs {
       display: flex;
       border-bottom: 2px solid #ddd;
+    }
+
+    #tab-content{
+      font-size: 14px;
     }
 
     .tab-button {
@@ -70,7 +74,6 @@
     table th, table td {
       text-align: left;
       padding: 8px 12px;
-      border: 1px solid #ddd;
     }
 
     table th {
@@ -94,7 +97,6 @@
       margin-top: 20px;
       padding: 10px 0;
       background-color: #f1f1f1;
-      font-size: 0.9em;
     }
 
     #social a {
@@ -121,6 +123,7 @@
 }
 
 #image-summary button {
+  font-size: 14px;
     padding: 8px 12px;
     border: 1px solid #000000;
     background-color: #ffffff;
@@ -154,7 +157,7 @@
 
 #image-details li {
     border-bottom: 1px solid #ddd;
-    padding: 10px 0;
+    padding: 0px 10px 10px 10px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -193,7 +196,6 @@
 
 .search-item span {
   font-size: 14px;
-  color: #333;
   margin-right: 10px; /* Отступ между текстом и кнопками */
 }
 
@@ -262,7 +264,6 @@
 
   .page-item span {
     font-size: 14px;
-    color: #333;
   }
 
   .page-button {
@@ -328,6 +329,7 @@ a:hover {
 
 /* Кнопки экспорта и копирования */
 button {
+  font-size: 14px;
   background-color: #000000;
   color: white;
   padding: 8px 15px;
@@ -370,7 +372,7 @@ input[type="number"] {
     margin: 5px;
     cursor: pointer;
     font-size: 14px;
-    color: #333;
+    color: black;
     transition: background-color 0.2s ease;
   }
 
@@ -426,7 +428,7 @@ input[type="number"] {
       justify-content: center;
       background: white;
       border: 1px solid #000000;
-      color: rgb(0, 0, 0);
+      color: black;
       border-radius: 5px;
       padding: 10px;
       font-size: 14px;
@@ -473,7 +475,7 @@ input[type="number"] {
       list-style-type: none;
       padding: 0;
       margin: 0;
-      font-size: 12px;
+      font-size: 14px;
     }
 
     #headings-list li {
@@ -482,8 +484,8 @@ input[type="number"] {
 
     .structure-display {
       margin-top: 10px;
-      font-size: 12px;
-      color: #555;
+      font-size: 14px;
+      color: black;
 
       .tabs {
   display: flex;
@@ -674,7 +676,6 @@ a:hover {
 
     .service-list a {
         text-decoration: none;
-        font-size: 15px;
         color: #555;
         transition: color 0.3s ease;
     }
@@ -744,17 +745,10 @@ input[type="text"] {
     <div id="tab-content">
       <div id="seo" class="tab active">
         <h1>ОСНОВНАЯ ИНФОРМАЦИЯ</h1>
-        <div class="section-title">МЕТАДАННЫЕ:</div>
+        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="margin-bottom: 10px;" class="copy-button" data-target="allmeta"> <i class="fas fa-clone"></i></button></span>
         <table>
-          <tr>
-            <th>Мета-теги</th>
-            <th>Значения</th>
-            <th><button class="copy-button" data-target="allmeta">
-              <i class="fas fa-clone"></i>
-          </button></th>
-        </tr>
         <tr>
-          <td>Title <div id="title-length" class="meta-length">-</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 30-70. Допустимо: 10-29, 71-90. Плохо: 0-9,91+"></i></td>
+          <td>Title: <div id="title-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 30-70. Допустимо: 10-29, 71-90. Плохо: 0-9,91+"></i></td>
             <td>
                 <div id="title">Загрузка...</div>
             </td>
@@ -765,7 +759,7 @@ input[type="text"] {
             </td>
         </tr>
         <tr>
-           <td>Description <div id="description-length" class="meta-length">-</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 150-250. Допустимо: 75-149, 251-300. Плохо: 0-74,301+"></i></td>
+           <td>Description: <div id="description-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 150-250. Допустимо: 75-149, 251-300. Плохо: 0-74,301+"></i></td>
             <td>
                 <div id="description">Загрузка...</div>
             </td>
@@ -776,7 +770,7 @@ input[type="text"] {
             </td>
         </tr>
         <tr>
-          <td>H1 <div id="h1-length" class="meta-length">-</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 20-60. Допустимо: 5-19, 61-70. Плохо: 0-4,71+"></i></td>
+          <td>H1: <div id="h1-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Отлично: 20-60. Допустимо: 5-19, 61-70. Плохо: 0-4,71+"></i></td>
             <td>
                 <div id="h1">Загрузка...</div>
             </td>
@@ -787,7 +781,7 @@ input[type="text"] {
             </td>
         </tr>
         <tr>
-        <td>Keywords   <div id="keywords-length" class="meta-length">-</div></td>
+        <td>Keywords:   <div id="keywords-length" class="meta-length">Символов: 0</div></td>
             <td>
               <div id="keywords">Загрузка...</div>
             </td>
@@ -800,20 +794,21 @@ input[type="text"] {
         </table>
         
         
-        <div class="section-title">ИНДЕКСАЦИЯ:</div>
+        <div class="section-title">ИНДЕКСАЦИЯ</div>
         <div class="block">
           <div class="title">Rel Canonical</div>
           <div id="canonical-result" class="status loading">Загрузка...</div>
         </div>
   
       <div class="block">
-          <div class="title">Meta Robots</div>
-          <div id="meta-robots-result" class="status loading">Загрузка...</div>
-      </div>
-      <div class="block">
         <div class="title">X-Robots-Tag</div>
         <div id="meta-x-Robots-Tag-result" class="status loading">Загрузка...</div>
     </div>
+
+    <div class="block">
+      <div class="title">Meta Robots</div>
+      <div id="meta-robots-result" class="status loading">Загрузка...</div>
+  </div>
   
       <div class="block">
           <div class="title">Robots.txt</div>
@@ -825,70 +820,70 @@ input[type="text"] {
           <div id="sitemap-result" class="status loading">Загрузка...</div>
       </div>
 
-        <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ:</div>
+        <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</div>
         <table>
           <tr>
-            <td>Текущий URL <div id="url-length" style="color:#555;font-size: 0.9em;"></div></td>
+            <td>Текущий URL: <div id="url-length" style="color:#555;font-size: 0.9em;"></div></td>
             <td id="current-url">Загрузка...</td>
           </tr>
           <tr>
-            <td>Кодировка</td>
+            <td>Кодировка:</td>
             <td><div id="charset">Загрузка...</div></td>
         </tr>
           <tr>
-            <td>Атрибут lang</td>
+            <td>Атрибут lang:</td>
             <td id="lang">Загрузка...</td>
           </tr>
           <tr>
-            <td>Атрибут hreflang</td>
+            <td>Атрибут hreflang:</td>
             <td><div id="hreflang">Загрузка...</div></td>
         </tr>
           <tr>
-            <td>Счетчик Яндекс Метрики</td>
+            <td>Счетчик Яндекс Метрики:</td>
             <td id="yandex-metrika">Загрузка...</td>
           </tr>
           <tr>
-            <td>Счетчик Google Tag Manager</td>
+            <td>Счетчик Google Tag Manager:</td>
             <td id="google-tag-manager">Загрузка...</td>
           </tr>
           <tr>
-            <td>Счетчик Google Analytics</td>
+            <td>Счетчик Google Analytics:</td>
             <td id="google-analytics">Загрузка...</td>
           </tr>
           <tr>
-            <td>CMS/WYSI/WYG</td>
+            <td>CMS/WYSI/WYG:</td>
             <td id="cms-data">Загрузка...</td>
           </tr>
           <tr>
-            <td>Размер страницы</td>
+            <td>Размер страницы:</td>
             <td id="page-size">Загрузка...</td>
           </tr>
           <tr>
-            <td>Код ответа сервера</td>
+            <td>Код ответа сервера:</td>
             <td id="response-code">Загрузка...</td>
           </tr>
           <tr>
-            <td>Время ответа сервера</td>
+            <td>Время ответа сервера:</td>
             <td id="time-code">Загрузка...</td>
           </tr>
         <tr>
-          <td>Возраст домена</td>
+          <td>Возраст домена:</td>
           <td id="domain-age">Загрузка...</td>
       </tr>
         <tr>
-            <td>Дата регистрации домена</td>
+            <td>Дата регистрации домена:</td>
             <td id="domain-registration-date">Загрузка...</td>
         </tr>
         <tr>
-            <td>Дата истечения SSL сертификата</td>
+            <td>Дата истечения SSL сертификата:</td>
             <td id="ssl-expiry-date">Загрузка...</td>
         </tr>
         <tr>
-          <td>IP сайта</td>
+          <td>IP сайта:</td>
           <td id="site-ip">Загрузка...</td>
       </tr>
         <tr>
-          <td>Яндекс ИКС</td>
+          <td>Яндекс ИКС:</td>
           <td id="yandex-iks">
             <img id="iksImage" style="display:none;" alt="ИКС не доступен">
             <span id="loadingMessage">Загрузка...</span>
@@ -932,7 +927,7 @@ input[type="text"] {
         <div class="search-panel">
           <div class="search-item">
             <span>Поиск по оператору<br>
-              <span style="color: #555; font-size: 12px;">site:domain.ru</span></span>
+              <span style="color: #555; font-size: 0.9em;">site:domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-site-yandex" class="search-button yandex">Я</button>
               <button id="check-index-google" class="search-button google">G</button>
@@ -941,7 +936,7 @@ input[type="text"] {
           <div class="search-item">
             <span>Поиск по оператору
               <br>
-              <span style="color: #555; font-size: 12px;">host:domain.ru</span>
+              <span style="color: #555; font-size: 0.9em;">host:domain.ru</span>
             </span>
             <div class="search-buttons">
               <button id="operator-host-yandex" class="search-button yandex">Я</button>
@@ -949,14 +944,14 @@ input[type="text"] {
           </div>
           <div class="search-item">
             <span>Поиск по оператору<br>
-              <span style="color: #555; font-size: 12px;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
+              <span style="color: #555; font-size: 0.9em;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-url-yandex" class="search-button yandex">Я</button>
             </div>
           </div>
           <div class="search-item">
             <span>Поиск дублей<br>
-              <span style="color: #555; font-size: 12px;">title:("Title страницы") site:domain.ru</span></span>
+              <span style="color: #555; font-size: 0.9em;">title:("Title страницы") site:domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-title-yandex" class="search-button yandex">Я</button>
             </div>
@@ -1038,13 +1033,13 @@ input[type="text"] {
         <h1>АНАЛИЗ ИЗОБРАЖЕНИЙ</h1>
         <div id="image-summary">
           <span><button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
-          <button data-filter="imagecss">Размещены в CSS (<span id="image-css">0</span>)</button>
-          <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
-          <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button>
-          <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button></span>
-          <span>  <button data-filter="low-500">Меньше 500 КБ (<span id="low-500-count">0</span>)</button>
-          <button data-filter="up-500">Больше 500 КБ (<span id="up-500-count">0</span>)</button>
-          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button>
+          <button data-filter="imagecss">Размещены в CSS (<span id="image-css">0</span>)</button><br>
+          <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
+          <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button><br>
+          <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button></span>
+          <span><button data-filter="low-500">Меньше 500 КБ (<span id="low-500-count">0</span>)</button><br>
+          <button data-filter="up-500">Больше 500 КБ (<span id="up-500-count">0</span>)</button><br>
+          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button><br>
           <button data-filter="status-404">Код ответа 4xx (<span id="status-404-count">0</span>)</button></span>
         </div>
         <button id="check-status">Проверить код ответа</button>
@@ -1062,11 +1057,11 @@ input[type="text"] {
         <section class="text-info">
           <div class="info-block">
             <span>Длина текста:</span>
-            <strong id="text-length">0</strong>
+            <span id="text-length">0</span>
           </div>
           <div class="info-block">
             <span>Длина текста (без пробелов):</span>
-            <strong id="clean-text-length">0</strong>
+            <span id="clean-text-length">0</span>
           </div>
           <div style="display: none;" class="info-block">
             <span>Водность текста:</span>
@@ -1137,9 +1132,9 @@ input[type="text"] {
               <tbody id="word-list"></tbody>
             </table>
           </div>
+          <span id="page-info">Страница 1 из 1</span>
           <div class="pagination">
             <button id="prev-page" class="button">Назад</button>
-            <span id="page-info">Страница 1 из 1</span>
             <button id="next-page" class="button">Вперёд</button>
           </div>
           <button id="export-button" class="button">Экспортировать в CSV</button>
@@ -1151,7 +1146,7 @@ input[type="text"] {
         <h1>ПОЛЕЗНОЕ</h1>
         <div class="service-container">
           <ul class="service-list">
-            <div class="section-title">АНАЛИТИКА:</div>
+            <div class="section-title">АНАЛИТИКА</div>
             <li class="hiddenli"><a href="https://webmaster.yandex.ru/sites/" target="_blank">Yandex Web Master</a></li>
             <li class="hiddenli"><a href="https://metrika.yandex.ru/list" target="_blank">Yandex Metrika</a></li>
             <li class="hiddenli"><a href="https://search.google.com/search-console" target="_blank">Google Search Console</a></li>
@@ -1162,7 +1157,7 @@ input[type="text"] {
             <li class="hiddenli"><a href="https://trends.google.ru/trends/" target="_blank">Google Trends</a></li>
             </ul>
             <ul class="service-list">
-              <div class="section-title">ТЕКСТ:</div>
+              <div class="section-title">ТЕКСТ</div>
               <li class="hiddenli"><a href="https://www.etxt.ru/" target="_blank">Etxt</a></li>
               <li class="hiddenli"><a href="https://text.ru/" target="_blank">Text</a></li>
               <li class="hiddenli"><a href="https://turgenev.ashmanov.com/" target="_blank">Turgenev</a></li>
@@ -1170,7 +1165,7 @@ input[type="text"] {
               <li class="hiddenli"><a href="https://simvoli.net/" target="_blank">Simvoli</a></li>
             </ul>
             <ul class="service-list">
-              <div class="section-title">ССЫЛКИ:</div>
+              <div class="section-title">ССЫЛКИ</div>
               <li class="hiddenli"><a href="https://ahrefs.com/" target="_blank">Ahrefs</a></li>
               <li class="hiddenli"><a href="https://gogetlinks.net/" target="_blank">Go Get Links</a></li>
               <li class="hiddenli"><a href="https://links.sape.ru/" target="_blank">Link Sape</a></li>
@@ -1183,13 +1178,13 @@ input[type="text"] {
               <li class="hiddenli"><a href="https://search.google.com/search-console/disavow-links" target="_blank">Google Disavow Links</a></li>
             </ul>
             <ul class="service-list">
-              <div class="section-title">ИЗОБРАЖЕНИЯ:</div>
+              <div class="section-title">ИЗОБРАЖЕНИЯ</div>
               <li class="hiddenli"><a href="https://imagecompressor.com/ru/" target="_blank">Image Compressor</a></li>
             </ul>
             </div>
             <div class="service-container">
               <ul class="service-list">
-                <div class="section-title">АУДИТ:</div>
+                <div class="section-title">АУДИТ</div>
                 <li class="hiddenli"><a href="https://labrika.ru/" target="_blank">Labrika</a></li>
                 <li class="hiddenli"><a href="https://pr-cy.ru/" target="_blank">Pr-Cy</a></li>
                 <li class="hiddenli"><a href="https://www.keys.so/" target="_blank">Keys</a></li>
@@ -1200,7 +1195,7 @@ input[type="text"] {
                 <li class="hiddenli"><a href="https://arsenkin.ru/tools/" target="_blank">Arsenkin Tools</a></li>
               </ul>
             <ul class="service-list">
-              <div class="section-title">РАЗРАБОТКА:</div>
+              <div class="section-title">РАЗРАБОТКА</div>
               <li class="hiddenli"><a href="https://github.com/" target="_blank">Git Hub</a></li>
               <li class="hiddenli"><a href="http://localhost/" target="_blank">Local Host</a></li>
               <li class="hiddenli"><a href="https://validator.w3.org/" target="_blank">W3 Validator</a></li>
@@ -1212,14 +1207,14 @@ input[type="text"] {
               <li class="hiddenli"><a href="https://onlinephp.io/" target="_blank">Online Php</a></li>
             </ul>
             <ul class="service-list">
-              <div class="section-title">ХОСТИНГИ:</div>
+              <div class="section-title">ХОСТИНГИ</div>
               <li class="hiddenli"><a href="https://www.netangels.ru/" target="_blank">Net Angels</a></li>
               <li class="hiddenli"><a href="https://beget.com/" target="_blank">Beget</a></li>
               <li class="hiddenli"><a href="https://timeweb.com/" target="_blank">Time Web</a></li>
               <li class="hiddenli"><a href="https://www.reg.ru/" target="_blank">Reg</a></li>
             </ul>
             <ul class="service-list">
-              <div class="section-title">ИИ:</div>
+              <div class="section-title">ИИ</div>
               <li class="hiddenli"><a href="https://a.ya.ru/" target="_blank">Yandex Gpt</a></li>
               <li class="hiddenli"><a href="https://chatgpt.com/" target="_blank">Chat Gpt</a></li>
               <li class="hiddenli"><a href="https://giga.chat/" target="_blank">Giga Chat</a></li>
@@ -1230,7 +1225,7 @@ input[type="text"] {
             </div>
             <div class="service-container">
               <ul class="service-list">
-                <div class="section-title">ОСТАЛЬНОЕ:</div>
+                <div class="section-title">ОСТАЛЬНОЕ</div>
                 <li class="hiddenli"><a href="https://redirectchecker.com/" target="_blank">Redirect Checker</a></li>
                 <li class="hiddenli"><a href="http://iloveadaptive.com/ru/" target="_blank">I Love Adaptive</a></li>
                 <li class="hiddenli"><a href="https://pagespeed.web.dev/" target="_blank">Page Speed Insights</a></li>
@@ -1254,7 +1249,7 @@ input[type="text"] {
                 <li class="hiddenli"><a href="https://www.google.com/intl/ru_ru/business/" target="_blank">Google Business</a></li>
             </ul>
             <ul class="service-list">
-                <div class="section-title">ПРОГРАММЫ:</div>
+                <div class="section-title">ПРОГРАММЫ</div>
                 <li class="hiddenli"><a href="https://github.com/apps/desktop" target="_blank">Git Hub Desktop</a></li>
                 <li class="hiddenli"><a href="https://kapeli.com/dash" target="_blank">Dash</a></li>
                 <li class="hiddenli"><a href="https://code.visualstudio.com/" target="_blank">Visual Studio Code</a></li>
@@ -1294,34 +1289,34 @@ input[type="text"] {
   </div>
           <div class="page-item">
             <span>Подсветить элементы noindex<br>
-              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span></span>
+              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
             <button id="highlight-noindex" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Подсветить элементы nofollow<br>
-              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span></span>
+              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
             <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Показать элементы none<br>
-              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span></span>
+              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
             <button id="toggle-none" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Отключить/включить Java Script<br>
-              <span style="color: #555; font-size: 12px;">По умолчанию включено</span></span>
+              <span style="color: #555; font-size: 0.9em;">По умолчанию включено</span></span>
             <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Отключить/включить CSS<br>
-              <span style="color: #555; font-size: 12px;">По умолчанию включено</span></span>
+              <span style="color: #555; font-size: 0.9em;">По умолчанию включено</span></span>
             <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Проверка API Check Trust<br>
-              <span style="color: #555; font-size: 12px;">По умолчанию выключено</span><br>
-              <span style="color: #555; font-size: 12px;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</span>
-              <ul style="color: #555; font-size: 12px;">
+              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span><br>
+              <span style="color: #555; font-size: 0.9em;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</span>
+              <ul style="color: #555; font-size: 0.9em;">
                   <li><strong>ТРАСТ</strong> сайтов — уровень доверия к ресурсу.</li>
                   <li><strong>СПАМ</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
               </ul></span>
@@ -1329,8 +1324,8 @@ input[type="text"] {
                 <i class="fa fa-toggle-off" aria-hidden="true"></i>
               </button>              
           </div>
-          <div class="section-title">ДОПОЛНЕНИЯ:</div>
-          <h2 style="margin: 0px;">API Check Trust</h2>
+          <div class="section-title">ДОПОЛНЕНИЯ</div>
+          <span style="margin: 0px;"><strong>API Check Trust</strong></span>
           <label for="apiKey">Ваш API ключ:</label>
           <input style="margin: 0px;" type="text" id="apiKey" placeholder="Введите API ключ" />
           <button id="saveKey"><span id="status">Сохранить</span></button>
