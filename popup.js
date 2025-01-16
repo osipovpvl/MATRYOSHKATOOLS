@@ -1853,14 +1853,21 @@ function checkCanonical(doc, currentUrl, container) {
 
   if (canonicalElement) {
       const canonicalUrl = canonicalElement.href;
-      if (canonicalUrl === currentUrl) {
+      const canonicalHref = canonicalElement.getAttribute('href');
+
+      if (canonicalHref.startsWith('/') || canonicalHref.startsWith('./') || canonicalHref.startsWith('../')) {
+          container.innerHTML = `
+              <span class="fa fa-times-circle" style="color:red;"></span>
+              Содержимое тега указано некорректно, но индексирование страницы не запрещено: <span>href="${canonicalHref}"</span>
+          `;
+      } else if (canonicalUrl === currentUrl) {
           container.innerHTML = `
               <span class="fas fa-check-circle" style="color: green;"></span>
               Каноничной страницей является текущая страница: <a href="${canonicalUrl}" target="_blank">${canonicalUrl}</a>
           `;
       } else {
           container.innerHTML = `
-              <span class="fa fa-times-circle" style="color:red;"></span>
+              <span class="fas fa-exclamation-circle" style="color: orange;"></span>
               Каноничной является другая страница: <a href="${canonicalUrl}" target="_blank">${canonicalUrl}</a>
           `;
       }
@@ -1872,36 +1879,6 @@ function checkCanonical(doc, currentUrl, container) {
   }
 }
 
-// Проверка Meta Robots
-function checkMetaRobots(doc, container) {
-  const metaElement = doc.querySelector('meta[name="robots"]');
-
-  if (metaElement) {
-      const content = metaElement.content.toLowerCase(); // Приводим содержимое к нижнему регистру для удобства проверки
-
-      if (content.includes("noindex")) {
-          container.innerHTML = `
-              <span class="fa fa-times-circle" style="color:red;"></span>
-              Индексация страницы запрещена (meta: ${content})
-          `;
-      } else if (content.includes("index") || content.includes("follow")) {
-          container.innerHTML = `
-              <span class="fas fa-check-circle" style="color: green;"></span>
-              Индексация страницы разрешена (meta: ${content})
-          `;
-      } else {
-          container.innerHTML = `
-              <span class="fas fa-exclamation-circle" style="color: orange;"></span>
-              Meta robots указан, но содержит нестандартные значения (meta: ${content})
-          `;
-      }
-  } else {
-      container.innerHTML = `
-          <span class="fas fa-check-circle" style="color: green;"></span>
-          Meta robots не указан (Индексация разрешена)
-      `;
-  }
-}
 
 
 // Проверка robots.txt с использованием регулярных выражений
