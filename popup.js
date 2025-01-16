@@ -2731,3 +2731,48 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 });
+
+// Получаем элементы
+const toggleButton = document.getElementById('toggle-numbers');
+const icon = toggleButton.querySelector('i');
+
+// Функция для изменения состояния кнопки
+function toggleNumbers() {
+  // Читаем текущее состояние из chrome storage
+  chrome.storage.sync.get('numbersVisible', function(data) {
+    let numbersVisible = data.numbersVisible || false;
+
+    // Toggle visibility
+    numbersVisible = !numbersVisible;
+    $('.topvisor-number').toggle(numbersVisible);
+
+    // Обновляем иконку
+    $('#toggle-numbers i').toggleClass('fa-toggle-on fa-toggle-off');
+
+    // Сохраняем новое состояние в chrome storage
+    chrome.storage.sync.set({ numbersVisible: numbersVisible });
+
+    // Отправляем сообщение для включения или выключения нумерации на страницах
+    chrome.runtime.sendMessage({ action: numbersVisible ? 'enableNumeric' : 'disableNumeric' });
+  });
+}
+
+// Обработчик клика на кнопку
+$(document).ready(function() {
+  // Инициализация состояния кнопки на основе chrome storage
+  chrome.storage.sync.get('numbersVisible', function(data) {
+    let isNumericEnabled = data.numbersVisible || false;
+
+    // Устанавливаем начальное состояние кнопки
+    if (isNumericEnabled) {
+      $('#toggle-numbers').addClass('active');
+      $('#toggle-numbers i').removeClass('fa-toggle-off').addClass('fa-toggle-on');
+    } else {
+      $('#toggle-numbers').removeClass('active');
+      $('#toggle-numbers i').removeClass('fa-toggle-on').addClass('fa-toggle-off');
+    }
+  });
+
+  // Обработчик клика на кнопку
+  $('#toggle-numbers').on('click', toggleNumbers);
+});

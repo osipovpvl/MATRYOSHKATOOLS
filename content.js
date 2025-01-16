@@ -512,3 +512,302 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     toggleFunctions(false);
   }
 });
+
+// Добавление нумерации в поисковых выдачах Яндекс и Google
+$(function() {
+  // Проверяем состояние из chrome storage
+  chrome.storage.sync.get('numbersVisible', function(data) {
+    let isNumericEnabled = data.numbersVisible || false;
+
+    // Если нумерация включена по умолчанию, сразу добавляем ее
+    if (isNumericEnabled) {
+      addNumericToSearchResults();
+    }
+
+    // Слушаем сообщения от popup.js
+    chrome.runtime.onMessage.addListener(function(message) {
+      if (message.action === 'enableNumeric') {
+        addNumericToSearchResults();
+      } else if (message.action === 'disableNumeric') {
+        removeNumericFromSearchResults();
+      }
+    });
+  });
+
+  // Функция для добавления нумерации в результаты поиска
+  function addNumericToSearchResults() {
+    if (location.href.indexOf('google.') != -1) {
+      serp_tools.google_numeric();
+      setInterval(serp_tools.google_numeric, 1000);
+    }
+    if (location.href.indexOf('yandex.') != -1 || location.href.indexOf('ya.') != -1) {
+      serp_tools.yandex_numeric();
+      setInterval(serp_tools.yandex_numeric, 1000);
+    }
+  }
+
+  // Функция для удаления нумерации из результатов поиска
+  function removeNumericFromSearchResults() {
+    $('.matryoshka-tools-number').remove();
+  }
+});
+
+
+var serp_tools = {};
+serp_tools.$number_tpl = $('<div class="matryoshka-tools-number"></div>')
+    .css({
+        'text-align': 'center',
+        'color': '#8bb4dd',
+        'font-size': '14px',
+        'margin-right': '20px',
+        position: 'absolute',
+        right: '100%'
+    });
+
+// получить объект с переменными для настройки SERP
+serp_tools.getParamsObject = function() {
+    var params = {};
+
+    params.matryoshka_tools_lang = serp_tools.getParam('matryoshka_tools_lang');
+    params.matryoshka_tools_region = serp_tools.getParam('matryoshka_tools_region');
+    params.matryoshka_tools_filter = serp_tools.getParam('matryoshka_tools_filter');
+
+    return params;
+};
+
+// получить необходимые GET параметр
+serp_tools.getParam = function(name) {
+    var param = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+    return param ? param[1] : '';
+};
+
+serp_tools.cookie = function(name) {
+    var matches = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+    return matches ? decodeURIComponent(matches[1]) : '';
+};
+
+serp_tools.set_cookie = function(name, value) {
+    var domain = location.host.replace('www.', '');
+    document.cookie = name + '=' + value + '; domain=.' + domain + '; path=/; expires=Mon, 01-Jan-2038 00:00:00 GMT";';
+};
+
+serp_tools.yandex_numeric = function() {
+    var $number_tpl = serp_tools.$number_tpl.clone()
+        .css({
+            width: 16,
+            top: 26,
+            left: -44,
+        });
+
+    var page = location.href.match(/[&?]p=(\d+)/);
+    if (page) page = page[1] * 1;
+    if (isNaN(page)) page = 0;
+
+    var onpage = 10;
+    var numdoc = serp_tools.getParam('numdoc');
+    if (numdoc && !isNaN(page)) onpage = numdoc;
+
+    var isMobile = (navigator.userAgent.indexOf('iPad') != -1 || navigator.userAgent.indexOf('Mobile') != -1);
+    var $items = $('#search-result:not(.serp-block_type_news-rubrics, :not(:password):has(.serp-item__label)) .serp-item:not(.serp-adv__item, .t-construct-adapter__adv, [data-j6rd], [data-fast-wzrd], [data-fast-name], :not(:password):has(.serp-item__label.serp-item__label_before_yes), :not(:password):has(.serp-adv-item__label), :not(:password):has(.serp-adv__counter), :not(:password):has(.label_color_yellow.organic__label_align_left)) a.Link:not(.organic__url_type_multiline)')
+        .filter(':not([href^="http://yabs.yandex."])')
+        .filter(':not([href^="https://yabs.yandex"])')
+        .filter(':not([href^="//yabs.yandex"])')
+        .filter(':not([href^="//m.yabs.yandex"])')
+        .filter(':not([href^="http://market-click2.yandex."])')
+        .filter(':not([href^="https://market-click2.yandex"])')
+        .filter(':not([href^="//market-click2.yandex"])')
+        .filter(':not([href^="//m.market-click2.yandex"])')
+        .filter(function() {
+            var href = $(this)
+                .attr('href');
+            if (!href) return false;
+
+            return !$(this)
+                .attr('href')
+                .match(/(https?:)?\/\/(www\.)?(m\.)?yandex\.\w{2,}\/search\/ads\?/);
+        })
+        .filter(function() {
+            var isOk = $(this)
+                .is('.organic__link') || $(this)
+                .is('.link_cropped_no.organic__url.link_theme_normal') || $(this)
+                .is('.organic__url:not([data-event-required])') || $(this)
+                .is('.SocialSnippetHeader-Link');
+            if (isMobile && !isOk) isOk = $(this)
+                .is('.organic__url.link_theme_normal');
+
+            return isOk;
+        })
+        .filter(function() {
+            return !$(this)
+                .closest('[data-fast-name="entity_offers"]')
+                .length;
+        })
+        .parent()
+        .parent();
+
+    if ($items.length == 15) onpage = 15;
+    if ($items.length % 5 != 0) onpage = Math.round($items.length / 5) * 5;
+    var first_n = onpage * page + 1;
+    $('.matryoshka-tools-number', $items)
+        .remove();
+
+    var isMobileVersion = $('meta[name="apple-mobile-web-app-capable"]')
+        .length;
+    if (isMobileVersion) {
+        $number_tpl.css({
+            top: 48,
+            right: -36,
+            left: 'auto'
+        });
+    } else if (window.innerWidth <= 990) {
+        $number_tpl.css({
+            left: -36
+        });
+    }
+
+    $.map($items, function(el, index) {
+        var $el = $(el);
+        var $number = $number_tpl.clone()
+            .text(first_n + index);
+
+        if (isMobileVersion && index === 0 && $el.closest('.serp-item:first-of-type')
+            .length) {
+            $number.css({
+                top: 32
+            });
+        }
+        if (isMobileVersion && $el.is('.SocialSnippet')) {
+            $number.css({
+                right: -21
+            });
+        } else {
+            $el.css({
+                position: 'relative'
+            });
+        }
+        $el.append($number);
+    });
+};
+
+serp_tools.google_numeric = function() {
+    var $number_tpl = serp_tools.$number_tpl.clone()
+        .css({
+            top: -2
+        });
+    var start = 0;
+    // Режим инкогнито (переход по страницам через ajax)
+    var href = $('#ab_ctls #ab_options .ab_dropdownitem')
+        .eq(0)
+        .children('a')
+        .attr('href');
+    if (!href) href = $('#gbw .gb_fb div.gb_uc > a.gb_b')
+        .eq(0)
+        .attr('href');
+
+    if (href) start = href.match(/%26start%3D(\d+)%26/);
+    if (!href) start = location.href.match(/[&?]start=(\d+)/)
+
+    if (start)
+        start = start[1] * 1;
+    if (isNaN(start))
+        start = 0;
+    var $items = $(`
+        #search ._NId > .srg > .g,
+        #search ._NId > .g,
+        #rso > .srg > div,
+        #rso div[data-hveid] > div > .srg > div,
+        #rso div[data-hveid] > .mnr-c:not([data-hveid]),
+        #search #rso > div > .srg > .g,
+        #search #rso > div > video-voyager > .g,
+        #search #rso > div > .g,
+        #search #rso > div > div > .g[data-hveid$="AA"],
+        #search #rso > .g,
+        #rso > .g.g-blk,
+        #rso > div > block-component > .g.g-blk,
+        #rso > div[data-hveid] > .osrp-blk .mnr-c.xpd,
+        #rso div.g[data-hveid$="AA"][data-ved],
+        #Odp5De .xpdopen div.g div[data-hveid$="AA"][data-ved],
+        #rso div.g[data-hveid$="AA"][jsname],
+        #botstuff div.g[data-hveid$="AA"][jsname],
+        #botstuff div.g div[data-hveid$="AA"][data-ved],
+        div[id^="arc-srp_"] div.g[data-hveid$="AA"][data-ved],
+        #rso div.g > div > div[data-hveid$="AA"][data-ved],
+        div[data-hveid$="AA"] > .g > div > div > div[data-hveid$="AA"][data-ved],
+        div[data-hveid$="AA"] div[data-sokoban-container],
+        ul.FxLDp div[data-sokoban-container],
+        ul.FxLDp > li > div > div[data-hveid$="AA"][data-ved],
+        div[data-hveid$="AA"] > .xpd:not(:has(.xpd)),
+        body > div > div > div > div.ezO2md,
+        div[data-hveid$="AA"] div.rULfzc,
+        div[data-hveid$="AA"][jsname] div.T61Aje
+    `)
+        .filter(':not(.obcontainer)')
+        .filter(':not(.vdQmEd)') 
+        .filter(':not(:has(.eMXfhf))')
+        .filter(':not(.no-sep):not(#imagebox_bigimages)')
+        .filter(':not(.kno-kp)')
+        .filter(':not(.rg-header):not(.card-section)')
+        .filter(':not(:password):not(:has(.kno-ftr:contains(\'support.google.com/websearch?p%3Dfeatured_snippets\')))')
+        .filter(':not(:password):not(:has([aria-level="2"][role="heading"])), :has([id^="evlb_"])')
+        .filter(':not(:password):not(div[data-sokoban-container]:has(div[data-sokoban-container]))');
+
+    $('.matryoshka-tools-number')
+        .remove();
+
+    var isMobileVersion = !!$('meta[name="viewport"][content*="width=device-width"]')
+        .length;
+
+    if (isMobileVersion) $number_tpl.css({
+        top: 7,
+        right: 0
+    });
+
+    var $itemsNew = [];
+    $.map($items, function(el) {
+        if ($(el)
+            .is('.ezO2md') && !$('> div > div > a', el)
+            .length) return;
+
+      
+        if (!$('a:not([href="#"])', el)
+            .length) return;
+
+
+        if ($(el)
+            .parent()
+            .is('div[data-hveid$="AA"]')) el = $(el)
+            .parent();
+
+        var $g = $('.g', $(el));
+        if ($g.length) {
+            $.map($g, function(subEl) {
+                $itemsNew.push($(subEl));
+            });
+        } else {
+            $itemsNew.push($(el));
+        }
+    });
+
+    var index = start + 1;
+    $.map($itemsNew, function(el) {
+        if ($('.matryoshka-tools-number', el)
+            .length) return;
+
+        var $number = $number_tpl.clone()
+            .text(index);
+
+        if (isMobileVersion && $(el)
+            .hasClass('card-section')) {
+            $number.css({
+                top: -8
+            });
+        }
+
+        $(el)
+            .css({
+                position: 'relative'
+            })
+            .append($number);
+        index++;
+    });
+};
