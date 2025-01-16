@@ -76,6 +76,10 @@
       padding: 8px 12px;
     }
 
+    #current-url{
+      word-break: break-word;
+    }
+
     table th {
       border-radius: 5px;
       background-color: #f2f2f2;
@@ -571,6 +575,7 @@ tr:nth-child(even) {
     }
 
     .status {
+      word-break: break-word;
     margin: 10px 0;
     font-size: 14px;
     align-items: center;
@@ -714,6 +719,7 @@ input[type="text"] {
         }
 
         .microdata-item {
+          word-break: break-word; 
   margin-bottom: 5px;
   padding: 5px;
   border: 1px solid #ddd;
@@ -976,11 +982,6 @@ input[type="text"] {
             <span>Показать нумерацию результатов в выдаче Яндекс и Google<br>
               <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
             <button id="toggle-numbers" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
-          </div>
-          <div class="search-item">
-            <span>Скрыть рекламу в выдаче Яндекс и Google<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
-            <button id="hide-reklama" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
         </div>
       </div>

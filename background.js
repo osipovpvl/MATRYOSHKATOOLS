@@ -197,7 +197,3 @@ chrome.runtime.onMessage.addListener(async (message) => {
 // Применяем сохраненное состояние при запуске
 chrome.runtime.onStartup.addListener(applySavedJavaScriptState);
 chrome.runtime.onInstalled.addListener(applySavedJavaScriptState);
-
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.storage.sync.set({ showNumbers: false });
-});
