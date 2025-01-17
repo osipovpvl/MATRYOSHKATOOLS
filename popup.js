@@ -1852,23 +1852,25 @@ function checkCanonical(doc, currentUrl, container) {
   const canonicalElement = doc.querySelector('link[rel="canonical"]');
 
   if (canonicalElement) {
-      const canonicalUrl = canonicalElement.href;
       const canonicalHref = canonicalElement.getAttribute('href');
 
-      if (canonicalHref.startsWith('/') || canonicalHref.startsWith('./') || canonicalHref.startsWith('../')) {
+      // Проверяем, является ли адрес относительным
+      const isRelative = !canonicalHref.startsWith('http://') && !canonicalHref.startsWith('https://');
+
+      if (isRelative) {
           container.innerHTML = `
-      <span class="fa fa-times-circle" style="color:red;"></span>
+              <span class="fa fa-times-circle" style="color:red;"></span>
               Содержимое тега указано некорректно, но индексирование страницы не запрещено: <span>href="${canonicalHref}"</span>
           `;
-      } else if (canonicalUrl === currentUrl) {
+      } else if (canonicalHref === currentUrl) {
           container.innerHTML = `
               <span class="fas fa-check-circle" style="color: green;"></span>
-              Каноничной страницей является текущая страница: <a href="${canonicalUrl}" target="_blank">${canonicalUrl}</a>
+              Каноничной страницей является текущая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
           `;
       } else {
           container.innerHTML = `
               <span class="fas fa-exclamation-circle" style="color: orange;"></span>
-              Каноничной является другая страница: <a href="${canonicalUrl}" target="_blank">${canonicalUrl}</a>
+              Каноничной является другая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
           `;
       }
   } else {
