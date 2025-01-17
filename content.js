@@ -557,7 +557,7 @@ var serp_tools = {};
 serp_tools.$number_tpl = $('<div class="matryoshka-tools-number"></div>')
     .css({
         'text-align': 'center',
-        'color': '#8bb4dd',
+        'color': '#555',
         'font-size': '14px',
         'margin-right': '20px',
         position: 'absolute',
