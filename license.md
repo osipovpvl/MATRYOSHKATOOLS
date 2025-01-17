@@ -1,6 +1,6 @@
 Лицензия Apache
 Версия 2.0, январь 2004
-http://www.apache.org/licenses/
+https://www.apache.org/licenses/
 
 УСЛОВИЯ ИСПОЛЬЗОВАНИЯ, ВОСПРОИЗВЕДЕНИЯ И РАСПРОСТРАНЕНИЯ
 
