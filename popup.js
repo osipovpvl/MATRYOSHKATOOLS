@@ -2258,7 +2258,7 @@ document.addEventListener("DOMContentLoaded", function () {
         return response.text().then(text => {
           const sizeInBytes = new Blob([text]).size;
           const sizeInKB = (sizeInBytes / 1024).toFixed(2);
-          pageSizeElement.textContent = `${sizeInKB} KB`;
+          pageSizeElement.textContent = `${sizeInKB} КБ`;
         });
       })
       .catch(() => {
@@ -2776,3 +2776,65 @@ $(document).ready(function() {
   // Обработчик клика на кнопку
   $('#toggle-numbers').on('click', toggleNumbers);
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  const speedElement = document.getElementById("speed-page");
+  
+  // Получаем ID текущей активной вкладки
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      const currentTab = tabs[0];
+  
+      if (currentTab) {
+       // Сначала проверяем, есть ли данные в background.js
+       chrome.runtime.sendMessage(
+          { type: "GET_PAGE_LOAD_TIME", tabId: currentTab.id },
+          (response) => {
+           if (response && response.loadTime) {
+              updateLoadTime(response.loadTime);
+           } else {
+              // Если данных нет, пытаемся выполнить скрипт на вкладке
+              getLoadTimeFromTab(currentTab.id);
+           }
+          }
+       );
+      }
+  });
+  
+  // Функция для обновления времени загрузки в DOM
+  function updateLoadTime(loadTime) {
+      const loadTimeHtml = `${loadTime} <span data-translation="seconds">сек</span>`;
+      speedElement.innerHTML = loadTimeHtml;
+  }
+  
+  // Функция для выполнения скрипта на вкладке и получения времени загрузки
+  function getLoadTimeFromTab(tabId) {
+      chrome.scripting.executeScript(
+       {
+          target: { tabId: tabId },
+          func: () => {
+           const timing = performance.timing;
+           const loadTime = (
+              (timing.domContentLoadedEventEnd - timing.navigationStart) /
+              1000
+           ).toFixed(1);
+           return loadTime;
+          },
+       },
+       (results) => {
+          if (chrome.runtime.lastError || !results || !results[0]) {
+           speedElement.textContent = "Не удалось определить";
+          } else {
+           const loadTime = results[0].result;
+           updateLoadTime(loadTime);
+  
+           // Сохраняем данные в background.js
+           chrome.runtime.sendMessage({
+              type: "SET_PAGE_LOAD_TIME",
+              tabId: tabId,
+              loadTime: loadTime,
+           });
+          }
+       }
+      );
+  }
+  });

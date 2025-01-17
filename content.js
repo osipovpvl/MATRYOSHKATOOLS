@@ -458,7 +458,7 @@ async function updateSiteInfo() {
       const trustColor = getTrustColor(data.trust);
       const spamColor = getSpamColor(data.spam);
 
-      infoSpan.innerHTML = `ТРАСТ: <span style="color: ${trustColor};">${data.trust}</span>, СПАМ: <span style="color: ${spamColor};">${data.spam}</span>`;
+      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span>, Спам: <span style="color: ${spamColor};">${data.spam}</span>`;
     } else {
       infoSpan.textContent = "Не удалось проверить";
       infoSpan.style.color = "red";
@@ -811,3 +811,19 @@ serp_tools.google_numeric = function() {
         index++;
     });
 };
+
+window.addEventListener("load", () => {
+  const timing = performance.timing;
+  
+  // Рассчитываем время загрузки страницы
+  const loadTime = timing.domContentLoadedEventEnd - timing.navigationStart;
+  
+  // Конвертируем миллисекунды в секунды и округляем
+  const loadTimeSeconds = (loadTime / 1000).toFixed(1);
+  
+  // Отправляем сообщение через background.js
+  chrome.runtime.sendMessage({
+      type: "SET_PAGE_LOAD_TIME",
+      loadTime: loadTimeSeconds,
+  });
+  });

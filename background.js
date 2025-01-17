@@ -197,3 +197,23 @@ chrome.runtime.onMessage.addListener(async (message) => {
 // Применяем сохраненное состояние при запуске
 chrome.runtime.onStartup.addListener(applySavedJavaScriptState);
 chrome.runtime.onInstalled.addListener(applySavedJavaScriptState);
+
+const tabLoadTimes = {};
+
+// Сохраняем время загрузки для каждой вкладки
+chrome.runtime.onMessage.addListener((message, sender) => {
+if (message.type === "SET_PAGE_LOAD_TIME") {
+    const tabId = message.tabId || (sender.tab && sender.tab.id);
+    if (tabId) {
+     tabLoadTimes[tabId] = message.loadTime;
+    }
+}
+});
+
+// Обрабатываем запрос от popup.js
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+if (message.type === "GET_PAGE_LOAD_TIME" && message.tabId) {
+    const loadTime = tabLoadTimes[message.tabId];
+    sendResponse({ loadTime: loadTime || 0 });
+}
+});

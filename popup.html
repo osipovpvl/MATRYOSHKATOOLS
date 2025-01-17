@@ -122,13 +122,13 @@
     }
 
     #image-summary {
-    margin-bottom: 20px;
     display: flex;
     gap: 10px;
 }
 
 #image-summary button {
   font-size: 14px;
+  margin: 5px;
     padding: 8px 12px;
     border: 1px solid #000000;
     background-color: #ffffff;
@@ -833,7 +833,7 @@ input[type="text"] {
             <td id="current-url">Загрузка...</td>
           </tr>
           <tr>
-            <td>Кодировка:</td>
+            <td>Кодировка HTML:</td>
             <td><div id="charset">Загрузка...</div></td>
         </tr>
           <tr>
@@ -864,6 +864,10 @@ input[type="text"] {
             <td>Размер страницы:</td>
             <td id="page-size">Загрузка...</td>
           </tr>
+          <tr>
+            <td>Скорость загрузки страницы:</td>
+            <td id="speed-page">Загрузка...</td>
+         </tr>
           <tr>
             <td>Код ответа сервера:</td>
             <td id="response-code">Загрузка...</td>
@@ -1042,11 +1046,11 @@ input[type="text"] {
           <span><button data-filter="all">Все изображения (<span id="total-images">0</span>)</button>
           <button data-filter="imagecss">Размещены в CSS (<span id="image-css">0</span>)</button><br>
           <button data-filter="filled-alt">Заполнен alt (<span id="filled-alt-count">0</span>)</button>
-          <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button><br>
-          <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button></span>
-          <span><button data-filter="low-500">Меньше 500 КБ (<span id="low-500-count">0</span>)</button><br>
+          <button data-filter="empty-alt">Пустой alt (<span id="empty-alt-count">0</span>)</button>
+          <button data-filter="missing-alt">Отсутствует alt (<span id="missing-alt-count">0</span>)</button><br>
+          <button data-filter="low-500">Меньше 500 КБ (<span id="low-500-count">0</span>)</button>
           <button data-filter="up-500">Больше 500 КБ (<span id="up-500-count">0</span>)</button><br>
-          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button><br>
+          <button data-filter="status-200">Код ответа 2xx (<span id="status-200-count">0</span>)</button>
           <button data-filter="status-404">Код ответа 4xx (<span id="status-404-count">0</span>)</button></span>
         </div>
         <button id="check-status">Проверить код ответа</button>
@@ -1122,7 +1126,7 @@ input[type="text"] {
             <button class="tab-buttons texts" data-tab="twoWords">2 слова</button>
             <button class="tab-buttons texts" data-tab="threeWords">3 слова</button>
             <button class="tab-buttons texts" data-tab="linkWords">Слова в ссылках</button>
-              <input type="text" id="word-search" placeholder="Поиск слов..." />
+              <input type="text" id="word-search" placeholder="Поиск слов" />
              
           </div>
 <br>
@@ -1204,6 +1208,7 @@ input[type="text"] {
               <li class="hiddenli"><a href="https://github.com/" target="_blank">Git Hub</a></li>
               <li class="hiddenli"><a href="http://localhost/" target="_blank">Local Host</a></li>
               <li class="hiddenli"><a href="https://validator.w3.org/" target="_blank">W3 Validator</a></li>
+              <li class="hiddenli"><a href="https://fontawesome.ru/" target="_blank">Font Awesome</a></li>
               <li class="hiddenli"><a href="https://snipp.ru/handbk/emoji" target="_blank">Snippet Emoji</a></li>
               <li class="hiddenli"><a href="https://rustxt.ru/html-editor-online" target="_blank">Rus Txt Html Editor Online</a></li>
               <li class="hiddenli"><a href="https://jsbin.com/?js,console" target="_blank">Js Bin</a></li>
@@ -1247,8 +1252,8 @@ input[type="text"] {
                 <li class="hiddenli"><a href="https://www.maxim-m.ru/tools/y-turbo" target="_blank">Maxim-M Yandex Turbo Page</a></li>
                 <li class="hiddenli"><a href="https://www.mysitemapgenerator.com/ru/yml/index.html" target="_blank">Feeds Generator</a></li>
                 <li class="hiddenli"><a href="https://valentin.app/" target="_blank">Valentin Local & International Checker</a></li>
-                <li class="hiddenli"><a href="https://merchants.google.com/noaccess/?continue=https://merchants.google.com/mc/" target="_blank">Google Merchants Center</a></li>
                 <li class="hiddenli"><a href="https://merchants.yandex.ru/?utm_source=webmaster&utm_medium=menu" target="_blank">Yandex Merchants</a></li>
+                <li class="hiddenli"><a href="https://merchants.google.com/noaccess/?continue=https://merchants.google.com/mc/" target="_blank">Google Merchants</a></li>
                 <li class="hiddenli"><a href="https://console.cloud.google.com/welcome?organizationId=0&supportedpurview=project" target="_blank">Google Cloud Platform</a></li>
                 <li class="hiddenli"><a href="https://business.yandex.ru/" target="_blank">Yandex Business</a></li>
                 <li class="hiddenli"><a href="https://www.google.com/intl/ru_ru/business/" target="_blank">Google Business</a></li>
@@ -1321,8 +1326,8 @@ input[type="text"] {
               <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span><br>
               <span style="color: #555; font-size: 0.9em;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</span>
               <ul style="color: #555; font-size: 0.9em;">
-                  <li><strong>ТРАСТ</strong> сайтов — уровень доверия к ресурсу.</li>
-                  <li><strong>СПАМ</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
+                  <li><strong>Траст</strong> сайтов — уровень доверия к ресурсу.</li>
+                  <li><strong>Спам</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
               </ul></span>
               <button id="checktrustbutton" class="page-button action-button">
                 <i class="fa fa-toggle-off" aria-hidden="true"></i>
