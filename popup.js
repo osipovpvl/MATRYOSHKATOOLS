@@ -1857,12 +1857,23 @@ function checkCanonical(doc, currentUrl, container) {
       // Проверяем, является ли адрес относительным
       const isRelative = !canonicalHref.startsWith('http://') && !canonicalHref.startsWith('https://');
 
+      // Нормализуем текущий URL и канонический URL для корректного сравнения
+      const normalizeUrl = (url) => {
+          return url
+              .trim()
+              .toLowerCase()
+              .replace(/\/$/, ''); // Убираем конечный слэш
+      };
+
+      const normalizedCurrentUrl = normalizeUrl(currentUrl);
+      const normalizedCanonicalHref = normalizeUrl(canonicalHref);
+
       if (isRelative) {
           container.innerHTML = `
               <span class="fa fa-times-circle" style="color:red;"></span>
               Содержимое тега указано некорректно, но индексирование страницы не запрещено: <span>href="${canonicalHref}"</span>
           `;
-      } else if (canonicalHref === currentUrl) {
+      } else if (normalizedCanonicalHref === normalizedCurrentUrl) {
           container.innerHTML = `
               <span class="fas fa-check-circle" style="color: green;"></span>
               Каноничной страницей является текущая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
