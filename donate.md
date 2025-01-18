@@ -1,6 +1,7 @@
-### [Отправить фиат](https://www.donationalerts.com/r/matryoshkatools)
-### Отправить криптовалюту
->### Bitcoin
+[Отправить фиат](https://www.donationalerts.com/r/matryoshkatools)
+
+Отправить криптовалюту
+>**Bitcoin**
 >
 >**Отправляйте только BTC на этот адрес.**
 >
@@ -10,7 +11,7 @@
 >
 >![QR Code](img/bitcoin.jpeg)
 
->### Ethereum
+>**Ethereum**
 >
 >**Отправляйте только ETH на этот адрес.**
 >
