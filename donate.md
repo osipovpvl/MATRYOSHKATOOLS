@@ -1,5 +1,4 @@
 ### [Отправить фиат](https://www.donationalerts.com/r/matryoshkatools)
----
 ### Отправить криптовалюту
 >### Bitcoin
 >
