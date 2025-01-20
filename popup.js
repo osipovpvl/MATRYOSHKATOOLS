@@ -1939,7 +1939,7 @@ async function checkRobotsTxt(tabUrl, container) {
 
       // Проверяем, существует ли файл robots.txt
       if (response.status === 404) {
-          container.innerHTML = `<p>Файл robots.txt отсутствует на сайте: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
+          container.innerHTML = `<p><span class="fa fa-times-circle" style="color:red;"></span> Файл robots.txt отсутствует</p>`;
           return;
       }
 
