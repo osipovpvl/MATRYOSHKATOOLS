@@ -1930,11 +1930,25 @@ async function checkRobotsTxt(tabUrl, container) {
   const robotsUrl = new URL("/robots.txt", tabUrl).href;
 
   try {
-      const response = await fetch(robotsUrl);
-      if (!response.ok) {
-          throw new Error("Не удалось загрузить robots.txt");
+      // Добавление User-Agent для избежания блокировок
+      const response = await fetch(robotsUrl, {
+          headers: {
+              "User-Agent": "Mozilla/5.0 (compatible; MyBot/1.0; +http://example.com/bot)"
+          }
+      });
+
+      // Проверяем, существует ли файл robots.txt
+      if (response.status === 404) {
+          container.innerHTML = `<p>Файл robots.txt отсутствует на сайте: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
+          return;
       }
 
+      // Если сервер вернул ошибку, но не 404
+      if (!response.ok) {
+          throw new Error(`Ошибка HTTP: ${response.status}`);
+      }
+
+      // Парсим содержимое robots.txt
       const robotsText = await response.text();
       const lines = robotsText.split("\n");
       const userAgents = {};
@@ -1942,15 +1956,14 @@ async function checkRobotsTxt(tabUrl, container) {
 
       // Функция для преобразования шаблонов robots.txt в регулярные выражения
       const convertRobotsTxtToRegex = (robotsTxtPattern) => {
-          // Экранируем спецсимволы и заменяем '*' на '.*'
           const regexPattern = robotsTxtPattern
               .replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
               .replace(/\\\*/g, ".*")
               .replace(/\\\$/g, "$");
-
           return new RegExp(`^${regexPattern}`);
       };
 
+      // Проверяем путь против шаблона из robots.txt
       const checkPathAgainstRobotsRegex = (pattern, path) => {
           return convertRobotsTxtToRegex(pattern).test(path);
       };
@@ -1965,26 +1978,24 @@ async function checkRobotsTxt(tabUrl, container) {
               }
           } else if (
               currentAgent &&
-              (trimmed.toLowerCase().startsWith("disallow:") ||
-                  trimmed.toLowerCase().startsWith("allow:"))
+              (trimmed.toLowerCase().startsWith("disallow:") || 
+              trimmed.toLowerCase().startsWith("allow:"))
           ) {
-              const rule = trimmed.split(":")[1].trim(); // Извлекаем правило
-              // Добавляем только непустые правила
+              const rule = trimmed.split(":")[1].trim();
               userAgents[currentAgent].push({
                   type: trimmed.toLowerCase().startsWith("disallow:") ? "Disallow" : "Allow",
-                  path: rule || "", // Если путь пустой, храним пустую строку
-                  original: trimmed, // Сохраняем оригинальную строку
+                  path: rule || "",
+                  original: trimmed,
               });
           }
       });
 
-      // Проверяем, разрешен ли путь для текущего user-agent
+      // Проверяем, разрешен ли путь для текущего User-Agent
       const isPathAllowed = (rules, path) => {
-          let allowed = true; // Разрешено по умолчанию
-          let ruleMatched = null; // Запоминаем правило
+          let allowed = true;
+          let ruleMatched = null;
 
           rules.forEach(({ type, path: rulePath, original }) => {
-              // Пустой Disallow не запрещает индексацию
               if (type === "Disallow" && rulePath === "") {
                   return;
               }
@@ -1997,6 +2008,7 @@ async function checkRobotsTxt(tabUrl, container) {
           return { allowed, ruleMatched };
       };
 
+      // Создаем HTML-вывод
       let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
       htmlContent += "<p>Список User-agent и их статус:</p>";
       htmlContent += "<ul>";
@@ -2014,11 +2026,12 @@ async function checkRobotsTxt(tabUrl, container) {
       htmlContent += "</ul>";
       container.innerHTML = htmlContent;
   } catch (error) {
-      container.innerHTML = 
-          `<span class="fa fa-times-circle" style="color:red;"></span> Не удалось загрузить robots.txt`;
+      // Упрощенный вывод ошибки
+      container.innerHTML = `<p><span class="fa fa-times-circle" style="color:red;"></span> Не удалось загрузить файл robots.txt<br>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
       //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
+
 
 
 
@@ -2048,7 +2061,7 @@ async function checkSitemap(tabUrl, container) {
     if (sitemapUrls.length === 0) {
       container.innerHTML = `
         <span class="fa fa-times-circle" style="color:red;"></span>
-        Ссылок на sitemap.xml не найдено
+        Ссылок на файл sitemap.xml не найдено
       `;
       return;
     }
@@ -2074,7 +2087,7 @@ async function checkSitemap(tabUrl, container) {
   } catch (error) {
     container.innerHTML = `
       <span class="fa fa-times-circle" style="color:red;"></span>
-      Ссылок на sitemap.xml не найдено
+      Ссылок на файл sitemap.xml не найдено
     `;
     //console.error("Ошибка при загрузке robots.txt:", error);
   }
