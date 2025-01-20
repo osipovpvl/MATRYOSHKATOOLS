@@ -2027,7 +2027,7 @@ async function checkRobotsTxt(tabUrl, container) {
       container.innerHTML = htmlContent;
   } catch (error) {
       // Упрощенный вывод ошибки
-      container.innerHTML = `<p><span class="fa fa-times-circle" style="color:red;"></span> Не удалось загрузить файл robots.txt<br>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
+      container.innerHTML = `<p><span class="fas fa-exclamation-circle" style="color: orange;"></span> Не удалось загрузить файл robots.txt<br>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
       //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
@@ -2067,7 +2067,7 @@ async function checkSitemap(tabUrl, container) {
     }
 
     // Проверяем доступность каждого найденного sitemap
-    let resultHtml = `<span class="fas fa-check-circle" style="color: green;"></span> Найдены следующие sitemap.xml файлы:`;
+    let resultHtml = `<span class="fas fa-check-circle" style="color: green;"></span> Найдены следующие файлы sitemap.xml:<p></p>`;
     for (const sitemapUrl of sitemapUrls) {
       try {
         const response = await fetch(sitemapUrl);
