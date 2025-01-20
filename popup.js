@@ -2010,7 +2010,7 @@ async function checkRobotsTxt(tabUrl, container) {
 
       // Создаем HTML-вывод
       let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
-      htmlContent += "<p>Список User-agent и их статус:</p>";
+      htmlContent += "<p>Список User-Agent и их статус:</p>";
       htmlContent += "<ul>";
 
       const currentPath = new URL(tabUrl).pathname + new URL(tabUrl).search;
