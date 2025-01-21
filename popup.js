@@ -205,48 +205,40 @@ function updateMetaLengthStyles(element, length, ranges, isMissing) {
 function populateMetaData(id, value) {
   const element = document.getElementById(id);
   const lengthElement = document.getElementById(`${id}-length`);
+  
 
+  // Обработка для H1
+  if (id === 'h1') {
+    const h1Tags = value || []; // Если value пустое, используем пустой массив
+    const h1Count = h1Tags.length;
+
+    if (h1Count === 0) {
+      element.textContent = "Отсутствует";
+      lengthElement.textContent = `Символов: ${h1Count}`;
+      lengthElement.style.color = "red"; // Красим текст длины
+    } else if (h1Count === 1) {
+      element.textContent = h1Tags[0]; // Один H1 выводим как текст
+      const displayedLength = h1Tags[0].length;
+      lengthElement.textContent = `Символов: ${displayedLength}`;
+      lengthElement.style.color = "green"; // Красим текст длины
+    } else {
+      // Несколько H1 выводим с нумерацией
+      element.innerHTML = h1Tags.map((h1, index) => `<div>${index + 1}. ${h1}</div>`).join("");
+      lengthElement.textContent = `Тегов: ${h1Count}`;
+      lengthElement.style.color = "red";
+    }
+    return;
+  }
   // Проверка на отсутствие значения: если значение пустое или состоит только из пробелов
   const isMissing = !value || value.trim() === "" || value === "Отсутствует";  // Проверяем на пустую строку и на null/undefined
 
-  // Устанавливаем текстовое значение
-  if (isMissing) {
-    element.textContent = "Отсутствует";  // Текст для отсутствующих данных
-  } else {
-    element.textContent = value;  // Устанавливаем сам текст мета-данных
-  }
+  const normalizeText = (str) => str.normalize('NFC').replace(/\s+/g, ' ').trim();
+  const cleanedValue = isMissing ? "" : normalizeText(value);
 
+  element.textContent = isMissing ? "Отсутствует" : cleanedValue;
 
-  // Если это H1, проверяем на дубли
-  if (id === "h1") {
-    const h1Texts = value.split(", ").map((text) => text.trim());
-    const duplicates = new Set();
-    const seen = new Set();
-
-    h1Texts.forEach((text) => {
-      if (seen.has(text)) {
-        duplicates.add(text);
-      } else {
-        seen.add(text);
-      }
-    });
-
-    if (duplicates.size > 0) {
-      // Если есть дубли, пишем "Дубль"
-      element.textContent = value;
-      lengthElement.textContent = "Найдены дубли";
-      lengthElement.classList.add("duplicate-warning");
-      return;
-    }
-  }
-
-  // Устанавливаем текстовое значение
-  element.textContent = value;
-
-
-  // Устанавливаем длину (если отсутствует, длина = 0)
-  const displayedLength = isMissing ? 0 : value.length;  // Длина равна 0, если данных нет
-  lengthElement.textContent = `Символов: ${displayedLength}`;  // Отображаем длину
+  const displayedLength = cleanedValue.length;
+  lengthElement.textContent = `Символов: ${displayedLength}`; // Отображаем длину
 
   // Устанавливаем стиль длины для разных мета-данных
   if (id === 'title') {
@@ -258,11 +250,6 @@ function populateMetaData(id, value) {
     updateMetaLengthStyles(lengthElement, displayedLength, {
       good: [150, 250],
       acceptable: [75, 149, 251, 300],
-    }, isMissing);
-  } else if (id === 'h1') {
-    updateMetaLengthStyles(lengthElement, displayedLength, {
-      good: [20, 60],
-      acceptable: [5, 19, 61, 70],
     }, isMissing);
   }
 }
@@ -337,27 +324,6 @@ function populateMicrodata(elementId, data, label) {
 
 // Функция для извлечения SEO данных
 function scrapeSEOData() {
-  const h1Elements = document.querySelectorAll("h1");
-  const h1Texts = {};
-  const duplicates = new Set();
-
-  h1Elements.forEach((h1) => {
-    const textContent = h1.textContent.trim();
-    if (!h1Texts[textContent]) {
-      h1Texts[textContent] = 1; // Если такой текст встречается впервые
-    } else {
-      h1Texts[textContent]++; // Увеличиваем счётчик
-      duplicates.add(textContent); // Добавляем в список дублирующихся
-    }
-  });
-
-  // Формируем строку с дублями
-  const h1Summary = Array.from(h1Elements)
-    .map((h1) => {
-      const textContent = h1.textContent.trim();
-      return duplicates.has(textContent) ? `${textContent}` : textContent;
-    })
-    .join(", ");
   // Функция для извлечения структурированных данных, таких как OpenGraph, Twitter и т. д.
   const extractStructuredData = (selector, attribute = "content") => {
     return Array.from(document.querySelectorAll(selector)).map(el => {
@@ -372,7 +338,7 @@ function scrapeSEOData() {
     title: document.querySelector("title")?.textContent || "Отсутствует", // textContent вместо innerText
     description: document.querySelector('meta[name="description"]')?.content || "Отсутствует",
     keywords: document.querySelector('meta[name="keywords"]')?.content || "Отсутствует",
-    h1: h1Summary || "Отсутствует",
+    h1: Array.from(document.querySelectorAll("h1")).map(h1 => h1.textContent.trim()) || [], // Собираем все H1
     linksCount: document.querySelectorAll("a[href]").length,  // Количество ссылок на странице
     imagesCount: document.querySelectorAll("img").length,  // Количество изображений на странице
     lang: document.documentElement.lang || "Отсутствует", // Язык страницы
