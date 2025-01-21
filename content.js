@@ -27,11 +27,14 @@ function getMetricsData() {
     const innerContent = script.innerHTML || "";
 
     // Яндекс Метрика
-    if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(")) {
+    if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(") || innerContent.includes("Ya.Metrika")) {
       const matchSrc = src.match(/watch\/(\d+)/); // ID в src
       const matchYM = innerContent.match(/ym\((\d+),/); // ID в ym()
+      const matchMetrika = innerContent.match(/new Ya\.Metrika\(\{[^}]*id\s*:\s*(\d+)/); // ID в Ya.Metrika
+
       if (matchSrc) metrics.yandexMetrika.add(matchSrc[1]);
       if (matchYM) metrics.yandexMetrika.add(matchYM[1]);
+      if (matchMetrika) metrics.yandexMetrika.add(matchMetrika[1]);
 
       // Поиск window.mainMetrikaId
       const mainMetrikaMatch = innerContent.match(/window\.mainMetrikaId\s*=\s*['"](\d+)['"]/);
@@ -73,11 +76,32 @@ function observeDOM() {
   observer.observe(document, { childList: true, subtree: true });
 }
 
+// Обертка для yandex_metrika_callbacks
+function wrapYandexMetrikaCallbacks() {
+  if (!window.yandex_metrika_callbacks) return;
+
+  const originalPush = window.yandex_metrika_callbacks.push;
+  window.yandex_metrika_callbacks.push = function (callback) {
+    //console.log("Яндекс Метрика callback добавлен");
+    originalPush.call(this, callback);
+
+    // Выполняем сканирование после добавления callback
+    setTimeout(() => {
+      const metricsData = getMetricsData();
+      chrome.runtime.sendMessage({ action: "updateMetrics", metrics: metricsData });
+    }, 0);
+  };
+}
+
+// Инициализация
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.action === "getMetrics") {
     const metricsData = getMetricsData();
     sendResponse(metricsData);
-    observeDOM(); // Начинаем отслеживать изменения DOM
+
+    // Начинаем отслеживать изменения DOM и перехватываем yandex_metrika_callbacks
+    observeDOM();
+    wrapYandexMetrikaCallbacks();
   }
 });
 
