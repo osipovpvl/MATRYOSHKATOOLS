@@ -224,7 +224,7 @@ function populateMetaData(id, value) {
     } else {
       // Несколько H1 выводим с нумерацией
       element.innerHTML = h1Tags.map((h1, index) => `<div>${index + 1}. ${h1}</div>`).join("");
-      lengthElement.textContent = `Тегов: ${h1Count}`;
+      lengthElement.textContent = `Заголовков: ${h1Count}`;
       lengthElement.style.color = "red";
     }
     return;
