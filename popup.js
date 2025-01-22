@@ -2884,3 +2884,180 @@ document.addEventListener("DOMContentLoaded", () => {
       );
   }
   });
+
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const yandexResultElement = document.getElementById("yandex-result-index");
+    const googleResultElement = document.getElementById("google-result-index");
+  
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const url = new URL(tabs[0].url);
+      const hostname = url.hostname;
+      const hostnameWithoutWWW = hostname.replace("www.", "");
+  
+      const yandexSearchUrlFull = `https://yandex.ru/search/?text=host:${hostname}`;
+      const yandexSearchUrlWithoutWWW = `https://yandex.ru/search/?text=host:${hostnameWithoutWWW}`;
+      const googleSearchUrl = `https://www.google.com/search?q=site:${hostname}`;
+  
+      // Флаг для предотвращения повторных запросов при капче
+      let isCaptchaDetected = false;
+  
+      async function fetchIndexedPages(engine, queryUrl) {
+        try {
+          // Проверка на кэшированные данные
+          const cachedData = localStorage.getItem(`${engine}-count-${hostnameWithoutWWW}`);
+          if (cachedData) {
+            const data = JSON.parse(cachedData);
+            const age = Date.now() - data.timestamp;
+            const maxAge = 24 * 60 * 60 * 1000; // 1 день
+  
+            if (age < maxAge) {
+              console.log(`Используем кэш для ${engine}`);
+              return data.count;
+            }
+          }
+  
+          // Если капча была обнаружена, прекращаем запросы
+          if (isCaptchaDetected) {
+            console.log("Запросы к поисковым системам приостановлены из-за капчи.");
+            return `Капча: <a href="#" style="color: blue; pointer-events: none; text-decoration: none;">Пройдите капчу</a>`;
+          }
+  
+          console.log(`Запрос к ${engine}: ${queryUrl}`);
+          const response = await fetch(queryUrl);
+  
+          // Проверка на ошибку 429 (капча)
+          if (response.status === 429) {
+            console.warn("Сработала капча.");
+            isCaptchaDetected = true; // Устанавливаем флаг капчи
+            const captchaUrl = response.url;
+            return `Капча: <a href="${captchaUrl}" target="_blank" style="color: blue;">Пройдите капчу</a>`;
+          }
+  
+          const text = await response.text();
+          console.log(`HTML-ответ от ${engine}:`, text);
+  
+          let resultCount = 0;
+  
+          if (engine === "yandex") {
+            // Пытаемся найти количество результатов в разных вариантах
+            let match = text.match(/нашлось ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
+  
+            if (!match) {
+              match = text.match(/нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // вариант с "нашёлся"
+            }
+  
+            if (!match) {
+              match = text.match(/найдено ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // вариант с "найдено"
+            }
+  
+            if (!match) {
+              match = text.match(/host:[^]+ — Яндекс: нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // альтернативный вариант
+            }
+  
+            if (!match) {
+              match = text.match(/host:[^]+ — Яндекс: нашлась ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // вариант с "нашлась"
+            }
+  
+            if (match) {
+              let result = match[1].replace(/\s|\u00a0/g, "")
+                                     .replace("тыс.", "000")
+                                     .replace("млн.", "000000")
+                                     .replace("млрд.", "000000000")
+                                     .replace("тыс", "000") // также склонения без точки
+                                     .replace("млн", "000000")
+                                     .replace("млрд", "000000000");
+  
+              resultCount = parseInt(result, 10);
+            } else {
+              console.warn("Данные не найдены с полным доменом. Попробуем без www.");
+  
+              // Если данные не были найдены с полным доменом, пробуем с доменом без www
+              const responseWithoutWWW = await fetch(yandexSearchUrlWithoutWWW);
+              const textWithoutWWW = await responseWithoutWWW.text();
+  
+              // Повторяем аналогичную обработку для версии без www
+              match = textWithoutWWW.match(/нашлось ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
+              if (!match) {
+                match = textWithoutWWW.match(/нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
+              }
+  
+              if (!match) {
+                match = textWithoutWWW.match(/host:[^]+ — Яндекс: нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
+              }
+  
+              if (match) {
+                let result = match[1].replace(/\s|\u00a0/g, "")
+                                       .replace("тыс.", "000")
+                                       .replace("млн.", "000000")
+                                       .replace("млрд.", "000000000")
+                                       .replace("тыс", "000") // также склонения без точки
+                                       .replace("млн", "000000")
+                                       .replace("млрд", "000000000");
+  
+                resultCount = parseInt(result, 10);
+              } else {
+                console.warn("Данные не найдены с доменом без www.");
+              }
+            }
+          } else if (engine === "google") {
+            const match = text.match(/<div id="result-stats">Результатов: примерно ([\d\s,]+(?:тыс\.|млн\.|млрд\.)?)/i);
+            if (match) {
+              let result = match[1]
+                .replace(/,/g, "")
+                .replace(/\s/g, "")
+                .replace("тыс.", "000")
+                .replace("млн.", "000000")
+                .replace("млрд.", "000000000");
+              resultCount = parseInt(result, 10);
+            } else {
+              console.warn("Данные не найдены в HTML Google.");
+            }
+          }
+  
+          // Если запрос успешен и не является капчей или 0, сохраняем данные в кэш
+          if (resultCount > 0 && resultCount !== 'Капча') {
+            localStorage.setItem(`${engine}-count-${hostnameWithoutWWW}`, JSON.stringify({
+              count: resultCount,
+              timestamp: Date.now() // Сохраняем метку времени
+            }));
+          }
+  
+          return resultCount;
+        } catch (error) {
+          console.error(`Ошибка при запросе к ${engine}:`, error);
+          return 0;
+        }
+      }
+  
+      async function updateYandexIndex() {
+        const count = await fetchIndexedPages("yandex", yandexSearchUrlFull);
+        console.log(`Результаты Яндекс: ${count}`);
+        // Проверка на капчу (если count - строка)
+        if (typeof count === 'string' && count.includes("Капча")) {
+          yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
+        } else if (count > 0) {
+          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
+        } else {
+          yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0`;
+        }
+      }
+  
+      async function updateGoogleIndex() {
+        const count = await fetchIndexedPages("google", googleSearchUrl);
+        console.log(`Результаты Google: ${count}`);
+        // Проверка на капчу (если count - строка)
+        if (typeof count === 'string' && count.includes("Капча")) {
+          googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
+        } else if (count > 0) {
+          googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
+        } else {
+          googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0`;
+        }
+      }
+  
+      updateYandexIndex();
+      updateGoogleIndex();
+    });
+  });
+  
