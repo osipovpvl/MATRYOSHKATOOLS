@@ -736,6 +736,41 @@ input[type="text"] {
 .duplicate-warning {
   color: red;
 }
+
+.marketing {
+  position: fixed; /* Закрепить футер */
+  left: 0;         /* Привязать футер к левой стороне */
+  bottom: 0;       /* Привязать футер к нижней стороне */
+  width: 100%;     /* Сделать футер на всю ширину страницы */
+  text-align: center; /* Центрирование текста */
+  padding: 10px 0; /* Отступы */
+  z-index: 9999;   /* Убедиться, что футер будет поверх других элементов */
+  text-align: center;
+      margin-top: 20px;
+      padding: 10px 0;
+      background-color: #f4f4f4;
+}
+
+  .marketinginfo {
+    justify-content: center;
+  display: flex;         /* Используем flexbox для строчного расположения элементов */
+  align-items: center;   /* Вертикальное выравнивание */
+  text-decoration: none; /* Убираем подчеркивание у ссылки */
+  color: #555;          /* Цвет текста */
+}
+
+.marketing a{
+  text-decoration: none;
+}
+
+.marketinginfo img {
+  height: 20px; /* Задаем высоту логотипа */
+  margin-right: 10px; /* Отступ справа от логотипа */
+}
+
+.text-marketinginfo {
+  font-size: 14px; /* Размер текста */
+}
   </style>
 </head>
 <body>
@@ -1358,7 +1393,7 @@ input[type="text"] {
     </div>
 
     <!-- Footer -->
-    <footer style="text-align: center; padding: 20px; background-color: #f4f4f4;">
+    <footer style="text-align: center; padding: 20px 20px 50px 20px; background-color: #f4f4f4;">
       <div id="social" style="margin-bottom: 5px;">
         <a title="Instagram" alt="Instagram" href="https://www.instagram.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #000000; text-decoration: none;">
           <i class="fab fa-instagram" style="font-size: 24px;"></i>
@@ -1369,6 +1404,13 @@ input[type="text"] {
       </div>
       <div style="color: #555;">&copy; 2025 MATRYOSHKA TOOLS</div>
     </footer>
+   <!--Рекламный блок-->
+    <div class="marketing">
+      <a class="marketinginfo" target="_blank" href="https://ipos.digital/">
+        <div class="text-marketinginfo">Разработано в  &nbsp</div>
+        <img src="/img/logo-ipos.svg" alt="ipos.digital">
+      </a>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>

@@ -12,13 +12,12 @@
  * Смотрите Лицензию для конкретного языка, регулирующего разрешения и
  * ограничения, предусмотренные Лицензией.
  */
-
 function getMetricsData() {
   const metrics = {
     yandexMetrika: new Set(),
     googleTagManager: new Set(),
     googleAnalytics: new Set(),
-    liveInternet: new Set(), // Добавляем объект для LiveInternet
+    liveInternet: new Set(),
   };
 
   // Проверяем все скрипты на странице
@@ -27,19 +26,28 @@ function getMetricsData() {
     const src = script.src || "";
     const innerContent = script.innerHTML || "";
 
-    // Яндекс Метрика
+    // Яндекс Метрика (старый способ)
     if (src.includes("mc.yandex.ru/metrika") || innerContent.includes("ym(") || innerContent.includes("Ya.Metrika")) {
-      const matchSrc = src.match(/watch\/(\d+)/); // ID в src
-      const matchYM = innerContent.match(/ym\((\d+),/); // ID в ym()
-      const matchMetrika = innerContent.match(/new Ya\.Metrika\(\{[^}]*id\s*:\s*(\d+)/); // ID в Ya.Metrika
+      const matchSrc = src.match(/watch\/(\d+)/);
+      const matchYM = innerContent.match(/ym\((\d+),/);
+      const matchMetrika = innerContent.match(/new Ya\.Metrika\(\{[^}]*id\s*:\s*(\d+)/);
 
       if (matchSrc) metrics.yandexMetrika.add(matchSrc[1]);
       if (matchYM) metrics.yandexMetrika.add(matchYM[1]);
       if (matchMetrika) metrics.yandexMetrika.add(matchMetrika[1]);
 
-      // Поиск window.mainMetrikaId
       const mainMetrikaMatch = innerContent.match(/window\.mainMetrikaId\s*=\s*['"](\d+)['"]/);
       if (mainMetrikaMatch) metrics.yandexMetrika.add(mainMetrikaMatch[1]);
+    }
+
+    // Новый счетчик Ya.Metrika2
+    if (innerContent.includes('window.yandex = {};') && innerContent.includes('window.yandex.metrika = new Ya.Metrika2')) {
+      const matchMetrika2 = innerContent.match(/'id'\s*:\s*(\d+)/);
+      if (matchMetrika2) {
+        const metrikaId = matchMetrika2[1];
+        console.log(`Найден счетчик Ya.Metrika2 с ID: ${metrikaId}`);
+        metrics.yandexMetrika.add(metrikaId);  // Добавляем ID в коллекцию
+      }
     }
 
     // Google Tag Manager
@@ -62,12 +70,10 @@ function getMetricsData() {
       metrics.liveInternet.add("Найден счетчик в содержимом script");
     }
 
-    // Проверка на наличие изображения LiveInternet
     if (src.includes("counter.yadro.ru/logo") || innerContent.includes("liveinternet.ru/click")) {
       metrics.liveInternet.add("Найдено изображение или ссылка счетчика");
     }
 
-    // Проверка на использование amp-аналитики с LiveInternet
     if (innerContent.includes("counter.yadro.ru/hit") && innerContent.includes("amp-analytics")) {
       metrics.liveInternet.add("Найден счетчик в AMP аналитике");
     }
@@ -82,7 +88,7 @@ function getMetricsData() {
     yandexMetrika: Array.from(metrics.yandexMetrika),
     googleTagManager: Array.from(metrics.googleTagManager),
     googleAnalytics: Array.from(metrics.googleAnalytics),
-    liveInternet: Array.from(metrics.liveInternet), // Добавляем данные о LiveInternet
+    liveInternet: Array.from(metrics.liveInternet),
   };
 }
 
@@ -105,7 +111,6 @@ function wrapYandexMetrikaCallbacks() {
     //console.log("Яндекс Метрика callback добавлен");
     originalPush.call(this, callback);
 
-    // Выполняем сканирование после добавления callback
     setTimeout(() => {
       const metricsData = getMetricsData();
       chrome.runtime.sendMessage({ action: "updateMetrics", metrics: metricsData });
@@ -124,8 +129,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     wrapYandexMetrikaCallbacks();
   }
 });
-
-
 
 function getImageSize(url) {
   return new Promise((resolve, reject) => {
