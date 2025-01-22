@@ -202,10 +202,10 @@ function updateMetaLengthStyles(element, length, ranges, isMissing) {
 }
 
 // Функция для заполнения мета-данных
+// Функция для заполнения мета-данных
 function populateMetaData(id, value) {
   const element = document.getElementById(id);
   const lengthElement = document.getElementById(`${id}-length`);
-  
 
   // Обработка для H1
   if (id === 'h1') {
@@ -220,15 +220,20 @@ function populateMetaData(id, value) {
       element.textContent = h1Tags[0]; // Один H1 выводим как текст
       const displayedLength = h1Tags[0].length;
       lengthElement.textContent = `Символов: ${displayedLength}`;
-      lengthElement.style.color = "green"; // Красим текст длины
+      // Вызываем updateMetaLengthStyles для определения цвета
+      updateMetaLengthStyles(lengthElement, displayedLength, {
+        good: [20, 60],
+        acceptable: [5, 19, 61, 70],
+      }, false); // Здесь isMissing явно false, так как значение присутствует
     } else {
       // Несколько H1 выводим с нумерацией
-      element.innerHTML = h1Tags.map((h1, index) => `<div>${index + 1}. ${h1}</div>`).join("");
-      lengthElement.textContent = `Заголовков: ${h1Count}`;
+      element.innerHTML = h1Tags.map((h1, index) => ` <div>${index + 1}. ${h1}</div>`).join("");
+      lengthElement.textContent = `Количество: ${h1Count}`;
       lengthElement.style.color = "red";
     }
     return;
   }
+
   // Проверка на отсутствие значения: если значение пустое или состоит только из пробелов
   const isMissing = !value || value.trim() === "" || value === "Отсутствует";  // Проверяем на пустую строку и на null/undefined
 

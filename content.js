@@ -262,6 +262,16 @@ function applyHighlight(type, isEnabled) {
   if (type === "noindex") {
     const noIndexElements = document.querySelectorAll('noindex');
     noIndexElements.forEach((el) => {
+      // Применяем стили непосредственно к <noindex>, если дочернего контейнера нет
+      if (isEnabled) {
+        el.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
+        el.style.border = "2px solid black";
+      } else {
+        el.style.backgroundColor = "";
+        el.style.border = "";
+      }
+
+      // Старый подход: поиск первого контейнера
       const firstContainer = el.querySelector('div, section, article, main, nav');
       if (firstContainer) {
         if (isEnabled) {
