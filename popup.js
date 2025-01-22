@@ -1181,6 +1181,7 @@ function fetchMetrics() {
         updateMetricStatus("yandex-metrika", response.yandexMetrika);
         updateMetricStatus("google-tag-manager", response.googleTagManager);
         updateMetricStatus("google-analytics", response.googleAnalytics);
+        updateMetricStatus("live-internet", response.liveInternet); // Обновляем статус LiveInternet
       } else {
         //console.error("Не удалось получить данные о метриках.");
       }
@@ -1209,6 +1210,7 @@ function updateMetricStatus(elementId, data) {
 document.addEventListener("DOMContentLoaded", () => {
   fetchMetrics();
 });
+
 
 
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -2912,7 +2914,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const maxAge = 24 * 60 * 60 * 1000; // 1 день
   
             if (age < maxAge) {
-              //console.log(`Используем кэш для ${engine}`);
+             //console.log(`Используем кэш для ${engine}`);
               return data.count;
             }
           }

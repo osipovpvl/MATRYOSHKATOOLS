@@ -18,6 +18,7 @@ function getMetricsData() {
     yandexMetrika: new Set(),
     googleTagManager: new Set(),
     googleAnalytics: new Set(),
+    liveInternet: new Set(), // Добавляем объект для LiveInternet
   };
 
   // Проверяем все скрипты на странице
@@ -52,6 +53,24 @@ function getMetricsData() {
       const match = src.match(/UA-\d+-\d+/) || src.match(/G-[A-Z0-9]+/) || innerContent.match(/['"]UA-\d+-\d+['"]/);
       if (match) metrics.googleAnalytics.add(match[0].replace(/['"]/g, ""));
     }
+
+    // Проверка на наличие счетчика LiveInternet
+    if (src.includes("counter.yadro.ru/hit")) {
+      metrics.liveInternet.add("Найден счетчик в script src");
+    }
+    if (innerContent.includes("counter.yadro.ru/hit")) {
+      metrics.liveInternet.add("Найден счетчик в содержимом script");
+    }
+
+    // Проверка на наличие изображения LiveInternet
+    if (src.includes("counter.yadro.ru/logo") || innerContent.includes("liveinternet.ru/click")) {
+      metrics.liveInternet.add("Найдено изображение или ссылка счетчика");
+    }
+
+    // Проверка на использование amp-аналитики с LiveInternet
+    if (innerContent.includes("counter.yadro.ru/hit") && innerContent.includes("amp-analytics")) {
+      metrics.liveInternet.add("Найден счетчик в AMP аналитике");
+    }
   });
 
   // Проверка переменной window.mainMetrikaId
@@ -63,6 +82,7 @@ function getMetricsData() {
     yandexMetrika: Array.from(metrics.yandexMetrika),
     googleTagManager: Array.from(metrics.googleTagManager),
     googleAnalytics: Array.from(metrics.googleAnalytics),
+    liveInternet: Array.from(metrics.liveInternet), // Добавляем данные о LiveInternet
   };
 }
 
@@ -104,6 +124,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     wrapYandexMetrikaCallbacks();
   }
 });
+
+
 
 function getImageSize(url) {
   return new Promise((resolve, reject) => {
