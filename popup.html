@@ -29,8 +29,14 @@
 
     /* Tabs navigation */
     #tabs {
-      display: flex;
-      border-bottom: 2px solid #ddd;
+    top: 0px;
+    position: fixed;
+    width: 100%;
+    text-align: center;
+    z-index: 9999;
+    text-align: center;
+    display: flex;
+    border-bottom: 2px solid #ddd;
     }
 
     #tab-content{
@@ -67,6 +73,7 @@
     }
 
     .tab.active {
+      margin-top: 30px;
       display: block;
     }
 
