@@ -45,7 +45,7 @@ function getMetricsData() {
       const matchMetrika2 = innerContent.match(/'id'\s*:\s*(\d+)/);
       if (matchMetrika2) {
         const metrikaId = matchMetrika2[1];
-        console.log(`Найден счетчик Ya.Metrika2 с ID: ${metrikaId}`);
+        //console.log(`Найден счетчик Ya.Metrika2 с ID: ${metrikaId}`);
         metrics.yandexMetrika.add(metrikaId);  // Добавляем ID в коллекцию
       }
     }
