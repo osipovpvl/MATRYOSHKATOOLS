@@ -2912,30 +2912,30 @@ document.addEventListener("DOMContentLoaded", () => {
             const maxAge = 24 * 60 * 60 * 1000; // 1 день
   
             if (age < maxAge) {
-              console.log(`Используем кэш для ${engine}`);
+              //console.log(`Используем кэш для ${engine}`);
               return data.count;
             }
           }
   
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
-            console.log("Запросы к поисковым системам приостановлены из-за капчи.");
+            //console.log("Запросы к поисковым системам приостановлены из-за капчи.");
             return `Капча: <a href="#" style="color: blue; pointer-events: none; text-decoration: none;">Пройдите капчу</a>`;
           }
   
-          console.log(`Запрос к ${engine}: ${queryUrl}`);
+          //console.log(`Запрос к ${engine}: ${queryUrl}`);
           const response = await fetch(queryUrl);
   
           // Проверка на ошибку 429 (капча)
           if (response.status === 429) {
-            console.warn("Сработала капча.");
+            //console.warn("Сработала капча.");
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
             return `Капча: <a href="${captchaUrl}" target="_blank" style="color: blue;">Пройдите капчу</a>`;
           }
   
           const text = await response.text();
-          console.log(`HTML-ответ от ${engine}:`, text);
+          //console.log(`HTML-ответ от ${engine}:`, text);
   
           let resultCount = 0;
   
@@ -2970,7 +2970,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
               resultCount = parseInt(result, 10);
             } else {
-              console.warn("Данные не найдены с полным доменом. Попробуем без www.");
+              //console.warn("Данные не найдены с полным доменом. Попробуем без www.");
   
               // Если данные не были найдены с полным доменом, пробуем с доменом без www
               const responseWithoutWWW = await fetch(yandexSearchUrlWithoutWWW);
@@ -2997,7 +2997,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
                 resultCount = parseInt(result, 10);
               } else {
-                console.warn("Данные не найдены с доменом без www.");
+                //console.warn("Данные не найдены с доменом без www.");
               }
             }
           } else if (engine === "google") {
@@ -3011,7 +3011,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 .replace("млрд.", "000000000");
               resultCount = parseInt(result, 10);
             } else {
-              console.warn("Данные не найдены в HTML Google.");
+              //console.warn("Данные не найдены в HTML Google.");
             }
           }
   
@@ -3025,14 +3025,14 @@ document.addEventListener("DOMContentLoaded", () => {
   
           return resultCount;
         } catch (error) {
-          console.error(`Ошибка при запросе к ${engine}:`, error);
+          //console.error(`Ошибка при запросе к ${engine}:`, error);
           return 0;
         }
       }
   
       async function updateYandexIndex() {
         const count = await fetchIndexedPages("yandex", yandexSearchUrlFull);
-        console.log(`Результаты Яндекс: ${count}`);
+        //console.log(`Результаты Яндекс: ${count}`);
         // Проверка на капчу (если count - строка)
         if (typeof count === 'string' && count.includes("Капча")) {
           yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
@@ -3045,7 +3045,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
       async function updateGoogleIndex() {
         const count = await fetchIndexedPages("google", googleSearchUrl);
-        console.log(`Результаты Google: ${count}`);
+        //console.log(`Результаты Google: ${count}`);
         // Проверка на капчу (если count - строка)
         if (typeof count === 'string' && count.includes("Капча")) {
           googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
