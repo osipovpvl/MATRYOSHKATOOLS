@@ -1939,13 +1939,13 @@ function checkMetaRobots(doc, container) {
       } else {
           container.innerHTML = `
               <span class="fas fa-exclamation-circle" style="color: orange;"></span>
-              Meta robots указан, но содержит нестандартные значения (meta: ${content})
+              Индексация разрешена, но Meta Robots содержит нестандартные значения (meta: ${content})
           `;
       }
   } else {
       container.innerHTML = `
           <span class="fas fa-check-circle" style="color: green;"></span>
-          Meta robots не указан (Индексация разрешена)
+          Meta Robots не указан (Индексация разрешена)
       `;
   }
 }
@@ -1965,7 +1965,7 @@ async function checkRobotsTxt(tabUrl, container) {
 
       // Проверяем, существует ли файл robots.txt
       if (response.status === 404) {
-          container.innerHTML = `<p><span class="fa fa-times-circle" style="color:red;"></span> Файл robots.txt отсутствует</p>`;
+          container.innerHTML = `<p><span class="fa fa-times-circle" style="color:red;"></span> Файл Robots.txt отсутствует</p>`;
           return;
       }
 
@@ -2035,7 +2035,7 @@ async function checkRobotsTxt(tabUrl, container) {
       };
 
       // Создаем HTML-вывод
-      let htmlContent = `<p>Файл robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
+      let htmlContent = `<p>Файл Robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
       htmlContent += "<p>Список User-Agent и их статус:</p>";
       htmlContent += "<ul>";
 
@@ -2053,7 +2053,7 @@ async function checkRobotsTxt(tabUrl, container) {
       container.innerHTML = htmlContent;
   } catch (error) {
       // Упрощенный вывод ошибки
-      container.innerHTML = `<p><span class="fas fa-exclamation-circle" style="color: orange;"></span> Не удалось загрузить файл robots.txt<p>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
+      container.innerHTML = `<p><span class="fas fa-exclamation-circle" style="color: orange;"></span> Не удалось загрузить файл Robots.txt<p>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
       //console.error("Ошибка при загрузке robots.txt:", error);
   }
 }
@@ -2069,7 +2069,7 @@ async function checkSitemap(tabUrl, container) {
   try {
     const robotsResponse = await fetch(robotsUrl);
     if (!robotsResponse.ok) {
-      throw new Error("robots.txt не найден");
+      throw new Error("Robots.txt не найден");
     }
 
     // Получаем текст из robots.txt
@@ -2087,13 +2087,13 @@ async function checkSitemap(tabUrl, container) {
     if (sitemapUrls.length === 0) {
       container.innerHTML = `
         <span class="fa fa-times-circle" style="color:red;"></span>
-        Ссылок на файл sitemap.xml не найдено
+        Ссылок на файл Sitemap.xml не найдено
       `;
       return;
     }
 
     // Проверяем доступность каждого найденного sitemap
-    let resultHtml = `<span class="fas fa-check-circle" style="color: green;"></span> Найдены следующие файлы sitemap.xml:<p></p>`;
+    let resultHtml = `<span class="fas fa-check-circle" style="color: green;"></span> Найдены следующие файлы Sitemap.xml:<p></p>`;
     for (const sitemapUrl of sitemapUrls) {
       try {
         const response = await fetch(sitemapUrl);
@@ -2113,7 +2113,7 @@ async function checkSitemap(tabUrl, container) {
   } catch (error) {
     container.innerHTML = `
       <span class="fa fa-times-circle" style="color:red;"></span>
-      Ссылок на файл sitemap.xml не найдено
+      Ссылок на файл Sitemap.xml не найдено
     `;
     //console.error("Ошибка при загрузке robots.txt:", error);
   }
@@ -2926,7 +2926,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
             //console.log("Запросы к поисковым системам приостановлены из-за капчи.");
-            return `Капча: <a href="#" style="color: blue; pointer-events: none; text-decoration: none;">Пройдите капчу</a>`;
+            return `Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройдите капчу</a>`;
           }
   
           //console.log(`Запрос к ${engine}: ${queryUrl}`);
@@ -2937,7 +2937,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //console.warn("Сработала капча.");
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
-            return `Капча: <a href="${captchaUrl}" target="_blank" style="color: blue;">Пройдите капчу</a>`;
+            return `Капча: <a href="${captchaUrl}" target="_blank">Пройдите капчу</a>`;
           }
   
           const text = await response.text();
@@ -3066,4 +3066,3 @@ document.addEventListener("DOMContentLoaded", () => {
       updateGoogleIndex();
     });
   });
-  
