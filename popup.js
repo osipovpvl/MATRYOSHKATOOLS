@@ -44,7 +44,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       populateMetaData("keywords", seoData.keywords);
       populateMetaData("h1", seoData.h1);
       
-      document.getElementById("current-url").textContent = tab.url || "Не удалось определить";
+      document.getElementById("current-url").innerHTML = tab.url 
+              ? `<a href="${tab.url}" target="_blank">${tab.url}</a>` 
+              : "Не удалось определить";
       //document.getElementById("links").textContent = seoData.linksCount || "N/A";
       //document.getElementById("images-count").textContent = seoData.imagesCount || "N/A";
       document.getElementById("lang").textContent = seoData.lang || "Не удалось определить";
@@ -287,8 +289,10 @@ document.addEventListener('DOMContentLoaded', () => {
               populateMetaData("keywords", seoData.keywords);
 
               // Отображаем URL и язык
-              document.getElementById("current-url").textContent = tab.url || "N/A";
-              document.getElementById("lang").textContent = seoData.lang || "N/A";
+              document.getElementById("current-url").innerHTML = tab.url 
+              ? `<a href="${tab.url}" target="_blank">${tab.url}</a>` 
+              : "Не удалось определить";
+              document.getElementById("lang").textContent = seoData.lang || "Не удалось определить";
 
               
           }
