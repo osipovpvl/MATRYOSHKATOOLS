@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/x-icon" href="matryoshka.ico">
   <title>MATRYOSHKA TOOLS</title>
+  <meta name="author" content="Осипов Павел Алексеевич">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
@@ -25,6 +26,18 @@
 
     #container {
       padding: 0;
+    }
+    
+    .container {
+      margin-top: 10px;
+    }
+
+    #seo, #texts, #links-info, #images, #microdata, #others {
+      margin-top: 20px;
+    }
+
+    #search, #tools {
+      margin-top: 40px;
     }
 
     /* Tabs navigation */
@@ -70,11 +83,10 @@
 
     .tab {
       display: none;
-      padding: 20px;
+      padding: 20px 20px 0px 20px;
     }
 
     .tab.active {
-      margin-top: 30px;
       display: block;
     }
 
@@ -116,16 +128,6 @@
       background-color: #f1f1f1;
     }
 
-    #social a {
-      color: #ffdd00;
-      text-decoration: none;
-      margin: 0 8px;
-    }
-
-    #social a:hover {
-      text-decoration: underline;
-    }
-
     #copy-status {
       color: #4CAF50;
       font-weight: bold;
@@ -134,6 +136,7 @@
     }
 
     #image-summary {
+      margin-top: 10px;
     display: flex;
     gap: 10px;
 }
@@ -212,6 +215,7 @@
 }
 
 .search-item span {
+  font-weight: bold;
   font-size: 14px;
   margin-right: 10px; /* Отступ между текстом и кнопками */
 }
@@ -233,7 +237,7 @@
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
-  color: #555;
+  color: gray;
   transition: background-color 0.2s ease;
 }
 
@@ -280,6 +284,7 @@
   }
 
   .page-item span {
+    font-weight: bold;
     font-size: 14px;
   }
 
@@ -295,7 +300,7 @@
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
-    color: #555;
+    color: gray;
     transition: background-color 0.2s ease;
   }
 
@@ -331,12 +336,8 @@
 }
 
 a {
-  color: #3498db;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
+  color: #333;
+  text-decoration: none !important;
 }
 
 /* Статус ссылки */
@@ -376,6 +377,7 @@ input[type="number"] {
   }
 
    #links-info {
+    margin-top: 30px;
     font-family: Arial, sans-serif;
     padding: 20px;
     background-color: #ffffff;
@@ -618,11 +620,6 @@ tr:nth-child(even) {
     margin-top: 10px;
 }
 
-a {
-    color: #1a73e8;
-    text-decoration: none;
-}
-
 a:hover {
     text-decoration: underline;
 }
@@ -690,12 +687,6 @@ a:hover {
 
     .service-list a {
         text-decoration: none;
-        color: #555;
-        transition: color 0.3s ease;
-    }
-
-    .service-list a:hover {
-        color: #000000;
     }
 
     .search-input-container {
@@ -724,7 +715,6 @@ input[type="text"] {
         .section-title {
             cursor: pointer;
             font-weight: bold;
-            margin: 10px 0;
         }
 
         .microdata-item {
@@ -737,8 +727,7 @@ input[type="text"] {
 }
 
 .meta-length {
-  font-size: 0.9em;
-  color: #555;
+  color: gray;
 }
 
 .duplicate-warning {
@@ -763,8 +752,7 @@ input[type="text"] {
     justify-content: center;
   display: flex;         /* Используем flexbox для строчного расположения элементов */
   align-items: center;   /* Вертикальное выравнивание */
-  text-decoration: none; /* Убираем подчеркивание у ссылки */
-  color: #555;          /* Цвет текста */
+  text-decoration: none; /* Убираем подчеркивание у ссылки */      /* Цвет текста */
 }
 
 .marketing a{
@@ -798,7 +786,7 @@ input[type="text"] {
     <!-- Tab Content -->
     <div id="tab-content">
       <div id="seo" class="tab active">
-        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="margin-bottom: 10px;" class="copy-button" data-target="allmeta"> <i class="fas fa-clone"></i></button></span>
+        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="margin-bottom: 5px;" class="copy-button" data-target="allmeta"> <i class="fas fa-clone"></i></button></span>
         <table>
         <tr>
           <td>Title: <div id="title-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 30-70. Допустимо: 10-29, 71-90. Некорректно: 0-9,91+"></i></td>
@@ -883,7 +871,7 @@ input[type="text"] {
         <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</div>
         <table>
           <tr>
-            <td>Текущий URL: <div id="url-length" style="color:#555;font-size: 0.9em;"></div></td>
+            <td>Текущий URL: <div id="url-length" style="color:gray;"></div></td>
             <td id="current-url">Загрузка...</td>
           </tr>
           <tr>
@@ -903,12 +891,12 @@ input[type="text"] {
             <td id="yandex-metrika">Загрузка...</td>
           </tr>
           <tr>
-            <td>Счетчик Google Tag Manager:</td>
-            <td id="google-tag-manager">Загрузка...</td>
-          </tr>
-          <tr>
             <td>Счетчик Google Analytics:</td>
             <td id="google-analytics">Загрузка...</td>
+          </tr>
+          <tr>
+            <td>Счетчик Google Tag Manager:</td>
+            <td id="google-tag-manager">Загрузка...</td>
           </tr>
           <tr>
             <td>Счетчик Live Internet:</td>
@@ -993,7 +981,7 @@ input[type="text"] {
         <div class="search-panel">
           <div class="search-item">
             <span>Поиск по оператору<br>
-              <span style="color: #555; font-size: 0.9em;">site:domain.ru</span></span>
+              <span style="color: gray;font-weight: normal;">site:domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-site-yandex" class="search-button yandex">Я</button>
               <button id="check-index-google" class="search-button google">G</button>
@@ -1002,7 +990,7 @@ input[type="text"] {
           <div class="search-item">
             <span>Поиск по оператору
               <br>
-              <span style="color: #555; font-size: 0.9em;">host:domain.ru</span>
+              <span style="color: gray;font-weight: normal;">host:domain.ru</span>
             </span>
             <div class="search-buttons">
               <button id="operator-host-yandex" class="search-button yandex">Я</button>
@@ -1010,14 +998,14 @@ input[type="text"] {
           </div>
           <div class="search-item">
             <span>Поиск по оператору<br>
-              <span style="color: #555; font-size: 0.9em;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
+              <span style="color: gray;font-weight: normal;">url:domain.ru/* | url:www.domain.ru/* | url:domain.ru | url:www.domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-url-yandex" class="search-button yandex">Я</button>
             </div>
           </div>
           <div class="search-item">
             <span>Поиск дублей<br>
-              <span style="color: #555; font-size: 0.9em;">title:("Title страницы") site:domain.ru</span></span>
+              <span style="color: gray;font-weight: normal;">title:("Title страницы") site:domain.ru</span></span>
             <div class="search-buttons">
               <button id="operator-title-yandex" class="search-button yandex">Я</button>
             </div>
@@ -1042,7 +1030,7 @@ input[type="text"] {
           </div>
           <div class="search-item">
             <span>Показать нумерацию результатов в выдаче Яндекс и Google<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
+              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
             <button id="toggle-numbers" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
         </div>
@@ -1356,34 +1344,34 @@ input[type="text"] {
   </div>
           <div class="page-item">
             <span>Подсветить элементы noindex<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
+              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
             <button id="highlight-noindex" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Подсветить элементы nofollow<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
+              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
             <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Показать элементы none<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span></span>
+              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
             <button id="toggle-none" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Отключить/включить Java Script<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию включено</span></span>
+              <span style="color: gray;font-weight: normal;">По умолчанию включено</span></span>
             <button id="toggle-js" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Отключить/включить CSS<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию включено</span></span>
+              <span style="color: gray;font-weight: normal;">По умолчанию включено</span></span>
             <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
             <span>Проверка API Check Trust<br>
-              <span style="color: #555; font-size: 0.9em;">По умолчанию выключено</span><br>
-              <span style="color: #555; font-size: 0.9em;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</span>
-              <ul style="color: #555; font-size: 0.9em;">
+              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span><br>
+              <span style="color: gray;font-weight: normal;">Включив проверку <strong>API Check Trust</strong>, вы сможете на сайте <strong>Go Get Links</strong> видеть:</span>
+              <ul style="color: gray;font-weight: normal;">
                   <li><strong>Траст</strong> сайтов — уровень доверия к ресурсу.</li>
                   <li><strong>Спам</strong> сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
               </ul></span>
@@ -1403,14 +1391,14 @@ input[type="text"] {
     <!-- Footer -->
     <footer style="text-align: center; padding: 20px 20px 50px 20px; background-color: #f4f4f4;">
       <div id="social" style="margin-bottom: 5px;">
-        <a title="Instagram" alt="Instagram" href="https://www.instagram.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #000000; text-decoration: none;">
+       <!-- <a title="Instagram" alt="Instagram" href="https://www.instagram.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #000000; text-decoration: none;">
           <i class="fab fa-instagram" style="font-size: 24px;"></i>
         </a>
-        <!--<a title="Git Hub" alt="Git Hub" href="https://github.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #333; text-decoration: none;">
+       <a title="Git Hub" alt="Git Hub" href="https://github.com/osipovpvl" target="_blank" style="margin: 0 10px; color: #333; text-decoration: none;">
           <i class="fab fa-github" style="font-size: 24px;"></i>
         </a>-->
       </div>
-      <div style="font-size: 14px;color: #555;">&copy; 2025 MATRYOSHKA TOOLS</div>
+      <div style="font-size: 14px;">by <a href="https://www.instagram.com/osipovpvl" target="_blank" style="text-decoration: none;">Pavel Osipov</a><br>&copy; «MATRYOSHKA TOOLS», 2025</div>
     </footer>
    <!--Рекламный блок-->
     <div class="marketing">
