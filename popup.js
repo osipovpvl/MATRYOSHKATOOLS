@@ -2926,7 +2926,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
             //console.log("Запросы к поисковым системам приостановлены из-за капчи.");
-            return `Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройдите капчу</a>`;
+            return `Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
           }
   
           //console.log(`Запрос к ${engine}: ${queryUrl}`);
@@ -2937,7 +2937,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //console.warn("Сработала капча.");
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
-            return `Капча: <a href="${captchaUrl}" target="_blank">Пройдите капчу</a>`;
+            return `Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
           }
   
           const text = await response.text();
@@ -3038,29 +3038,27 @@ document.addEventListener("DOMContentLoaded", () => {
   
       async function updateYandexIndex() {
         const count = await fetchIndexedPages("yandex", yandexSearchUrlFull);
-        //console.log(`Результаты Яндекс: ${count}`);
-        // Проверка на капчу (если count - строка)
+
         if (typeof count === 'string' && count.includes("Капча")) {
-          yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
         } else if (count > 0) {
-          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
+            yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
         } else {
-          yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank">Проверить</a>`;
         }
-      }
-  
-      async function updateGoogleIndex() {
+    }
+
+    async function updateGoogleIndex() {
         const count = await fetchIndexedPages("google", googleSearchUrl);
-        //console.log(`Результаты Google: ${count}`);
-        // Проверка на капчу (если count - строка)
+
         if (typeof count === 'string' && count.includes("Капча")) {
-          googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
         } else if (count > 0) {
-          googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
+            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
         } else {
-          googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank">Проверить</a>`;
         }
-      }
+    }
   
       updateYandexIndex();
       updateGoogleIndex();
