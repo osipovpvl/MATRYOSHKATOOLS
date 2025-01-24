@@ -2926,7 +2926,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
             //console.log("Запросы к поисковым системам приостановлены из-за капчи.");
-            return `Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
+            return `<br>Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
           }
   
           //console.log(`Запрос к ${engine}: ${queryUrl}`);
@@ -2937,7 +2937,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //console.warn("Сработала капча.");
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
-            return `Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
+            return `<br>Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
           }
   
           const text = await response.text();
