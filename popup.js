@@ -2926,7 +2926,7 @@ document.addEventListener("DOMContentLoaded", () => {
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
             //console.log("Запросы к поисковым системам приостановлены из-за капчи.");
-            return `<br>Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
+            return `<br><br>Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
           }
   
           //console.log(`Запрос к ${engine}: ${queryUrl}`);
@@ -2937,7 +2937,7 @@ document.addEventListener("DOMContentLoaded", () => {
             //console.warn("Сработала капча.");
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
-            return `<br>Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
+            return `<br><br>Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
           }
   
           const text = await response.text();
@@ -3044,7 +3044,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (count > 0) {
             yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
         } else {
-            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank">Проверить</a>`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank">Проверить</a>`;
         }
     }
 
@@ -3056,7 +3056,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else if (count > 0) {
             googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()}`;
         } else {
-            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank">Проверить</a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank">Проверить</a>`;
         }
     }
   
