@@ -3064,3 +3064,22 @@ document.addEventListener("DOMContentLoaded", () => {
       updateGoogleIndex();
     });
   });
+
+// Футер
+  const marketingBlocks = document.querySelectorAll('.marketinginfo');
+  let currentIndex = 0;
+  
+  // Изначально показываем первый блок
+  marketingBlocks[currentIndex].classList.add('active');
+  
+  setInterval(() => {
+    // Убираем активный класс у текущего блока
+    marketingBlocks[currentIndex].classList.remove('active');
+  
+    // Переходим к следующему блоку
+    currentIndex = (currentIndex + 1) % marketingBlocks.length;
+  
+    // Добавляем активный класс новому блоку
+    marketingBlocks[currentIndex].classList.add('active');
+  }, 5000); // 5000 миллисекунд = 5 секунд
+  

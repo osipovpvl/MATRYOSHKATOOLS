@@ -118,10 +118,7 @@
     }
 
     footer {
-      text-align: center;
-      margin-top: 20px;
-      padding: 10px 0;
-      background-color: #f1f1f1;
+      margin-top: 60px;
     }
 
     #copy-status {
@@ -725,24 +722,36 @@ input[type="text"] {
 }
 
 .marketing {
+  border-top: 1px solid #ddd;
   position: fixed; /* Закрепить футер */
   left: 0;         /* Привязать футер к левой стороне */
   bottom: 0;       /* Привязать футер к нижней стороне */
   width: 100%;     /* Сделать футер на всю ширину страницы */
   text-align: center; /* Центрирование текста */
-  padding: 10px 0; /* Отступы */
+  padding: 20px 0; /* Отступы */
   z-index: 9999;   /* Убедиться, что футер будет поверх других элементов */
   text-align: center;
       margin-top: 20px;
-      padding: 10px 0;
-      background-color: #f4f4f4;
+      background-color: #ffffff;
 }
 
   .marketinginfo {
-    justify-content: center;
-  display: flex;         /* Используем flexbox для строчного расположения элементов */
-  align-items: center;   /* Вертикальное выравнивание */
-  text-decoration: none; /* Убираем подчеркивание у ссылки */      /* Цвет текста */
+    margin-top: 10px;
+    opacity: 0;
+  visibility: hidden; /* Полностью скрываем блок */
+  transition: opacity 2s ease-in-out, visibility 0s 2s; 
+  position: absolute; /* Блоки будут перекрывать друг друга */
+  top: 0; /* Позиционирование сверху */
+  left: 0; /* Позиционирование слева */
+  width: 100%; /* Ширина блока */
+  z-index: 0; /* Низкий слой */
+}
+
+.marketinginfo.active {
+  opacity: 1;
+  transition: opacity 2s ease-in-out, visibility 0s 0s; 
+  visibility: visible; /* Делаем блок видимым */
+  z-index: 1; /* Поднимаем активный блок */
 }
 
 .marketing a{
@@ -1371,18 +1380,27 @@ input[type="text"] {
       </div>
     </div>
 
-    <!-- Футер -->
-    <footer style="text-align: center; padding: 10px 20px 45px 20px; background-color: #f4f4f4;">
-      <div style="font-size: 14px;">Если у вас возникли идеи по улучшению расширения, вы можете связаться с нами в Instagram: <a target="_blank" href="https://www.instagram.com/osipovpvl">https://www.instagram.com/osipovpvl</a><br><br>
-        © «MATRYOSHKA TOOLS», 2025</div>
-    </footer>
-   <!--Рекламный блок-->
+    <footer>
+
     <div class="marketing">
-      <a class="marketinginfo" target="_blank" href="https://ipos.digital/">
-        <div class="text-marketinginfo">Разработано в  &nbsp</div>
-        <img src="/img/logo-ipos.svg" alt="ipos.digital">
-      </a>
+     <div class="marketinginfo">
+      <a target="_blank" href="https://www.instagram.com/osipovpvl">
+        <div class="text-marketinginfo" style=" display: flex; /* Для выравнивания содержимого внутри */
+        align-items: center; /* Центрируем по вертикали */
+        justify-content: center;">Идеи и предложения пишите в Instagram: @osipovpvl</div>
+        </a>
+      </div>
+   
+      <div class="marketinginfo">
+        <a target="_blank" href="https://ipos.digital/">
+          <div class="text-marketinginfo" style=" display: flex; /* Для выравнивания содержимого внутри */
+          align-items: center; /* Центрируем по вертикали */
+          justify-content: center;">Разработано в  &nbsp<img src="/img/logo-ipos.svg" alt="ipos.digital"></div>
+        </a>
+      </div>
+
     </div>
+  </footer>
   </div>
   <script src="popup.js"></script>
 </body>
