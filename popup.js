@@ -1476,24 +1476,54 @@ chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
 });
 });
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const headingsSummary = document.querySelector(".headings-summary");
   const headingsList = document.getElementById("headings-list");
   const structureDisplay = document.getElementById("structure-display");
   const highlightButton = document.getElementById("toggle-highlight-headings");
 
+  if (!highlightButton) {
+    //console.error("Кнопка 'toggle-highlight-headings' не найдена в DOM.");
+    return;
+  }
+
   // Флаг для отслеживания состояния подсветки
   let isHighlightActive = false;
 
+  // Загружаем сохранённое состояние из chrome.storage при старте
+  chrome.storage.sync.get("highlightState", (data) => {
+    if (chrome.runtime.lastError) {
+      //console.error("Ошибка при получении состояния подсветки:", chrome.runtime.lastError);
+      return;
+    }
+
+    isHighlightActive = data.highlightState || false;
+    updateButtonState();
+
+    // Применяем подсветку на активной вкладке, если она включена
+    if (isHighlightActive) {
+      toggleHighlightHeadings(true);
+    }
+  });
+
   // Общение с содержимым страницы
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (!tabs || !tabs[0]) {
+      //console.error("Не удалось получить активную вкладку.");
+      return;
+    }
+
     chrome.scripting.executeScript(
       {
         target: { tabId: tabs[0].id },
         func: extractHeadings,
       },
       (results) => {
+        if (chrome.runtime.lastError) {
+         //console.error("Ошибка выполнения скрипта:", chrome.runtime.lastError);
+          return;
+        }
+
         if (results && results[0] && results[0].result) {
           const { headingsCount, headingsData, headingsStructure } = results[0].result;
 
@@ -1511,6 +1541,8 @@ document.addEventListener("DOMContentLoaded", () => {
           // Сохраняем данные
           window.headingsData = headingsData;
           window.headingsStructure = headingsStructure;
+        } else {
+          //console.error("Не удалось извлечь данные заголовков.");
         }
       }
     );
@@ -1518,6 +1550,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Отображение заголовков
   function renderHeadings(type) {
+    if (!window.headingsData) {
+      //console.error("Нет данных для отображения заголовков.");
+      return;
+    }
+
     const filtered = type === "all" ? window.headingsData : window.headingsData.filter((h) => h.tagName === type);
     headingsList.innerHTML = filtered
       .map((h) => `<li><b>${h.tagName}:</b> ${h.text}</li>`)
@@ -1527,11 +1564,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Отображение структуры заголовков
   function renderStructure() {
+    if (!window.headingsStructure) {
+      //console.error("Нет данных для отображения структуры заголовков.");
+      return;
+    }
+
     structureDisplay.innerHTML = window.headingsStructure
       .map(
         (h) =>
           `<div style="margin-left: ${
-            h.tagName === "H2" ? "10px" : h.tagName === "H3" ? "20px" : h.tagName === "H4" ? "30px" : "0"
+            h.tagName === "H2"
+              ? "10px"
+              : h.tagName === "H3"
+              ? "20px"
+              : h.tagName === "H4"
+              ? "30px"
+              : "0"
           };"><b>${h.tagName}:</b> ${h.text}</div>`
       )
       .join("");
@@ -1539,33 +1587,89 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Обработчик кликов по блокам
-  headingsSummary.addEventListener("click", (e) => {
-    const headingType = e.target.closest(".heading-count")?.dataset.heading;
-    if (headingType) {
-      if (headingType === "all") {
-        renderStructure(); // Показать всю структуру заголовков
-      } else {
-        renderHeadings(headingType); // Показать заголовки конкретного типа
+  if (headingsSummary) {
+    headingsSummary.addEventListener("click", (e) => {
+      const headingType = e.target.closest(".heading-count")?.dataset.heading;
+      if (headingType) {
+        if (headingType === "all") {
+          renderStructure(); // Показать всю структуру заголовков
+        } else {
+          renderHeadings(headingType); // Показать заголовки конкретного типа
+        }
       }
-    }
-  });
+    });
+  } else {
+    //console.error("Элемент 'headings-summary' не найден в DOM.");
+  }
 
-  // Кнопка подсветки
-  highlightButton.addEventListener("click", () => {
+  // Функция для подсветки заголовков
+  function toggleHighlightHeadings(isActive) {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (!tabs || !tabs[0]) {
+        //console.error("Не удалось получить активную вкладку для подсветки.");
+        return;
+      }
+
       chrome.scripting.executeScript(
         {
           target: { tabId: tabs[0].id },
-          func: toggleHighlightHeadings,
-          args: [isHighlightActive], // Передаем текущее состояние подсветки
+          func: (active) => {
+            const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+            headings.forEach((heading) => {
+              if (active) {
+                heading.style.backgroundColor = "#8e8e8e";
+
+                if (!heading.querySelector("span")) {
+                  let label = document.createElement("span");
+                  label.style.marginLeft = "10px";
+                  label.style.color = "white";
+                  label.textContent = `${heading.tagName}`;
+                  heading.appendChild(label);
+                }
+              } else {
+                heading.style.backgroundColor = "";
+                let labels = heading.querySelectorAll("span");
+                labels.forEach((label) => label.remove());
+              }
+            });
+          },
+          args: [isActive],
         },
         () => {
-          // Переключаем состояние подсветки
-          isHighlightActive = !isHighlightActive;
-          //highlightButton.textContent = isHighlightActive ? "Отключить подстветку" : "Включить подсветку";
+          if (chrome.runtime.lastError) {
+            //console.error("Ошибка выполнения подсветки заголовков:", chrome.runtime.lastError);
+          } else {
+            //console.log(`Подсветка заголовков ${isActive ? "включена" : "выключена"}.`);
+          }
         }
       );
     });
+  }
+
+  // Функция для обновления текста на кнопке
+  function updateButtonState() {
+    highlightButton.textContent = isHighlightActive ? "Выключить подсветку H1-H6" : "Включить подсветку H1-H6";
+  }
+
+  // Кнопка подсветки
+  highlightButton.addEventListener("click", () => {
+    isHighlightActive = !isHighlightActive;
+    chrome.storage.sync.set({ highlightState: isHighlightActive }, () => {
+      if (chrome.runtime.lastError) {
+        //console.error("Ошибка сохранения состояния подсветки:", chrome.runtime.lastError);
+      } else {
+        //console.log("Состояние подсветки сохранено:", isHighlightActive);
+      }
+    });
+
+    // Отправляем сообщение в content.js для применения состояния подсветки
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs && tabs[0]) {
+        chrome.tabs.sendMessage(tabs[0].id, { type: "TOGGLE_HIGHLIGHT", isActive: isHighlightActive });
+      }
+    });
+
+    updateButtonState();
   });
 
   // Функция для извлечения заголовков (выполняется на странице)
@@ -1586,25 +1690,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return { headingsCount, headingsData, headingsStructure };
   }
-
-  // Функция для включения/отключения подсветки заголовков (выполняется на странице)
-  function toggleHighlightHeadings(isActive) {
-    // Получаем все заголовки на странице
-    const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
-
-    if (isActive) {
-      // Если подсветка уже включена, убираем её
-      headings.forEach((heading) => {
-        heading.style.outline = ""; // Убираем стиль
-      });
-    } else {
-      // Если подсветка отключена, включаем её
-      headings.forEach((heading) => {
-        heading.style.outline = "2px dashed black"; // Добавляем стиль
-      });
-    }
-  }
 });
+
 
 document.addEventListener("DOMContentLoaded", () => {
   const tabs = document.querySelectorAll(".tab-buttons");

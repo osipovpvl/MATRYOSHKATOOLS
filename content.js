@@ -414,6 +414,45 @@ chrome.runtime.onMessage.addListener((message) => {
 });
 
 
+// Подключение content script
+chrome.storage.sync.get("highlightState", (data) => {
+  const isHighlightActive = data.highlightState || false;
+  toggleHighlightHeadings(isHighlightActive); // Применяем подсветку сразу при загрузке
+});
+
+// Функция подсветки заголовков
+function toggleHighlightHeadings(isActive) {
+  const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
+
+  headings.forEach((heading) => {
+    if (isActive) {
+      heading.style.backgroundColor = "#8e8e8e";
+
+      // Добавляем информацию рядом с заголовком
+      if (!heading.querySelector("span")) {
+        let label = document.createElement("span");
+        label.style.marginLeft = "10px";
+        label.style.color = "white";
+        label.textContent = `${heading.tagName}`;
+        heading.appendChild(label);
+      }
+    } else {
+      heading.style.backgroundColor = "";
+
+      // Удаляем информацию
+      let labels = heading.querySelectorAll("span");
+      labels.forEach((label) => label.remove());
+    }
+  });
+}
+
+// Слушаем сообщения от popup.js
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === "TOGGLE_HIGHLIGHT") {
+    toggleHighlightHeadings(message.isActive);
+  }
+});
+
 
 
 // Изначально функции отключены
