@@ -429,8 +429,9 @@ function toggleHighlightHeadings(isActive) {
       heading.style.backgroundColor = "#8e8e8e";
 
       // Добавляем информацию рядом с заголовком
-      if (!heading.querySelector("span")) {
+      if (!heading.querySelector(".highlight-label")) {
         let label = document.createElement("span");
+        label.classList.add("highlight-label");
         label.style.marginLeft = "10px";
         label.style.color = "white";
         label.textContent = `${heading.tagName}`;
@@ -439,8 +440,8 @@ function toggleHighlightHeadings(isActive) {
     } else {
       heading.style.backgroundColor = "";
 
-      // Удаляем информацию
-      let labels = heading.querySelectorAll("span");
+      // Удаляем только добавленные метки, но не трогаем другие элементы
+      let labels = heading.querySelectorAll(".highlight-label");
       labels.forEach((label) => label.remove());
     }
   });

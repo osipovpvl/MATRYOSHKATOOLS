@@ -1619,8 +1619,9 @@ document.addEventListener("DOMContentLoaded", () => {
               if (active) {
                 heading.style.backgroundColor = "#8e8e8e";
 
-                if (!heading.querySelector("span")) {
+                if (!heading.querySelector(".highlight-label")) {
                   let label = document.createElement("span");
+                  label.classList.add("highlight-label");
                   label.style.marginLeft = "10px";
                   label.style.color = "white";
                   label.textContent = `${heading.tagName}`;
@@ -1628,8 +1629,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
               } else {
                 heading.style.backgroundColor = "";
-                let labels = heading.querySelectorAll("span");
-                labels.forEach((label) => label.remove());
+            // Удаляем только добавленные метки, но не трогаем другие элементы
+      let labels = heading.querySelectorAll(".highlight-label");
+      labels.forEach((label) => label.remove());
               }
             });
           },
