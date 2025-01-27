@@ -3025,55 +3025,50 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = JSON.parse(cachedData);
             const age = Date.now() - data.timestamp;
             const maxAge = 24 * 60 * 60 * 1000; // 1 день
-  
+      
             if (age < maxAge) {
-             //console.log(`Используем кэш для ${engine}`);
               return data.count;
             }
           }
-  
+      
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
-            //console.log("Запросы к поисковым системам приостановлены из-за капчи.");
             return `<br><br>Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
           }
-  
-          //console.log(`Запрос к ${engine}: ${queryUrl}`);
+      
           const response = await fetch(queryUrl);
-  
+      
           // Проверка на ошибку 429 (капча)
           if (response.status === 429) {
-            //console.warn("Сработала капча.");
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
             return `<br><br>Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
           }
-  
+      
           const text = await response.text();
-          //console.log(`HTML-ответ от ${engine}:`, text);
-  
+      
           let resultCount = 0;
-  
+      
           if (engine === "yandex") {
             // Пытаемся найти количество результатов в разных вариантах
             let match = text.match(/нашлось ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
-  
+      
             if (!match) {
               match = text.match(/нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // вариант с "нашёлся"
             }
-  
+      
             if (!match) {
               match = text.match(/найдено ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // вариант с "найдено"
             }
-  
+      
             if (!match) {
               match = text.match(/host:[^]+ — Яндекс: нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // альтернативный вариант
             }
-  
+      
             if (!match) {
               match = text.match(/host:[^]+ — Яндекс: нашлась ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i); // вариант с "нашлась"
             }
-  
+      
             if (match) {
               let result = match[1].replace(/\s|\u00a0/g, "")
                                      .replace("тыс.", "000")
@@ -3082,25 +3077,23 @@ document.addEventListener("DOMContentLoaded", () => {
                                      .replace("тыс", "000") // также склонения без точки
                                      .replace("млн", "000000")
                                      .replace("млрд", "000000000");
-  
+      
               resultCount = parseInt(result, 10);
             } else {
-              //console.warn("Данные не найдены с полным доменом. Попробуем без www.");
-  
               // Если данные не были найдены с полным доменом, пробуем с доменом без www
               const responseWithoutWWW = await fetch(yandexSearchUrlWithoutWWW);
               const textWithoutWWW = await responseWithoutWWW.text();
-  
+      
               // Повторяем аналогичную обработку для версии без www
               match = textWithoutWWW.match(/нашлось ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
               if (!match) {
                 match = textWithoutWWW.match(/нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
               }
-  
+      
               if (!match) {
                 match = textWithoutWWW.match(/host:[^]+ — Яндекс: нашёлся ([\d\s\u00a0]+(?:тыс\.)?(?:млн\.)?(?:млрд\.)?)/i);
               }
-  
+      
               if (match) {
                 let result = match[1].replace(/\s|\u00a0/g, "")
                                        .replace("тыс.", "000")
@@ -3109,10 +3102,8 @@ document.addEventListener("DOMContentLoaded", () => {
                                        .replace("тыс", "000") // также склонения без точки
                                        .replace("млн", "000000")
                                        .replace("млрд", "000000000");
-  
+      
                 resultCount = parseInt(result, 10);
-              } else {
-                //console.warn("Данные не найдены с доменом без www.");
               }
             }
           } else if (engine === "google") {
@@ -3125,11 +3116,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 .replace("млн.", "000000")
                 .replace("млрд.", "000000000");
               resultCount = parseInt(result, 10);
-            } else {
-              //console.warn("Данные не найдены в HTML Google.");
             }
           }
-  
+      
           // Если запрос успешен и не является капчей или 0, сохраняем данные в кэш
           if (resultCount > 0 && resultCount !== 'Капча') {
             localStorage.setItem(`${engine}-count-${hostnameWithoutWWW}`, JSON.stringify({
@@ -3137,13 +3126,13 @@ document.addEventListener("DOMContentLoaded", () => {
               timestamp: Date.now() // Сохраняем метку времени
             }));
           }
-  
+      
           return resultCount;
         } catch (error) {
-          //console.error(`Ошибка при запросе к ${engine}:`, error);
           return 0;
         }
       }
+      
   
       async function updateYandexIndex() {
         const count = await fetchIndexedPages("yandex", yandexSearchUrlFull);
@@ -3191,4 +3180,3 @@ document.addEventListener("DOMContentLoaded", () => {
     // Добавляем активный класс новому блоку
     marketingBlocks[currentIndex].classList.add('active');
   }, 5000); // 5000 миллисекунд = 5 секунд
-  
