@@ -490,6 +490,7 @@ function getApiKey() {
 
 // Функция для определения цвета Trust
 function getTrustColor(trust) {
+  if (trust > 100) return "green";
   if (trust >= 0 && trust <= 30) return "red";
   if (trust >= 31 && trust <= 50) return "orange";
   if (trust >= 51 && trust <= 100) return "green";
@@ -498,6 +499,7 @@ function getTrustColor(trust) {
 
 // Функция для определения цвета Spam
 function getSpamColor(spam) {
+  if (spam > 100) return "red";
   if (spam >= 0 && spam <= 7) return "green";
   if (spam > 7 && spam <= 12) return "orange";
   if (spam > 12 && spam <= 100) return "red";
@@ -528,12 +530,43 @@ async function fetchDomainData(domain) {
   }
 }
 
+// Кэш для хранения проверенных доменов
+const DOMAIN_CACHE_KEY = "domainCache";
+
+// Функция для получения кэша доменов
+function getDomainCache() {
+  const cache = localStorage.getItem(DOMAIN_CACHE_KEY);
+  if (cache) {
+    const parsedCache = JSON.parse(cache);
+    const now = Date.now();
+
+    // Удаляем устаревшие записи (старше месяца)
+    for (const domain in parsedCache) {
+      if (now - parsedCache[domain].timestamp > 30 * 24 * 60 * 60 * 1000) {
+        delete parsedCache[domain];
+      }
+    }
+
+    // Сохраняем обновленный кэш
+    localStorage.setItem(DOMAIN_CACHE_KEY, JSON.stringify(parsedCache));
+    return parsedCache;
+  }
+  return {};
+}
+
+// Функция для сохранения данных домена в кэш
+function saveDomainToCache(domain, data) {
+  const cache = getDomainCache();
+  cache[domain] = { ...data, timestamp: Date.now() };
+  localStorage.setItem(DOMAIN_CACHE_KEY, JSON.stringify(cache));
+}
+
 // Функция для обновления информации о доменах
 async function updateSiteInfo() {
   if (!functionsEnabled) return; // Проверяем, активны ли функции
 
-  //console.log("Обновление информации о доменах...");
   const siteLinks = document.querySelectorAll("span.site-link a");
+  const domainCache = getDomainCache();
 
   siteLinks.forEach(async (link) => {
     const domain = new URL(link.href).hostname;
@@ -548,22 +581,38 @@ async function updateSiteInfo() {
     infoSpan.classList.add("trust-spam-info");
     infoSpan.style.marginLeft = "10px";
     infoSpan.textContent = "Проверка...";
-
     link.parentElement.appendChild(infoSpan);
+
+    // Проверяем, есть ли данные в кэше
+    if (domainCache[domain]) {
+      const cachedData = domainCache[domain];
+      const trustColor = getTrustColor(cachedData.trust);
+      const spamValue = cachedData.spam > 100 ? "N/A" : cachedData.spam;
+      const spamColor = cachedData.spam > 100 ? "red" : getSpamColor(cachedData.spam);
+
+      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${cachedData.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
+      return;
+    }
 
     // Получаем данные через API
     const data = await fetchDomainData(domain);
     if (data) {
       const trustColor = getTrustColor(data.trust);
-      const spamColor = getSpamColor(data.spam);
+      const spamValue = data.spam > 100 ? "N/A" : data.spam;
+      const spamColor = data.spam > 100 ? "red" : getSpamColor(data.spam);
 
-      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span>, Спам: <span style="color: ${spamColor};">${data.spam}</span>`;
+      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
+
+      
+      // Сохраняем данные в кэш
+      saveDomainToCache(domain, data);
     } else {
       infoSpan.textContent = "Не удалось проверить";
       infoSpan.style.color = "red";
     }
   });
 }
+
 
 // Функция для остановки обновления информации
 function stopUpdatingSiteInfo() {
