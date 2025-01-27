@@ -2795,17 +2795,42 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-
-
 // Получаем ссылку на элементы
 const apiKeyInput = document.getElementById('apiKey');
 const saveButton = document.getElementById('saveKey');
 const statusMessage = document.getElementById('status');
+const limitsElement = document.getElementById('CheckTrustLimits'); // Элемент для отображения баланса
+
+// Функция для получения баланса
+function fetchBalance(apiKey) {
+  const apiUrl = `https://checktrust.ru/app.php?r=host/app/summary/basic&applicationKey=${apiKey}&host=google.com&parameterList=hostLimitsBalance`;
+
+  fetch(apiUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      //console.log('API Response:', data); // Выводим ответ в консоль
+      if (data && data.success) {
+        const balance = data.hostLimitsBalance; // Прямо здесь получаем hostLimitsBalance
+        if (balance !== undefined) {
+          limitsElement.textContent = `Баланс: ${balance}`;
+        } else {
+          limitsElement.textContent = 'Баланс: Ошибка: Баланс не найден в ответе.';
+        }
+      } else {
+        limitsElement.textContent = 'Баланс: Ошибка при получении баланса';
+      }
+    })
+    .catch((error) => {
+      //console.error('Ошибка запроса баланса:', error);
+      limitsElement.textContent = 'Баланс: Ошибка при запросе баланса';
+    });
+}
 
 // Загружаем сохраненный API ключ при открытии popup
 chrome.storage.sync.get('apiKey', (data) => {
   if (data.apiKey) {
     apiKeyInput.value = data.apiKey;
+    fetchBalance(data.apiKey); // Получаем баланс сразу после загрузки ключа
   }
 });
 
@@ -2817,12 +2842,14 @@ saveButton.addEventListener('click', () => {
     chrome.storage.sync.set({ apiKey: apiKey }, () => {
       statusMessage.textContent = 'API ключ сохранен!';
       statusMessage.style.color = 'green';
+      fetchBalance(apiKey); // Получаем баланс сразу после сохранения ключа
     });
   } else {
     statusMessage.textContent = 'Введите валидный API ключ!';
     statusMessage.style.color = 'red';
   }
 });
+
 document.addEventListener('DOMContentLoaded', () => {
   const checkTrustButton = document.getElementById('checktrustbutton');
 

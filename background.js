@@ -33,7 +33,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             if (data && data.success && data.summary) {
               sendResponse({ 
                 trust: data.summary.trust, 
-                spam: data.summary.spam 
+                spam: data.summary.spam
               });
             } else {
               sendResponse(null); // Ответ на случай ошибки API
