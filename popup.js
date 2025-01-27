@@ -2018,17 +2018,17 @@ function checkMetaRobots(doc, container) {
       if (content.includes("noindex")) {
           container.innerHTML = `
               <span class="fa fa-times-circle" style="color:red;"></span>
-              Индексация страницы запрещена (meta: ${content})
+              Индексация страницы запрещена: ${content}
           `;
       } else if (content.includes("index") || content.includes("follow")) {
           container.innerHTML = `
               <span class="fas fa-check-circle" style="color: green;"></span>
-              Индексация страницы разрешена (meta: ${content})
+              Индексация страницы разрешена: ${content}
           `;
       } else {
           container.innerHTML = `
               <span class="fas fa-exclamation-circle" style="color: orange;"></span>
-              Индексация разрешена, но Meta Robots содержит нестандартные значения (meta: ${content})
+              Индексация разрешена, но Meta Robots содержит нестандартные значения: ${content}
           `;
       }
   } else {
