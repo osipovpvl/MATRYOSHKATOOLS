@@ -2151,6 +2151,9 @@ async function checkSitemap(tabUrl, container) {
   // Формируем URL для robots.txt
   const robotsUrl = new URL("/robots.txt", tabUrl).href;
 
+  let resultHtml = "";
+  let sitemapsFound = false;
+
   try {
     const robotsResponse = await fetch(robotsUrl);
     if (!robotsResponse.ok) {
@@ -2159,46 +2162,75 @@ async function checkSitemap(tabUrl, container) {
 
     // Получаем текст из robots.txt
     const robotsText = await robotsResponse.text();
-    
+
     // Ищем все строки, начинающиеся с "Sitemap:"
     const sitemapUrls = [];
     const sitemapRegex = /sitemap:\s*(https?:\/\/[^\s]+)/gi;
     let match;
     while ((match = sitemapRegex.exec(robotsText)) !== null) {
-      sitemapUrls.push(match[1]);  // Добавляем каждый найденный sitemap URL в список
+      sitemapUrls.push(match[1]); // Добавляем каждый найденный sitemap URL в список
     }
 
     // Если нет найденных sitemap, проверяем стандартный путь /sitemap.xml
     if (sitemapUrls.length === 0) {
       const defaultSitemapUrl = new URL("/sitemap.xml", tabUrl).href;
-      sitemapUrls.push(defaultSitemapUrl);
-    }
-
-    // Проверяем доступность каждого найденного sitemap
-    let resultHtml = `<span class="fas fa-check-circle" style="color: green;"></span> Найдены следующие файлы Sitemap.xml:<p></p>`;
-    for (const sitemapUrl of sitemapUrls) {
       try {
-        const response = await fetch(sitemapUrl);
-        if (!response.ok) {
-          throw new Error(`Не удалось найти: ${sitemapUrl}`);
+        const defaultResponse = await fetch(defaultSitemapUrl);
+        if (defaultResponse.status === 200) {
+          resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: green;\"></span> Доступен: <a href=\"${defaultSitemapUrl}\" target=\"_blank\">${defaultSitemapUrl}</a></div>`;
+          sitemapsFound = true;
+        } else {
+          resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Файл Sitemap.xml отсутствует</div>`;
         }
-        resultHtml += `<div><a href="${sitemapUrl}" target="_blank">${sitemapUrl}</a></div>`;
       } catch (error) {
-        resultHtml += `<div style="color: red;">Ошибка: ${sitemapUrl}</div>`;
-        //console.error("Ошибка при проверке sitemap:", error);
+        resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Файл Sitemap.xml отсутствует</div>`;
+      }
+    } else {
+      // Проверяем доступность каждого найденного sitemap
+      for (const sitemapUrl of sitemapUrls) {
+        try {
+          const response = await fetch(sitemapUrl);
+          if (response.status === 200) {
+            resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: green;\"></span> Доступен: <a href=\"${sitemapUrl}\" target=\"_blank\">${sitemapUrl}</a></div>`;
+            sitemapsFound = true;
+          } else if (response.status === 404) {
+            resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Недоступен: <a href=\"${sitemapUrl}\" target=\"_blank\">${sitemapUrl}</a></div>`;
+          } else {
+            resultHtml += `<div><span class=\"fas fa-exclamation-circle\" style=\"color: orange;\"></span> Неожиданный ответ (${response.status}): <a href=\"${sitemapUrl}\" target=\"_blank\"> ${sitemapUrl}</a></div>`;
+          }
+        } catch (error) {
+          resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Не удалось проверить: <a href=\"${sitemapUrl}\" target=\"_blank\"> ${sitemapUrl}</a></div>`;
+        }
       }
     }
-
-    // Обновляем контейнер с результатами
-    container.innerHTML = resultHtml;
-
   } catch (error) {
-    container.innerHTML = `
-      <span class="fa fa-times-circle" style="color:red;"></span>
-      Ссылок на файл Sitemap.xml не найдено
-    `;
-    //console.error("Ошибка при загрузке robots.txt:", error);
+    // Если robots.txt недоступен, проверяем стандартный путь /sitemap.xml
+    const defaultSitemapUrl = new URL("/sitemap.xml", tabUrl).href;
+    try {
+      const defaultResponse = await fetch(defaultSitemapUrl);
+      if (defaultResponse.status === 200) {
+        resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: green;\"></span> Доступен: <a href=\"${defaultSitemapUrl}\" target=\"_blank\">${defaultSitemapUrl}</a></div>`;
+        sitemapsFound = true;
+      } else {
+        resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Файл Sitemap.xml отсутствует</div>`;
+      }
+    } catch (innerError) {
+      resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Файл Sitemap.xml отсутствует</div>`;
+    }
   }
+
+  // Если файлы найдены, добавляем заголовок
+  if (sitemapsFound) {
+    resultHtml = `Список Sitemap.xml и их статус:<br><br>` + resultHtml;
+  }
+
+  // Если ничего не найдено и файл по умолчанию недоступен
+  if (!resultHtml) {
+    resultHtml = `<span class=\"fa fa-times-circle\" style=\"color:red;\"></span> Файл Sitemap.xml отсутствует`;
+  }
+
+  // Обновляем контейнер с результатами
+  container.innerHTML = resultHtml;
 }
 
 
