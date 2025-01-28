@@ -2129,19 +2129,18 @@ async function checkRobotsTxt(tabUrl, container) {
 
       let htmlContent = `<p>Файл Robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
       htmlContent += "<p>Список User-Agent и их статус:</p>";
-      htmlContent += "<ul>";
+      htmlContent += "<p>";
 
       const currentPath = new URL(tabUrl).pathname + new URL(tabUrl).search;
 
       for (const { agent, rules } of userAgents) {
           const { allowed, ruleMatched } = isPathAllowed(rules, currentPath);
-          htmlContent += `<li>User-Agent: ${agent} 
-              <span class="${allowed ? 'fas fa-check-circle' : 'fa fa-times-circle'}" 
-              style="color: ${allowed ? 'green' : 'red'};"></span> 
+          htmlContent += `<li style="list-style:none;"><span class="${allowed ? 'fas fa-check-circle' : 'fa fa-times-circle'}" 
+              style="color: ${allowed ? 'green' : 'red'};"></span> User-Agent: ${agent} 
               ${allowed ? "Разрешено" : `Запрещено правилом: <code>${ruleMatched}</code>`}</li>`;
       }
 
-      htmlContent += "</ul>";
+      htmlContent += "</ы>";
       container.innerHTML = htmlContent;
   } catch (error) {
       container.innerHTML = `<p><span class="fas fa-exclamation-circle" style="color: orange;"></span> Не удалось загрузить файл Robots.txt<p>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
