@@ -2039,10 +2039,8 @@ function checkMetaRobots(doc, container) {
   }
 }
 
-
-// Проверка файла robots.txt
+// Проверка robots.txt
 async function checkRobotsTxt(tabUrl, container) {
-  // Добавляем уникальный параметр, чтобы избежать кеширования
   const robotsUrl = new URL("/robots.txt", tabUrl).href;
 
   try {
@@ -2064,15 +2062,41 @@ async function checkRobotsTxt(tabUrl, container) {
 
       const robotsText = await response.text();
 
-      // Проверка на пустой файл
       if (robotsText.trim() === "") {
           container.innerHTML = `<p><span class="fa fa-exclamation-circle" style="color:orange;"></span> Файл Robots.txt пуст (Индексация разрешена)</p>`;
           return;
       }
 
       const lines = robotsText.split("\n");
-      const userAgents = {};
+      const userAgents = [];
       let currentAgent = null;
+
+      // Сбор всех User-Agent и их правил
+      lines.forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed.toLowerCase().startsWith("user-agent:")) {
+              currentAgent = trimmed.split(":")[1].trim().toLowerCase();
+              userAgents.push({ agent: currentAgent, rules: [] });
+          } else if (
+              currentAgent &&
+              (trimmed.toLowerCase().startsWith("disallow:") ||
+                  trimmed.toLowerCase().startsWith("allow:"))
+          ) {
+              const rule = trimmed.split(":")[1].trim();
+              userAgents[userAgents.length - 1].rules.push({
+                  type: trimmed.toLowerCase().startsWith("disallow:") ? "Disallow" : "Allow",
+                  path: rule || "",
+                  original: trimmed,
+              });
+          }
+      });
+
+      // Применение правил следующим User-Agent, если правила пустые
+      for (let i = userAgents.length - 1; i >= 0; i--) {
+          if (userAgents[i].rules.length === 0 && i < userAgents.length - 1) {
+              userAgents[i].rules = userAgents[i + 1].rules;
+          }
+      }
 
       const convertRobotsTxtToRegex = (robotsTxtPattern) => {
           const regexPattern = robotsTxtPattern
@@ -2085,27 +2109,6 @@ async function checkRobotsTxt(tabUrl, container) {
       const checkPathAgainstRobotsRegex = (pattern, path) => {
           return convertRobotsTxtToRegex(pattern).test(path);
       };
-
-      lines.forEach((line) => {
-          const trimmed = line.trim();
-          if (trimmed.toLowerCase().startsWith("user-agent:")) {
-              currentAgent = trimmed.split(":")[1].trim();
-              if (!userAgents[currentAgent]) {
-                  userAgents[currentAgent] = [];
-              }
-          } else if (
-              currentAgent &&
-              (trimmed.toLowerCase().startsWith("disallow:") ||
-                  trimmed.toLowerCase().startsWith("allow:"))
-          ) {
-              const rule = trimmed.split(":")[1].trim();
-              userAgents[currentAgent].push({
-                  type: trimmed.toLowerCase().startsWith("disallow:") ? "Disallow" : "Allow",
-                  path: rule || "",
-                  original: trimmed,
-              });
-          }
-      });
 
       const isPathAllowed = (rules, path) => {
           let allowed = true;
@@ -2130,7 +2133,7 @@ async function checkRobotsTxt(tabUrl, container) {
 
       const currentPath = new URL(tabUrl).pathname + new URL(tabUrl).search;
 
-      for (const [agent, rules] of Object.entries(userAgents)) {
+      for (const { agent, rules } of userAgents) {
           const { allowed, ruleMatched } = isPathAllowed(rules, currentPath);
           htmlContent += `<li>User-Agent: ${agent} 
               <span class="${allowed ? 'fas fa-check-circle' : 'fa fa-times-circle'}" 
