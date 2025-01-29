@@ -3204,3 +3204,67 @@ document.addEventListener("DOMContentLoaded", () => {
     // Добавляем активный класс новому блоку
     marketingBlocks[currentIndex].classList.add('active');
   }, 5000); // 5000 миллисекунд = 5 секунд
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  // Файл: popup.js
+
+document.addEventListener("DOMContentLoaded", function () {
+  const toggleButton = document.getElementById("toggle-wordstat");
+
+  // Проверяем сохраненное состояние
+  chrome.storage.local.get(["wordstatPanel"], function (result) {
+      const isEnabled = result.wordstatPanel !== false;
+      updateButtonState(isEnabled);
+  });
+
+  toggleButton.addEventListener("click", function () {
+      chrome.storage.local.get(["wordstatPanel"], function (result) {
+          const newState = !result.wordstatPanel;
+          chrome.storage.local.set({ "wordstatPanel": newState });
+
+          updateButtonState(newState);
+
+          chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+              if (tabs[0] && tabs[0].url.includes("wordstat.yandex.ru")) {
+                  chrome.scripting.executeScript({
+                      target: { tabId: tabs[0].id },
+                      func: togglePanelInjected,
+                      args: [newState]
+                  });
+              }
+          });
+      });
+  });
+});
+
+function updateButtonState(isEnabled) {
+  const toggleButton = document.getElementById("toggle-wordstat");
+  toggleButton.innerHTML = isEnabled
+      ? '<i class="fa fa-toggle-on" aria-hidden="true"></i>'
+      : '<i class="fa fa-toggle-off" aria-hidden="true"></i>';
+}
+
+// Эта функция будет передаваться в `executeScript`
+function togglePanelInjected(state) {
+  let panel = document.getElementById("wordstat-helper");
+  if (panel) {
+      panel.style.display = state ? "block" : "none";
+  }
+}

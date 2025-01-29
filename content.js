@@ -1,3 +1,226 @@
+if (window.location.hostname === 'wordstat.yandex.ru') {
+  // Массив для хранения добавленных фраз и частотностей
+  const addedWords = {};
+  let totalFrequency = 0;
+
+  // Функция для обновления статистики в панели
+  function updateStats() {
+      const statsElement = document.getElementById('stats');
+      statsElement.textContent = `Добавлено фраз: ${Object.keys(addedWords).length}, Общая частотность: ${totalFrequency}`;
+  }
+
+  // Функция для добавления нового слова и частотности в панель
+  function addToPanel(word, frequency, isPlus = true) {
+      if (isNaN(frequency) || frequency <= 0) {
+          console.error(`Неверная частотность для фразы ${word}: ${frequency}`);
+          return;
+      }
+
+      if (addedWords[word]) {
+          console.log(`Фраза ${word} уже добавлена. Не добавляем.`);
+          return;
+      }
+
+      const table = document.getElementById('added-words-table');
+      if (!table) {
+          console.error("Таблица для добавленных фраз не найдена!");
+          return;
+      }
+
+      const newRow = document.createElement('tr');
+      newRow.innerHTML = `
+          <td>${word}</td>
+          <td>${frequency}</td>
+          <td><button class="remove-btn">-</button></td>
+      `;
+      table.appendChild(newRow);
+      totalFrequency += parseInt(frequency, 10);
+      addedWords[word] = { frequency: frequency, isAdded: true, isPlus: isPlus };  // Сохраняем фразу и её состояние
+      console.log(`Обновленная общая частотность: ${totalFrequency}`);
+
+      // Добавляем обработчик для кнопки "-"
+      const removeButton = newRow.querySelector('.remove-btn');
+      removeButton.addEventListener('click', () => {
+          removeFromPanel(word, frequency);
+      });
+
+      // Обновляем статистику
+      updateStats();
+      saveToLocalStorage(); // Сохраняем изменения в localStorage
+  }
+
+  // Функция для удаления слова и частотности из панели
+  function removeFromPanel(word, frequency) {
+      const rows = document.querySelectorAll('#added-words-table tr');
+      rows.forEach(row => {
+          const cell = row.querySelector('td:first-child');
+          if (cell && cell.textContent.trim() === word) {
+              row.remove();
+          }
+      });
+      delete addedWords[word];
+      totalFrequency -= parseInt(frequency, 10);
+      if (totalFrequency < 0) {
+          totalFrequency = 0;
+      }
+
+      // Восстанавливаем кнопку "+" в случае удаления фразы
+      const links = document.querySelectorAll('.table__content-cell a');
+      links.forEach(link => {
+          if (link.textContent.trim() === word) {
+              const plusButton = link.nextElementSibling;
+              if (plusButton) {
+                  plusButton.textContent = '+';
+                  plusButton.removeEventListener('click', arguments.callee);
+                  plusButton.addEventListener('click', () => {
+                      addToPanel(word, frequency);
+                      plusButton.textContent = '-';
+                  });
+              }
+          }
+      });
+
+      updateStats();
+      saveToLocalStorage(); // Сохраняем изменения в localStorage
+  }
+
+  // Функция для сохранения фраз в localStorage
+  function saveToLocalStorage() {
+      const wordsArray = [];
+      const rows = document.querySelectorAll('#added-words-table tr');
+      rows.forEach(row => {
+          const wordCell = row.querySelector('td:first-child');
+          const frequencyCell = row.querySelector('td:nth-child(2)');
+          if (wordCell && frequencyCell) {
+              const word = wordCell.textContent.trim();
+              const frequency = frequencyCell.textContent.trim();
+              wordsArray.push({
+                  word: word,
+                  frequency: frequency,
+                  isPlus: addedWords[word].isPlus // Добавляем состояние кнопки
+              });
+          }
+      });
+
+      localStorage.setItem('addedWords', JSON.stringify(wordsArray));
+  }
+
+  // Функция для загрузки фраз из localStorage
+  function loadFromLocalStorage() {
+      try {
+          const savedData = localStorage.getItem('addedWords');
+          if (savedData) {
+              const wordsArray = JSON.parse(savedData);
+              wordsArray.forEach(item => {
+                  if (item && item.word && item.frequency) {
+                      addToPanel(item.word, item.frequency, item.isPlus); // Восстанавливаем состояние кнопки
+                      if (item.isPlus === false) {
+                          // Если фраза была удалена, отображаем "-" и настраиваем логику для удаления
+                          const rows = document.querySelectorAll('#added-words-table tr');
+                          rows.forEach(row => {
+                              const wordCell = row.querySelector('td:first-child');
+                              if (wordCell && wordCell.textContent.trim() === item.word) {
+                                  const removeButton = row.querySelector('.remove-btn');
+                                  removeButton.textContent = '-';
+                              }
+                          });
+                      }
+                  }
+              });
+          }
+      } catch (e) {
+          console.error("Ошибка при загрузке данных из localStorage", e);
+      }
+  }
+
+  // Создаем панель для вывода данных
+  const panel = document.createElement('div');
+  panel.style.position = 'fixed';
+  panel.style.top = '20px';
+  panel.style.right = '20px';
+  panel.style.width = '300px';
+  panel.style.height = 'auto';
+  panel.style.backgroundColor = '#fff';
+  panel.style.border = '1px solid #ccc';
+  panel.style.padding = '10px';
+  panel.style.overflowY = 'auto';
+  panel.style.zIndex = '9999';
+  panel.innerHTML = `
+      <h3>Добавленные фразы</h3>
+      <table border="1" style="width: 100%; border-collapse: collapse;">
+          <thead>
+              <tr>
+                  <th>Фраза</th>
+                  <th>Частотность</th>
+                  <th>Действие</th>
+              </tr>
+          </thead>
+          <tbody id="added-words-table">
+              <!-- Тут будут отображаться добавленные слова -->
+          </tbody>
+      </table>
+      <div id="stats" style="margin-top: 10px;">
+          Добавлено фраз: 0, Общая частотность: 0
+      </div>
+  `;
+  document.body.appendChild(panel); // Добавляем панель на страницу
+
+  // Функция для обработки ссылок и добавления кнопок "+"
+  function addPlusButtonsToLinks() {
+      const links = document.querySelectorAll('.table__content-cell a');
+
+      links.forEach(link => {
+          if (link.hasAttribute('data-plus-button')) return;
+
+          const word = link.textContent.trim();
+          const parentCell = link.closest('td');
+          const frequencyCell = parentCell.nextElementSibling;
+          const frequency = frequencyCell ? frequencyCell.textContent.trim().replace(/\s+/g, '') : '';
+
+          if (addedWords[word]) {
+              return;
+          }
+
+          const plusButton = document.createElement('button');
+          plusButton.textContent = '+';
+          plusButton.style.marginRight = '10px';
+          plusButton.style.cursor = 'pointer';
+
+          plusButton.addEventListener('click', () => {
+              addToPanel(word, frequency);
+              plusButton.textContent = '-';
+              plusButton.removeEventListener('click', arguments.callee);
+              plusButton.addEventListener('click', () => {
+                  removeFromPanel(word, frequency);
+                  plusButton.textContent = '+';
+              });
+          });
+
+          parentCell.insertBefore(plusButton, link);
+          link.setAttribute('data-plus-button', 'true');
+      });
+  }
+
+  const observer = new MutationObserver(() => {
+      addPlusButtonsToLinks();
+  });
+
+  observer.observe(document.body, {
+      childList: true,
+      subtree: true
+  });
+
+  // Инициализация
+  window.onload = function() {
+      loadFromLocalStorage();
+      addPlusButtonsToLinks();
+  };
+}
+
+
+
+
+
 /*
  * Авторские права 2025 PAVEL OSIPOV «MATRYOSHKA TOOLS»
  *
