@@ -398,10 +398,10 @@ input[type="number"] {
   }
 
   .copy-button {
+    color: #333;
     background: none;
     border: none;
     cursor: pointer;
-    font-size: 16px;
     display: flex;
     align-items: center;
   }
@@ -568,10 +568,6 @@ tr:nth-child(even) {
     margin: 10px 0;
     font-size: 14px;
     align-items: center;
-}
-
-.loading {
-    color: gray;
 }
 
 .green {
@@ -750,6 +746,7 @@ input[type="text"] {
 .text-marketinginfo {
   font-size: 14px; /* Размер текста */
 }
+
   </style>
 </head>
 <body>
@@ -768,49 +765,49 @@ input[type="text"] {
 
     <div id="tab-content">
       <div id="seo" class="tab active">
-        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="margin-bottom: 5px;" class="copy-button" data-target="allmeta"> <i class="fas fa-clone"></i></button></span>
+        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="allmeta">Копировать</button></span>
         <table>
         <tr>
-          <td>Title: <div id="title-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 30-70. Допустимо: 10-29, 71-90. Некорректно: 0-9,91+"></i></td>
+          <td style="padding: 0">Title: <div id="title-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 30-70. Допустимо: 10-29, 71-90. Некорректно: 0-9,91+"></i></td>
             <td>
                 <div id="title">Загрузка...</div>
             </td>
             <td>
-                <button class="copy-button" data-target="title">
-                    <i class="fas fa-clone"></i>
+                <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="title">
+                  Копировать
                 </button>
             </td>
         </tr>
         <tr>
-           <td>Description: <div id="description-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 150-250. Допустимо: 75-149, 251-300. Некорректно: 0-74,301+"></i></td>
+           <td style="padding: 0">Description: <div id="description-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 150-250. Допустимо: 75-149, 251-300. Некорректно: 0-74,301+"></i></td>
             <td>
                 <div id="description">Загрузка...</div>
             </td>
             <td>
-                <button class="copy-button" data-target="description">
-                    <i class="fas fa-clone"></i>
+                <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="description">
+                  Копировать
                 </button>
             </td>
         </tr>
         <tr>
-          <td>H1: <div id="h1-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 20-60. Допустимо: 5-19, 61-70. Некорректно: 0-4,71+"></i></td>
+          <td style="padding: 0">H1: <div id="h1-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 20-60. Допустимо: 5-19, 61-70. Некорректно: 0-4,71+"></i></td>
             <td>
                 <div id="h1">Загрузка...</div>
             </td>
             <td>
-                <button class="copy-button" data-target="h1">
-                    <i class="fas fa-clone"></i>
+                <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="h1">
+                  Копировать
                 </button>
             </td>
         </tr>
         <tr>
-        <td>Keywords:   <div id="keywords-length" class="meta-length">Символов: 0</div></td>
+        <td style="padding: 0">Keywords:   <div id="keywords-length" class="meta-length">Символов: 0</div></td>
             <td>
               <div id="keywords">Загрузка...</div>
             </td>
             <td>
-              <button class="copy-button" data-target="keywords">
-                <i class="fas fa-clone"></i>
+              <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="keywords">
+                Копировать
               </button>
             </td>
           </tr>
@@ -853,75 +850,81 @@ input[type="text"] {
         <div class="section-title">ДОПОЛНИТЕЛЬНАЯ ИНФОРМАЦИЯ</div>
         <table>
           <tr>
-            <td>Текущий URL: <div id="url-length" style="color:gray;"></div></td>
+            <td style="padding: 0">Текущий URL: <div id="url-length" style="color:gray;"></div></td>
             <td id="current-url">Загрузка...</td>
           </tr>
           <tr>
-            <td>Кодировка HTML:</td>
+            <td style="padding: 0">Поддомены:</td>
+            <td id="subdomains">
+              <span id="searchsubdomains">Загрузка...</span>
+          </td>
+        </tr>
+          <tr>
+            <td style="padding: 0">Кодировка HTML:</td>
             <td><div id="charset">Загрузка...</div></td>
         </tr>
           <tr>
-            <td>Атрибут lang:</td>
+            <td style="padding: 0">Атрибут lang:</td>
             <td id="lang">Загрузка...</td>
           </tr>
           <tr>
-            <td>Атрибут hreflang:</td>
+            <td style="padding: 0">Атрибут hreflang:</td>
             <td><div id="hreflang">Загрузка...</div></td>
         </tr>
           <tr>
-            <td>Счетчик Яндекс Метрики:</td>
+            <td style="padding: 0">Счетчик Яндекс Метрики:</td>
             <td id="yandex-metrika">Загрузка...</td>
           </tr>
           <tr>
-            <td>Счетчик Google Analytics:</td>
+            <td style="padding: 0">Счетчик Google Analytics:</td>
             <td id="google-analytics">Загрузка...</td>
           </tr>
           <tr>
-            <td>Счетчик Google Tag Manager:</td>
+            <td style="padding: 0">Счетчик Google Tag Manager:</td>
             <td id="google-tag-manager">Загрузка...</td>
           </tr>
           <tr>
-            <td>Счетчик Live Internet:</td>
+            <td style="padding: 0">Счетчик Live Internet:</td>
             <td id="live-internet">Загрузка...</td>
           </tr>
           <tr>
-            <td>CMS/WYSI/WYG:</td>
+            <td style="padding: 0">CMS/WYSI/WYG:</td>
             <td id="cms-data">Загрузка...</td>
           </tr>
           <tr>
-            <td>Размер страницы:</td>
+            <td style="padding: 0">Размер страницы:</td>
             <td id="page-size">Загрузка...</td>
           </tr>
           <tr>
-            <td>Скорость загрузки страницы:</td>
+            <td style="padding: 0">Скорость загрузки страницы:</td>
             <td id="speed-page">Загрузка...</td>
          </tr>
           <tr>
-            <td>Код ответа сервера:</td>
+            <td style="padding: 0">Код ответа сервера:</td>
             <td id="response-code">Загрузка...</td>
           </tr>
           <tr>
-            <td>Время ответа сервера:</td>
+            <td style="padding: 0">Время ответа сервера:</td>
             <td id="time-code">Загрузка...</td>
           </tr>
         <tr>
-          <td>Возраст домена:</td>
+          <td style="padding: 0">Возраст домена:</td>
           <td id="domain-age">Загрузка...</td>
       </tr>
         <tr>
-            <td>Дата регистрации домена:</td>
+            <td style="padding: 0">Дата регистрации домена:</td>
             <td id="domain-registration-date">Загрузка...</td>
         </tr>
         <tr>
-            <td>Дата истечения SSL сертификата:</td>
+            <td style="padding: 0">Дата истечения SSL сертификата:</td>
             <td id="ssl-expiry-date">Загрузка...</td>
         </tr>
         <tr>
-          <td>IP сайта:</td>
+          <td style="padding: 0">IP сайта:</td>
           <td id="site-ip">Загрузка...</td>
       </tr>
         <tr>
-          <td>Яндекс ИКС:</td>
+          <td style="padding: 0">Яндекс ИКС:</td>
           <td id="yandex-iks">
             <img id="iksImage" style="display:none;" alt="ИКС не доступен">
             <span id="loadingMessage">Загрузка...</span>
@@ -990,21 +993,21 @@ input[type="text"] {
             </div>
           </div>
           <div class="search-item">
-            <span>Искать на картах</span>
+            <span>Искать организацию на картах</span>
             <div class="search-buttons">
               <button id="search-yandex-maps" class="search-button yandex">Я</button>
               <button id="search-google-maps" class="search-button google">G</button>
             </div>
              <!-- Блок для ввода для Яндекс.Карт -->
   <div id="yandex-search-input" class="search-input-container" style="display: none;">
-    <input type="text" id="yandex-input" placeholder="Название или домен" />
-    <button id="yandex-check" class="check-button">Проверить</button>
+    <input type="text" id="yandex-input" placeholder="Искать в Яндекс" />
+    <button id="yandex-check" class="check-button">Искать</button>
   </div>
   
   <!-- Блок для ввода для Google.Карт -->
   <div id="google-search-input" class="search-input-container" style="display: none;">
-    <input type="text" id="google-input" placeholder="Название или домен" />
-    <button id="google-check" class="check-button">Проверить</button>
+    <input type="text" id="google-input" placeholder="Искать в Google" />
+    <button id="google-check" class="check-button">Искать</button>
   </div>
           </div>
           <div class="search-item">
@@ -1057,6 +1060,7 @@ input[type="text"] {
           <button id="check-links-status">Проверить код ответа</button>
           <button id="copy-links">Копировать ссылки</button>
           <button id="export-links">Экспортировать в CSV</button>
+          <button id="highlight-nofollow">Включить подсветку nofollow</button>
         </div>
       
         <!-- Детали ссылок -->
@@ -1079,6 +1083,7 @@ input[type="text"] {
           <button data-filter="status-404">Код ответа 4xx (<span id="status-404-count">0</span>)</button></span>
         </div>
         <button id="check-status">Проверить код ответа</button>
+        <button id="check-altimg">Показать alt изображений</button>
         <div id="image-details">
           <ul id="image-list" style="list-style: none; padding: 0;"></ul>
         </div>
@@ -1330,11 +1335,6 @@ input[type="text"] {
             <button id="highlight-noindex" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Подсветить элементы nofollow<br>
-              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
-            <button id="highlight-nofollow" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
-          </div>
-          <div class="page-item">
             <span>Показать элементы none<br>
               <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
             <button id="toggle-none" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
@@ -1350,20 +1350,20 @@ input[type="text"] {
             <button id="toggle-css" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Показать панель в Яндекс Ворд Стат<br>
-              <span style="color: gray;font-weight: normal;">По умолчанию включено</span></span>
+            <span>Показать панель Wordstat<br>
+              <span style="color: gray;font-weight: normal;">В разработке</span></span>
             <button id="toggle-wordstat" class="page-button action-button"><i class="fa fa-toggle-on" aria-hidden="true"></i></button>
           </div>
           <div class="page-item">
-            <span>Проверка API Check Trust<br>
+            <span>Показать Спам/Траст<br>
               <span style="color: gray;font-weight: normal;">По умолчанию выключено</span><br>
-              <span style="color: gray;font-weight: normal;">Включив проверку API Check Trust, вы сможете на сайте Go Get Links видеть:</span>
+              <span style="color: gray;font-weight: normal;">Включив показ Спам/Траст, вы с помощью API Check Trust сможете на сайте Go Get Links видеть:</span>
               <ul style="color: gray;font-weight: normal;">
                   <li>Траст сайтов — уровень доверия к ресурсу.</li>
                   <li>Спам сайтов — оценка потенциальной спамности или подозрительности сайта.</li>
               </ul>
               <span style="font-weight: normal;" id="CheckTrustLimits">Баланс: Введите API ключ</span><br>
-              <input style="margin: 0px;" type="text" id="apiKey" placeholder="Введите API ключ" />
+              <input style="margin: 0px;" type="text" id="apiKey" placeholder="API ключ" />
               <button id="saveKey"><span id="status" style="font-weight: normal;">Сохранить</span></button>
             </span>
               <button id="checktrustbutton" class="page-button action-button">

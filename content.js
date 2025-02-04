@@ -1,223 +1,128 @@
+/*
+ * Авторские права 2025 PAVEL OSIPOV «MATRYOSHKA TOOLS»
+ *
+ * Лицензировано по Лицензии Apache, версия 2.0 (далее «Лицензия»);
+ * вы не можете использовать этот файл, за исключением случаев, предусмотренных Лицензией.
+ * Вы можете получить копию Лицензии по адресу
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Если не требуется законом или по договоренности, программное обеспечение
+ * распространяется по Лицензии «КАК ЕСТЬ», БЕЗ ГАРАНТИЙ И УСЛОВИЙ ЛЮБОГО ВИДА, явных или подразумеваемых.
+ * Смотрите Лицензию для конкретного языка, регулирующего разрешения и
+ * ограничения, предусмотренные Лицензией.
+ */
+
+
+
 if (window.location.hostname === 'wordstat.yandex.ru') {
-  // Массив для хранения добавленных фраз и частотностей
-  const addedWords = {};
-  let totalFrequency = 0;
-
-  // Функция для обновления статистики в панели
-  function updateStats() {
-      const statsElement = document.getElementById('stats');
-      statsElement.textContent = `Добавлено фраз: ${Object.keys(addedWords).length}, Общая частотность: ${totalFrequency}`;
-  }
-
-  // Функция для добавления нового слова и частотности в панель
-  function addToPanel(word, frequency, isPlus = true) {
-      if (isNaN(frequency) || frequency <= 0) {
-          console.error(`Неверная частотность для фразы ${word}: ${frequency}`);
-          return;
+  //Панель Вордстат 
+  
+  function addSearchButtons() {
+    chrome.storage.local.get(["wordstatPanel"], function (result) {
+      const isEnabled = result.wordstatPanel !== false;
+      const searchInputContainer = document.querySelector('.wordstat__search-input');
+      if (!searchInputContainer) return;
+  
+      let panel = document.getElementById("wordstat-helper");
+      if (!panel) {
+        panel = document.createElement("div");
+        panel.id = "wordstat-helper";
+        searchInputContainer.appendChild(panel);
       }
-
-      if (addedWords[word]) {
-          console.log(`Фраза ${word} уже добавлена. Не добавляем.`);
-          return;
+      panel.style.display = isEnabled ? "block" : "none";
+  
+      if (!isEnabled || panel.childElementCount) return;
+  
+      const buttonsContainer = document.createElement('div');
+      buttonsContainer.className = 'custom-wrapp-buttons';
+      buttonsContainer.style.position = 'absolute';
+      buttonsContainer.style.top = '0';
+      buttonsContainer.style.bottom = '0';
+      buttonsContainer.style.right = '0';
+      buttonsContainer.style.zIndex = '3';
+      buttonsContainer.style.display = 'flex';
+      buttonsContainer.style.alignItems = 'center';
+      buttonsContainer.style.gap = '2px';
+      buttonsContainer.style.padding = '0 5px';
+      buttonsContainer.style.margin = '80px 500px 0px 0px';
+  
+      function applyTransformation(type) {
+        const searchInput = document.querySelector(".wordstat__search-input > input");
+        if (!searchInput || !searchInput.value) return;
+  
+        let words = searchInput.value.trim().split(/\s+/);
+  
+        if (type === "group") {
+          searchInput.value = words.length > 1 ? `(${words.join('|')})` : `(${words[0]})`;
+        } else if (type === "minus") {
+          searchInput.value = words.map(word => word.startsWith('-') ? word : `-${word}`).join(' ');
+        } else if (type === "clear") {
+          searchInput.value = searchInput.value.replace(/["\[\]()|!\-]/g, '').replace(/\s+/g, ' ').trim();
+        } else {
+          const n = searchInput.value.replace(/-\[.*\]\s?/gi, "")
+            .replace(/["\[\]']/gi, "")
+            .trim(),
+            r = n.split(" -"),
+            a = r[0],
+            o = r.slice(1),
+            i = n.replace(/-[[\]"][^[\]"]*[[\]"]/gi, "")
+              .split(" ")
+              .map(e => e[0] === "-" ? "" : e)
+              .join(" ")
+              .trim(),
+            l = `"${a} ${a.split(" ").slice(-1)[0]}"${o.length ? " -" + o.join(" -") : ""}`,
+            s = `"${i}"`,
+            u = `[${i}]`,
+            c = `"${i.split(" ").map(e => "-!+".includes(e[0]) ? e : "!" + e).join(" ")}"`;
+  
+          if (type === "level") searchInput.value = l;
+          else if (type === "exact") searchInput.value = s;
+          else if (type === "form") searchInput.value = c;
+          else if (type === "order") searchInput.value = u;
+        }
+  
+        searchInput.dispatchEvent(new InputEvent("input", { bubbles: true }));
+        const searchButton = document.querySelector(".wordstat__search-button");
+        if (searchButton) searchButton.click();
       }
-
-      const table = document.getElementById('added-words-table');
-      if (!table) {
-          console.error("Таблица для добавленных фраз не найдена!");
-          return;
-      }
-
-      const newRow = document.createElement('tr');
-      newRow.innerHTML = `
-          <td>${word}</td>
-          <td>${frequency}</td>
-          <td><button class="remove-btn">-</button></td>
-      `;
-      table.appendChild(newRow);
-      totalFrequency += parseInt(frequency, 10);
-      addedWords[word] = { frequency: frequency, isAdded: true, isPlus: isPlus };  // Сохраняем фразу и её состояние
-      console.log(`Обновленная общая частотность: ${totalFrequency}`);
-
-      // Добавляем обработчик для кнопки "-"
-      const removeButton = newRow.querySelector('.remove-btn');
-      removeButton.addEventListener('click', () => {
-          removeFromPanel(word, frequency);
+  
+      const buttons = [
+        { title: 'Дублирование последнего слова', text: '++', type: 'level' },
+        { title: 'Точное соответствие', text: '""', type: 'exact' },
+        { title: 'Фиксация словоформ', text: '!!', type: 'form' },
+        { title: 'Фиксированный порядок слов', text: '[]', type: 'order' },
+        { title: 'Группировка слов', text: '()', type: 'group' },
+        { title: 'Минусовать слова', text: '--', type: 'minus' },
+        { title: 'Очистка спецсимволов', text: 'X', type: 'clear' }
+      ];
+  
+      buttons.forEach(btn => {
+        const button = document.createElement('button');
+        button.className = 'custom-wrapp-button';
+        button.title = btn.title;
+        button.textContent = btn.text;
+        button.style.background = 'white';
+        button.style.border = '1px solid #ddd';
+        button.style.padding = '5px 8px';
+        button.style.cursor = 'pointer';
+        button.style.fontSize = '14px';
+        button.style.borderRadius = '5px';
+  
+        button.addEventListener('click', () => applyTransformation(btn.type));
+  
+        buttonsContainer.appendChild(button);
       });
-
-      // Обновляем статистику
-      updateStats();
-      saveToLocalStorage(); // Сохраняем изменения в localStorage
+  
+      panel.appendChild(buttonsContainer);
+    });
   }
-
-  // Функция для удаления слова и частотности из панели
-  function removeFromPanel(word, frequency) {
-      const rows = document.querySelectorAll('#added-words-table tr');
-      rows.forEach(row => {
-          const cell = row.querySelector('td:first-child');
-          if (cell && cell.textContent.trim() === word) {
-              row.remove();
-          }
-      });
-      delete addedWords[word];
-      totalFrequency -= parseInt(frequency, 10);
-      if (totalFrequency < 0) {
-          totalFrequency = 0;
-      }
-
-      // Восстанавливаем кнопку "+" в случае удаления фразы
-      const links = document.querySelectorAll('.table__content-cell a');
-      links.forEach(link => {
-          if (link.textContent.trim() === word) {
-              const plusButton = link.nextElementSibling;
-              if (plusButton) {
-                  plusButton.textContent = '+';
-                  plusButton.removeEventListener('click', arguments.callee);
-                  plusButton.addEventListener('click', () => {
-                      addToPanel(word, frequency);
-                      plusButton.textContent = '-';
-                  });
-              }
-          }
-      });
-
-      updateStats();
-      saveToLocalStorage(); // Сохраняем изменения в localStorage
-  }
-
-  // Функция для сохранения фраз в localStorage
-  function saveToLocalStorage() {
-      const wordsArray = [];
-      const rows = document.querySelectorAll('#added-words-table tr');
-      rows.forEach(row => {
-          const wordCell = row.querySelector('td:first-child');
-          const frequencyCell = row.querySelector('td:nth-child(2)');
-          if (wordCell && frequencyCell) {
-              const word = wordCell.textContent.trim();
-              const frequency = frequencyCell.textContent.trim();
-              wordsArray.push({
-                  word: word,
-                  frequency: frequency,
-                  isPlus: addedWords[word].isPlus // Добавляем состояние кнопки
-              });
-          }
-      });
-
-      localStorage.setItem('addedWords', JSON.stringify(wordsArray));
-  }
-
-  // Функция для загрузки фраз из localStorage
-  function loadFromLocalStorage() {
-      try {
-          const savedData = localStorage.getItem('addedWords');
-          if (savedData) {
-              const wordsArray = JSON.parse(savedData);
-              wordsArray.forEach(item => {
-                  if (item && item.word && item.frequency) {
-                      addToPanel(item.word, item.frequency, item.isPlus); // Восстанавливаем состояние кнопки
-                      if (item.isPlus === false) {
-                          // Если фраза была удалена, отображаем "-" и настраиваем логику для удаления
-                          const rows = document.querySelectorAll('#added-words-table tr');
-                          rows.forEach(row => {
-                              const wordCell = row.querySelector('td:first-child');
-                              if (wordCell && wordCell.textContent.trim() === item.word) {
-                                  const removeButton = row.querySelector('.remove-btn');
-                                  removeButton.textContent = '-';
-                              }
-                          });
-                      }
-                  }
-              });
-          }
-      } catch (e) {
-          console.error("Ошибка при загрузке данных из localStorage", e);
-      }
-  }
-
-  // Создаем панель для вывода данных
-  const panel = document.createElement('div');
-  panel.style.position = 'fixed';
-  panel.style.top = '20px';
-  panel.style.right = '20px';
-  panel.style.width = '300px';
-  panel.style.height = 'auto';
-  panel.style.backgroundColor = '#fff';
-  panel.style.border = '1px solid #ccc';
-  panel.style.padding = '10px';
-  panel.style.overflowY = 'auto';
-  panel.style.zIndex = '9999';
-  panel.innerHTML = `
-      <h3>Добавленные фразы</h3>
-      <table border="1" style="width: 100%; border-collapse: collapse;">
-          <thead>
-              <tr>
-                  <th>Фраза</th>
-                  <th>Частотность</th>
-                  <th>Действие</th>
-              </tr>
-          </thead>
-          <tbody id="added-words-table">
-              <!-- Тут будут отображаться добавленные слова -->
-          </tbody>
-      </table>
-      <div id="stats" style="margin-top: 10px;">
-          Добавлено фраз: 0, Общая частотность: 0
-      </div>
-  `;
-  document.body.appendChild(panel); // Добавляем панель на страницу
-
-  // Функция для обработки ссылок и добавления кнопок "+"
-  function addPlusButtonsToLinks() {
-      const links = document.querySelectorAll('.table__content-cell a');
-
-      links.forEach(link => {
-          if (link.hasAttribute('data-plus-button')) return;
-
-          const word = link.textContent.trim();
-          const parentCell = link.closest('td');
-          const frequencyCell = parentCell.nextElementSibling;
-          const frequency = frequencyCell ? frequencyCell.textContent.trim().replace(/\s+/g, '') : '';
-
-          if (addedWords[word]) {
-              return;
-          }
-
-          const plusButton = document.createElement('button');
-          plusButton.textContent = '+';
-          plusButton.style.marginRight = '10px';
-          plusButton.style.cursor = 'pointer';
-
-          plusButton.addEventListener('click', () => {
-              addToPanel(word, frequency);
-              plusButton.textContent = '-';
-              plusButton.removeEventListener('click', arguments.callee);
-              plusButton.addEventListener('click', () => {
-                  removeFromPanel(word, frequency);
-                  plusButton.textContent = '+';
-              });
-          });
-
-          parentCell.insertBefore(plusButton, link);
-          link.setAttribute('data-plus-button', 'true');
-      });
-  }
-
-  const observer = new MutationObserver(() => {
-      addPlusButtonsToLinks();
-  });
-
-  observer.observe(document.body, {
-      childList: true,
-      subtree: true
-  });
-
-  // Инициализация
-  window.onload = function() {
-      loadFromLocalStorage();
-      addPlusButtonsToLinks();
-  };
+  
+  const observer = new MutationObserver(() => addSearchButtons());
+  observer.observe(document.body, { childList: true, subtree: true });
+  
+  window.onload = function () { addSearchButtons(); };
 }
-
-
 
 
 
@@ -235,6 +140,9 @@ if (window.location.hostname === 'wordstat.yandex.ru') {
  * Смотрите Лицензию для конкретного языка, регулирующего разрешения и
  * ограничения, предусмотренные Лицензией.
  */
+
+
+
 function getMetricsData() {
   const metrics = {
     yandexMetrika: new Set(),
@@ -487,7 +395,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 
 // Проверяем сохраненное состояние при загрузке страницы
-chrome.storage.local.get(['cssEnabled'], function(result) {
+chrome.storage.local.get(['cssEnabled'], function (result) {
   const cssEnabled = result.cssEnabled !== undefined ? result.cssEnabled : true; // Восстанавливаем состояние из памяти
 
   // Если стили выключены, сразу отключаем их
@@ -535,7 +443,7 @@ function applyHighlight(type, isEnabled) {
     const noFollowElements = document.querySelectorAll('a[rel="nofollow"]');
     noFollowElements.forEach((el) => {
       if (isEnabled) {
-        el.style.backgroundColor = "rgba(255, 0, 0, 0.3)";
+        el.style.backgroundColor = "rgba(0, 0, 0, 0.3)";
         el.style.border = "2px solid black";
       } else {
         el.style.backgroundColor = "";
@@ -826,7 +734,7 @@ async function updateSiteInfo() {
 
       infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
 
-      
+
       // Сохраняем данные в кэш
       saveDomainToCache(domain, data);
     } else {
@@ -885,9 +793,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 // Добавление нумерации в поисковых выдачах Яндекс и Google
-$(function() {
+$(function () {
   // Проверяем состояние из chrome storage
-  chrome.storage.sync.get('numbersVisible', function(data) {
+  chrome.storage.sync.get('numbersVisible', function (data) {
     let isNumericEnabled = data.numbersVisible || false;
 
     // Если нумерация включена по умолчанию, сразу добавляем ее
@@ -896,7 +804,7 @@ $(function() {
     }
 
     // Слушаем сообщения от popup.js
-    chrome.runtime.onMessage.addListener(function(message) {
+    chrome.runtime.onMessage.addListener(function (message) {
       if (message.action === 'enableNumeric') {
         addNumericToSearchResults();
       } else if (message.action === 'disableNumeric') {
@@ -926,163 +834,163 @@ $(function() {
 
 var serp_tools = {};
 serp_tools.$number_tpl = $('<div class="matryoshka-tools-number"></div>')
-    .css({
-        'text-align': 'center',
-        'color': '#8e8e8e',
-        'font-size': '14px',
-        'margin-right': '20px',
-        position: 'absolute',
-        right: '100%'
-    });
+  .css({
+    'text-align': 'center',
+    'color': '#8e8e8e',
+    'font-size': '14px',
+    'margin-right': '20px',
+    position: 'absolute',
+    right: '100%'
+  });
 
 // получить объект с переменными для настройки SERP
-serp_tools.getParamsObject = function() {
-    var params = {};
+serp_tools.getParamsObject = function () {
+  var params = {};
 
-    params.matryoshka_tools_lang = serp_tools.getParam('matryoshka_tools_lang');
-    params.matryoshka_tools_region = serp_tools.getParam('matryoshka_tools_region');
-    params.matryoshka_tools_filter = serp_tools.getParam('matryoshka_tools_filter');
+  params.matryoshka_tools_lang = serp_tools.getParam('matryoshka_tools_lang');
+  params.matryoshka_tools_region = serp_tools.getParam('matryoshka_tools_region');
+  params.matryoshka_tools_filter = serp_tools.getParam('matryoshka_tools_filter');
 
-    return params;
+  return params;
 };
 
 // получить необходимые GET параметр
-serp_tools.getParam = function(name) {
-    var param = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
-    return param ? param[1] : '';
+serp_tools.getParam = function (name) {
+  var param = location.search.match(new RegExp('[?&]' + name + '=([^&]*)'));
+  return param ? param[1] : '';
 };
 
-serp_tools.cookie = function(name) {
-    var matches = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-    return matches ? decodeURIComponent(matches[1]) : '';
+serp_tools.cookie = function (name) {
+  var matches = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+  return matches ? decodeURIComponent(matches[1]) : '';
 };
 
-serp_tools.set_cookie = function(name, value) {
-    var domain = location.host.replace('www.', '');
-    document.cookie = name + '=' + value + '; domain=.' + domain + '; path=/; expires=Mon, 01-Jan-2038 00:00:00 GMT";';
+serp_tools.set_cookie = function (name, value) {
+  var domain = location.host.replace('www.', '');
+  document.cookie = name + '=' + value + '; domain=.' + domain + '; path=/; expires=Mon, 01-Jan-2038 00:00:00 GMT";';
 };
 
-serp_tools.yandex_numeric = function() {
-    var $number_tpl = serp_tools.$number_tpl.clone()
-        .css({
-            width: 16,
-            top: 26,
-            left: -44,
-        });
-
-    var page = location.href.match(/[&?]p=(\d+)/);
-    if (page) page = page[1] * 1;
-    if (isNaN(page)) page = 0;
-
-    var onpage = 10;
-    var numdoc = serp_tools.getParam('numdoc');
-    if (numdoc && !isNaN(page)) onpage = numdoc;
-
-    var isMobile = (navigator.userAgent.indexOf('iPad') != -1 || navigator.userAgent.indexOf('Mobile') != -1);
-    var $items = $('#search-result:not(.serp-block_type_news-rubrics, :not(:password):has(.serp-item__label)) .serp-item:not(.serp-adv__item, .t-construct-adapter__adv, [data-j6rd], [data-fast-wzrd], [data-fast-name], :not(:password):has(.serp-item__label.serp-item__label_before_yes), :not(:password):has(.serp-adv-item__label), :not(:password):has(.serp-adv__counter), :not(:password):has(.label_color_yellow.organic__label_align_left)) a.Link:not(.organic__url_type_multiline)')
-        .filter(':not([href^="http://yabs.yandex."])')
-        .filter(':not([href^="https://yabs.yandex"])')
-        .filter(':not([href^="//yabs.yandex"])')
-        .filter(':not([href^="//m.yabs.yandex"])')
-        .filter(':not([href^="http://market-click2.yandex."])')
-        .filter(':not([href^="https://market-click2.yandex"])')
-        .filter(':not([href^="//market-click2.yandex"])')
-        .filter(':not([href^="//m.market-click2.yandex"])')
-        .filter(function() {
-            var href = $(this)
-                .attr('href');
-            if (!href) return false;
-
-            return !$(this)
-                .attr('href')
-                .match(/(https?:)?\/\/(www\.)?(m\.)?yandex\.\w{2,}\/search\/ads\?/);
-        })
-        .filter(function() {
-            var isOk = $(this)
-                .is('.organic__link') || $(this)
-                .is('.link_cropped_no.organic__url.link_theme_normal') || $(this)
-                .is('.organic__url:not([data-event-required])') || $(this)
-                .is('.SocialSnippetHeader-Link');
-            if (isMobile && !isOk) isOk = $(this)
-                .is('.organic__url.link_theme_normal');
-
-            return isOk;
-        })
-        .filter(function() {
-            return !$(this)
-                .closest('[data-fast-name="entity_offers"]')
-                .length;
-        })
-        .parent()
-        .parent();
-
-    if ($items.length == 15) onpage = 15;
-    if ($items.length % 5 != 0) onpage = Math.round($items.length / 5) * 5;
-    var first_n = onpage * page + 1;
-    $('.matryoshka-tools-number', $items)
-        .remove();
-
-    var isMobileVersion = $('meta[name="apple-mobile-web-app-capable"]')
-        .length;
-    if (isMobileVersion) {
-        $number_tpl.css({
-            top: 48,
-            right: -36,
-            left: 'auto'
-        });
-    } else if (window.innerWidth <= 990) {
-        $number_tpl.css({
-            left: -36
-        });
-    }
-
-    $.map($items, function(el, index) {
-        var $el = $(el);
-        var $number = $number_tpl.clone()
-            .text(first_n + index);
-
-        if (isMobileVersion && index === 0 && $el.closest('.serp-item:first-of-type')
-            .length) {
-            $number.css({
-                top: 32
-            });
-        }
-        if (isMobileVersion && $el.is('.SocialSnippet')) {
-            $number.css({
-                right: -21
-            });
-        } else {
-            $el.css({
-                position: 'relative'
-            });
-        }
-        $el.append($number);
+serp_tools.yandex_numeric = function () {
+  var $number_tpl = serp_tools.$number_tpl.clone()
+    .css({
+      width: 15,
+      top: 3,
+      left: -50,
     });
+
+  var page = location.href.match(/[&?]p=(\d+)/);
+  if (page) page = page[1] * 1;
+  if (isNaN(page)) page = 0;
+
+  var onpage = 10;
+  var numdoc = serp_tools.getParam('numdoc');
+  if (numdoc && !isNaN(page)) onpage = numdoc;
+
+  var isMobile = (navigator.userAgent.indexOf('iPad') != -1 || navigator.userAgent.indexOf('Mobile') != -1);
+  var $items = $('#search-result:not(.serp-block_type_news-rubrics, :not(:password):has(.serp-item__label)) .serp-item:not(.serp-adv__item, .t-construct-adapter__adv, [data-j6rd], [data-fast-wzrd], [data-fast-name], :not(:password):has(.serp-item__label.serp-item__label_before_yes), :not(:password):has(.serp-adv-item__label), :not(:password):has(.serp-adv__counter), :not(:password):has(.label_color_yellow.organic__label_align_left)) a.Link:not(.organic__url_type_multiline)')
+    .filter(':not([href^="http://yabs.yandex."])')
+    .filter(':not([href^="https://yabs.yandex"])')
+    .filter(':not([href^="//yabs.yandex"])')
+    .filter(':not([href^="//m.yabs.yandex"])')
+    .filter(':not([href^="http://market-click2.yandex."])')
+    .filter(':not([href^="https://market-click2.yandex"])')
+    .filter(':not([href^="//market-click2.yandex"])')
+    .filter(':not([href^="//m.market-click2.yandex"])')
+    .filter(function () {
+      var href = $(this)
+        .attr('href');
+      if (!href) return false;
+
+      return !$(this)
+        .attr('href')
+        .match(/(https?:)?\/\/(www\.)?(m\.)?yandex\.\w{2,}\/search\/ads\?/);
+    })
+    .filter(function () {
+      var isOk = $(this)
+        .is('.organic__link') || $(this)
+          .is('.link_cropped_no.organic__url.link_theme_normal') || $(this)
+            .is('.organic__url:not([data-event-required])') || $(this)
+              .is('.SocialSnippetHeader-Link');
+      if (isMobile && !isOk) isOk = $(this)
+        .is('.organic__url.link_theme_normal');
+
+      return isOk;
+    })
+    .filter(function () {
+      return !$(this)
+        .closest('[data-fast-name="entity_offers"]')
+        .length;
+    })
+    .parent()
+    .parent();
+
+  if ($items.length == 15) onpage = 15;
+  if ($items.length % 5 != 0) onpage = Math.round($items.length / 5) * 5;
+  var first_n = onpage * page + 1;
+  $('.matryoshka-tools-number', $items)
+    .remove();
+
+  var isMobileVersion = $('meta[name="apple-mobile-web-app-capable"]')
+    .length;
+  if (isMobileVersion) {
+    $number_tpl.css({
+      top: 48,
+      right: -36,
+      left: 'auto'
+    });
+  } else if (window.innerWidth <= 990) {
+    $number_tpl.css({
+      left: -36
+    });
+  }
+
+  $.map($items, function (el, index) {
+    var $el = $(el);
+    var $number = $number_tpl.clone()
+      .text(first_n + index);
+
+    if (isMobileVersion && index === 0 && $el.closest('.serp-item:first-of-type')
+      .length) {
+      $number.css({
+        top: 32
+      });
+    }
+    if (isMobileVersion && $el.is('.SocialSnippet')) {
+      $number.css({
+        right: -21
+      });
+    } else {
+      $el.css({
+        position: 'relative'
+      });
+    }
+    $el.append($number);
+  });
 };
 
-serp_tools.google_numeric = function() {
-    var $number_tpl = serp_tools.$number_tpl.clone()
-        .css({
-            top: -2
-        });
-    var start = 0;
-    // Режим инкогнито (переход по страницам через ajax)
-    var href = $('#ab_ctls #ab_options .ab_dropdownitem')
-        .eq(0)
-        .children('a')
-        .attr('href');
-    if (!href) href = $('#gbw .gb_fb div.gb_uc > a.gb_b')
-        .eq(0)
-        .attr('href');
+serp_tools.google_numeric = function () {
+  var $number_tpl = serp_tools.$number_tpl.clone()
+    .css({
+      top: 5
+    });
+  var start = 0;
+  // Режим инкогнито (переход по страницам через ajax)
+  var href = $('#ab_ctls #ab_options .ab_dropdownitem')
+    .eq(0)
+    .children('a')
+    .attr('href');
+  if (!href) href = $('#gbw .gb_fb div.gb_uc > a.gb_b')
+    .eq(0)
+    .attr('href');
 
-    if (href) start = href.match(/%26start%3D(\d+)%26/);
-    if (!href) start = location.href.match(/[&?]start=(\d+)/)
+  if (href) start = href.match(/%26start%3D(\d+)%26/);
+  if (!href) start = location.href.match(/[&?]start=(\d+)/)
 
-    if (start)
-        start = start[1] * 1;
-    if (isNaN(start))
-        start = 0;
-    var $items = $(`
+  if (start)
+    start = start[1] * 1;
+  if (isNaN(start))
+    start = 0;
+  var $items = $(`
         #search ._NId > .srg > .g,
         #search ._NId > .g,
         #rso > .srg > div,
@@ -1112,89 +1020,141 @@ serp_tools.google_numeric = function() {
         div[data-hveid$="AA"] div.rULfzc,
         div[data-hveid$="AA"][jsname] div.T61Aje
     `)
-        .filter(':not(.obcontainer)')
-        .filter(':not(.vdQmEd)') 
-        .filter(':not(:has(.eMXfhf))')
-        .filter(':not(.no-sep):not(#imagebox_bigimages)')
-        .filter(':not(.kno-kp)')
-        .filter(':not(.rg-header):not(.card-section)')
-        .filter(':not(:password):not(:has(.kno-ftr:contains(\'support.google.com/websearch?p%3Dfeatured_snippets\')))')
-        .filter(':not(:password):not(:has([aria-level="2"][role="heading"])), :has([id^="evlb_"])')
-        .filter(':not(:password):not(div[data-sokoban-container]:has(div[data-sokoban-container]))');
+    .filter(':not(.obcontainer)')
+    .filter(':not(.vdQmEd)')
+    .filter(':not(:has(.eMXfhf))')
+    .filter(':not(.no-sep):not(#imagebox_bigimages)')
+    .filter(':not(.kno-kp)')
+    .filter(':not(.rg-header):not(.card-section)')
+    .filter(':not(:password):not(:has(.kno-ftr:contains(\'support.google.com/websearch?p%3Dfeatured_snippets\')))')
+    .filter(':not(:password):not(:has([aria-level="2"][role="heading"])), :has([id^="evlb_"])')
+    .filter(':not(:password):not(div[data-sokoban-container]:has(div[data-sokoban-container]))');
 
-    $('.matryoshka-tools-number')
-        .remove();
+  $('.matryoshka-tools-number')
+    .remove();
 
-    var isMobileVersion = !!$('meta[name="viewport"][content*="width=device-width"]')
-        .length;
+  var isMobileVersion = !!$('meta[name="viewport"][content*="width=device-width"]')
+    .length;
 
-    if (isMobileVersion) $number_tpl.css({
-        top: 7,
-        right: 0
-    });
+  if (isMobileVersion) $number_tpl.css({
+    top: 7,
+    right: 0
+  });
 
-    var $itemsNew = [];
-    $.map($items, function(el) {
-        if ($(el)
-            .is('.ezO2md') && !$('> div > div > a', el)
-            .length) return;
-
-      
-        if (!$('a:not([href="#"])', el)
-            .length) return;
+  var $itemsNew = [];
+  $.map($items, function (el) {
+    if ($(el)
+      .is('.ezO2md') && !$('> div > div > a', el)
+        .length) return;
 
 
-        if ($(el)
-            .parent()
-            .is('div[data-hveid$="AA"]')) el = $(el)
-            .parent();
+    if (!$('a:not([href="#"])', el)
+      .length) return;
 
-        var $g = $('.g', $(el));
-        if ($g.length) {
-            $.map($g, function(subEl) {
-                $itemsNew.push($(subEl));
-            });
-        } else {
-            $itemsNew.push($(el));
-        }
-    });
 
-    var index = start + 1;
-    $.map($itemsNew, function(el) {
-        if ($('.matryoshka-tools-number', el)
-            .length) return;
+    if ($(el)
+      .parent()
+      .is('div[data-hveid$="AA"]')) el = $(el)
+        .parent();
 
-        var $number = $number_tpl.clone()
-            .text(index);
+    var $g = $('.g', $(el));
+    if ($g.length) {
+      $.map($g, function (subEl) {
+        $itemsNew.push($(subEl));
+      });
+    } else {
+      $itemsNew.push($(el));
+    }
+  });
 
-        if (isMobileVersion && $(el)
-            .hasClass('card-section')) {
-            $number.css({
-                top: -8
-            });
-        }
+  var index = start + 1;
+  $.map($itemsNew, function (el) {
+    if ($('.matryoshka-tools-number', el)
+      .length) return;
 
-        $(el)
-            .css({
-                position: 'relative'
-            })
-            .append($number);
-        index++;
-    });
+    var $number = $number_tpl.clone()
+      .text(index);
+
+    if (isMobileVersion && $(el)
+      .hasClass('card-section')) {
+      $number.css({
+        top: -8
+      });
+    }
+
+    $(el)
+      .css({
+        position: 'relative'
+      })
+      .append($number);
+    index++;
+  });
 };
 
 window.addEventListener("load", () => {
   const timing = performance.timing;
-  
+
   // Рассчитываем время загрузки страницы
   const loadTime = timing.domContentLoadedEventEnd - timing.navigationStart;
-  
+
   // Конвертируем миллисекунды в секунды и округляем
   const loadTimeSeconds = (loadTime / 1000).toFixed(1);
-  
+
   // Отправляем сообщение через background.js
   chrome.runtime.sendMessage({
-      type: "SET_PAGE_LOAD_TIME",
-      loadTime: loadTimeSeconds,
+    type: "SET_PAGE_LOAD_TIME",
+    loadTime: loadTimeSeconds,
   });
+});
+
+
+(function() {
+  chrome.storage.local.get(["altImgToggle"], function (data) {
+      const showAlt = data.altImgToggle || false;
+      toggleImages(showAlt);
   });
+
+  // Следим за изменениями в хранилище, чтобы включать ALT при клике из popup.js
+  chrome.storage.onChanged.addListener(function(changes, namespace) {
+      if (changes.altImgToggle) {
+          toggleImages(changes.altImgToggle.newValue);
+      }
+  });
+
+  function toggleImages(showAlt) {
+      document.querySelectorAll("img").forEach(img => {
+          if (showAlt) {
+              if (!img.dataset.originalSrc) {
+                  img.dataset.originalSrc = img.src;
+              }
+              if (!img.dataset.altElement) {
+                  const altText = img.alt || "Нет alt";
+                  const altElement = document.createElement("span");
+                  altElement.textContent = altText;
+                  altElement.style.cssText = `
+                      display: inline-block;
+                      width: ${img.width}px;
+                      height: ${img.height}px;
+                      background: gray;
+                      color: #000;
+                      text-align: center;
+                      vertical-align: middle;
+                      line-height: ${img.height}px;
+                      font-size: 14px;
+                      font-weight: bold;
+                      overflow: hidden;
+                  `;
+                  img.style.display = "none";
+                  img.after(altElement);
+                  img.dataset.altElement = "true";
+              }
+          } else {
+              if (img.dataset.altElement) {
+                  img.nextElementSibling?.remove();
+                  img.style.display = "inline";
+                  delete img.dataset.altElement;
+              }
+          }
+      });
+  }
+})();

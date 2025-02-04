@@ -111,18 +111,25 @@ function updateButtonState(isEnabled) {
 }
 
 });
-
 let noIndexActive = false;
 let noFollowActive = false;
 
 // Загружаем сохраненные значения при старте
-chrome.storage.local.get(['noIndexActive', 'noFollowActive'], function (result) {
-  noIndexActive = result.noIndexActive || false;
+chrome.storage.local.get(['noFollowActive', 'noIndexActive'], function(result) {
+  // Загружаем состояние для обеих кнопок
   noFollowActive = result.noFollowActive || false;
+  noIndexActive = result.noIndexActive || false;
 
-  // Обновляем состояние кнопок
+  // Обновляем текст кнопки для nofollow в зависимости от состояния
+  const noFollowButton = document.getElementById("highlight-nofollow");
+  if (noFollowActive) {
+    noFollowButton.innerHTML = "Выключить подсветку nofollow";  // Текст для включенного состояния
+  } else {
+    noFollowButton.innerHTML = "Включить подсветку nofollow";  // Текст для выключенного состояния
+  }
+
+  // Обновляем состояние кнопки для noIndex
   updateButtonState("highlight-noindex", noIndexActive);
-  updateButtonState("highlight-nofollow", noFollowActive);
 });
 
 // Обработчик для кнопки подсветки noindex
@@ -143,12 +150,22 @@ document.getElementById("highlight-noindex").addEventListener("click", () => {
 
 // Обработчик для кнопки подсветки nofollow
 document.getElementById("highlight-nofollow").addEventListener("click", () => {
+  // Переключаем состояние noFollowActive
   noFollowActive = !noFollowActive;
-  updateButtonState("highlight-nofollow", noFollowActive);
+
+  // Обновляем текст кнопки сразу после переключения состояния
+  const noFollowButton = document.getElementById("highlight-nofollow");
+  if (noFollowActive) {
+    noFollowButton.innerHTML = "Выключить подсветку nofollow";  // Текст для включенного состояния
+  } else {
+    noFollowButton.innerHTML = "Включить подсветку nofollow";  // Текст для выключенного состояния
+  }
+
+  // Сразу обновляем состояние в локальном хранилище
   chrome.storage.local.set({ noFollowActive });
 
   // Применяем изменения на текущей вкладке
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
     chrome.tabs.sendMessage(tabs[0].id, {
       type: "updateHighlight",
       highlightType: "nofollow",
@@ -172,8 +189,6 @@ function updateButtonState(buttonId, isActive) {
     icon.classList.add("fa-toggle-off");
   }
 }
-
-
 
 
 // Функция для обновления длины и окрашивания текста
@@ -2281,12 +2296,12 @@ document.addEventListener('DOMContentLoaded', function () {
                       }
 
                       // Обновляем DOM с результатом
-                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = `${icon} <span style="color: gray;">${statusText}</span>`;
+                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = `${icon} <span>${statusText}</span>`;
                       document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
                       document.getElementById('meta-x-Robots-Tag-result').classList.add(statusClass);
                   } else {
                       // Если заголовок не найден, считаем, что все в порядке
-                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span style="color: gray;">Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
+                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
                       document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
                       document.getElementById('meta-x-Robots-Tag-result').classList.add('success');
                   }
@@ -3205,66 +3220,24 @@ document.addEventListener("DOMContentLoaded", () => {
     marketingBlocks[currentIndex].classList.add('active');
   }, 5000); // 5000 миллисекунд = 5 секунд
 
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    const button = document.getElementById("check-altimg");
 
+    chrome.storage.local.get(["altImgToggle"], function (data) {
+        const showAlt = data.altImgToggle || false;
+        updateButtonText(showAlt);
+    });
 
+    button.addEventListener("click", function () {
+        chrome.storage.local.get(["altImgToggle"], function (data) {
+            const newState = !data.altImgToggle;
+            chrome.storage.local.set({ altImgToggle: newState });
+            updateButtonText(newState);
+        });
+    });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  // Файл: popup.js
-
-document.addEventListener("DOMContentLoaded", function () {
-  const toggleButton = document.getElementById("toggle-wordstat");
-
-  // Проверяем сохраненное состояние
-  chrome.storage.local.get(["wordstatPanel"], function (result) {
-      const isEnabled = result.wordstatPanel !== false;
-      updateButtonState(isEnabled);
-  });
-
-  toggleButton.addEventListener("click", function () {
-      chrome.storage.local.get(["wordstatPanel"], function (result) {
-          const newState = !result.wordstatPanel;
-          chrome.storage.local.set({ "wordstatPanel": newState });
-
-          updateButtonState(newState);
-
-          chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-              if (tabs[0] && tabs[0].url.includes("wordstat.yandex.ru")) {
-                  chrome.scripting.executeScript({
-                      target: { tabId: tabs[0].id },
-                      func: togglePanelInjected,
-                      args: [newState]
-                  });
-              }
-          });
-      });
-  });
+    function updateButtonText(showAlt) {
+        button.textContent = showAlt ? "Не показывать alt" : "Показать alt";
+    }
 });
-
-function updateButtonState(isEnabled) {
-  const toggleButton = document.getElementById("toggle-wordstat");
-  toggleButton.innerHTML = isEnabled
-      ? '<i class="fa fa-toggle-on" aria-hidden="true"></i>'
-      : '<i class="fa fa-toggle-off" aria-hidden="true"></i>';
-}
-
-// Эта функция будет передаваться в `executeScript`
-function togglePanelInjected(state) {
-  let panel = document.getElementById("wordstat-helper");
-  if (panel) {
-      panel.style.display = state ? "block" : "none";
-  }
-}
