@@ -2328,7 +2328,7 @@ document.addEventListener('DOMContentLoaded', function () {
                               }
                           }
                       } else {
-                          statusText = 'Заголовок X-Robots-Tag не содержит запрещающих директив (Индексация разрешена: index)';
+                          statusText = 'Заголовок X-Robots-Tag не содержит запрещающих директив (Индексация разрешена)';
                           icon = '<span class="fas fa-check-circle" style="color: green;"></span>';
                       }
 
