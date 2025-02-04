@@ -2338,7 +2338,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       resultElement.classList.add(statusClass);
                   } else {
                       // Если заголовок не найден, считаем, что индексация разрешена
-                      resultElement.innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена: index)</span>';
+                      resultElement.innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
                       resultElement.classList.remove('loading');
                       resultElement.classList.add('success');
                   }
