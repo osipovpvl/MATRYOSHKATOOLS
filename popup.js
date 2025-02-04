@@ -2244,7 +2244,6 @@ async function checkSitemap(tabUrl, container) {
   // Обновляем контейнер с результатами
   container.innerHTML = resultHtml;
 }
-
 document.addEventListener('DOMContentLoaded', function () {
   // Функция для проверки HTTP-заголовков
   function checkRobotsTag() {
@@ -2309,6 +2308,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                   if (botDirectives[bot].includes('noindex') || botDirectives[bot].includes('none')) {
                                       botStatus = 'Индексация запрещена';
                                       botIcon = '<span class="fa fa-times-circle" style="color: red;"></span>';
+                                      botDirectivesText = botDirectives[bot].includes('noindex') ? 'Индексация запрещена: noindex' : '';
                                   } else if (botDirectives[bot].includes('all')) {
                                       botStatus = 'Индексация разрешена: index';
                                       botIcon = '<span class="fas fa-check-circle" style="color: green;"></span>';
@@ -2317,7 +2317,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                       botIcon = '<span class="fa fa-exclamation-circle" style="color: orange;"></span>';
                                   }
 
-                                  // Собираем директивы
+                                  // Собираем другие директивы
                                   const otherDirectives = botDirectives[bot].filter(d => d !== 'noindex' && d !== 'none' && d !== 'all');
                                   if (otherDirectives.length > 0) {
                                       botDirectivesText = `: ${otherDirectives.join(', ')}`;
