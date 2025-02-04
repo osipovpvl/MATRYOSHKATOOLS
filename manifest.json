@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "MATRYOSHKA TOOLS",
   "description": "Полезные инструменты и сервисы для анализа и оптимизации сайта.",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "permissions": ["activeTab", "tabs", "contentSettings", "scripting", "storage"],
   "background": {
     "service_worker": "background.js"
