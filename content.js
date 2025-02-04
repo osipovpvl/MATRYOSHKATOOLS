@@ -17,7 +17,6 @@
 
 if (window.location.hostname === 'wordstat.yandex.ru') {
   //Панель Вордстат 
-  
   function addSearchButtons() {
     chrome.storage.local.get(["wordstatPanel"], function (result) {
       const isEnabled = result.wordstatPanel !== false;
@@ -58,7 +57,11 @@ if (window.location.hostname === 'wordstat.yandex.ru') {
         } else if (type === "minus") {
           searchInput.value = words.map(word => word.startsWith('-') ? word : `-${word}`).join(' ');
         } else if (type === "clear") {
-          searchInput.value = searchInput.value.replace(/["\[\]()|!\-]/g, '').replace(/\s+/g, ' ').trim();
+          searchInput.value = searchInput.value
+            .replace(/["\[\]()!\-]/g, '')
+            .replace(/\|/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
         } else {
           const n = searchInput.value.replace(/-\[.*\]\s?/gi, "")
             .replace(/["\[\]']/gi, "")
@@ -122,6 +125,7 @@ if (window.location.hostname === 'wordstat.yandex.ru') {
   observer.observe(document.body, { childList: true, subtree: true });
   
   window.onload = function () { addSearchButtons(); };
+  
 }
 
 
