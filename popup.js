@@ -2033,14 +2033,17 @@ function checkMetaRobots(doc, container) {
           message = `Индексация разрешена: ${content}`;
       } else {
           statusIcon = '<span class="fas fa-exclamation-circle" style="color: orange;"></span>';
-          message = `Индексация разрешена, найдены нестандартные значения: ${content}`;
+          message = `Индексация разрешена, но с ограничениями: ${content}`;
       }
       
       results.push(`<div>${statusIcon} ${name}: ${message}</div>`);
   });
   
   if (results.length > 0) {
-      container.innerHTML = results.join('');
+      container.innerHTML = `
+          Обнаружены метатеги Meta Robots:<br><br>
+          ${results.join('')}
+      `;
   } else {
       container.innerHTML = `
           <span class="fas fa-check-circle" style="color:green;"></span>
@@ -2048,6 +2051,7 @@ function checkMetaRobots(doc, container) {
       `;
   }
 }
+
 
 // Проверка robots.txt
 async function checkRobotsTxt(tabUrl, container) {
