@@ -2014,30 +2014,36 @@ function checkCanonical(doc, currentUrl, container) {
 
 // Проверка Meta Robots
 function checkMetaRobots(doc, container) {
-  const metaElement = doc.querySelector('meta[name="robots"]');
-
-  if (metaElement) {
-      const content = metaElement.content.toLowerCase(); // Приводим содержимое к нижнему регистру для удобства проверки
-
-      if (content.includes("noindex")) {
-          container.innerHTML = `
-              <span class="fa fa-times-circle" style="color:red;"></span>
-              Индексация страницы запрещена: ${content}
-          `;
-      } else if (content.includes("index") || content.includes("follow")) {
-          container.innerHTML = `
-              <span class="fas fa-check-circle" style="color: green;"></span>
-              Индексация страницы разрешена: ${content}
-          `;
+  const metaElements = doc.querySelectorAll('meta[name]');
+  const allowedNames = ["robots", "yandex", "googlebot"];
+  const results = [];
+  
+  metaElements.forEach(meta => {
+      const name = meta.getAttribute('name').toLowerCase();
+      if (!allowedNames.includes(name)) return;
+      
+      const content = meta.getAttribute('content').toLowerCase();
+      let statusIcon, message;
+      
+      if (content.includes("noindex") || content.includes("none")) {
+          statusIcon = '<span class="fa fa-times-circle" style="color:red;"></span>';
+          message = `Индексация запрещена: ${content}`;
+      } else if (content.includes("all") || content.includes("index")) {
+          statusIcon = '<span class="fas fa-check-circle" style="color:green;"></span>';
+          message = `Индексация разрешена: ${content}`;
       } else {
-          container.innerHTML = `
-              <span class="fas fa-exclamation-circle" style="color: orange;"></span>
-              Индексация разрешена, но Meta Robots содержит нестандартные значения: ${content}
-          `;
+          statusIcon = '<span class="fas fa-exclamation-circle" style="color: orange;"></span>';
+          message = `Индексация разрешена, найдены нестандартные значения: ${content}`;
       }
+      
+      results.push(`<div>${statusIcon} ${name}: ${message}</div>`);
+  });
+  
+  if (results.length > 0) {
+      container.innerHTML = results.join('');
   } else {
       container.innerHTML = `
-          <span class="fas fa-check-circle" style="color: green;"></span>
+          <span class="fas fa-check-circle" style="color:green;"></span>
           Meta Robots не указан (Индексация разрешена)
       `;
   }
@@ -2239,7 +2245,6 @@ async function checkSitemap(tabUrl, container) {
   container.innerHTML = resultHtml;
 }
 
-
 document.addEventListener('DOMContentLoaded', function () {
   // Функция для проверки HTTP-заголовков
   function checkRobotsTag() {
@@ -2248,69 +2253,100 @@ document.addEventListener('DOMContentLoaded', function () {
           const url = tab.url;
 
           // Меняем статус на "Загрузка"
-          document.getElementById('meta-x-Robots-Tag-result').classList.add('loading');
-          document.getElementById('meta-x-Robots-Tag-result').textContent = 'Загрузка...';
+          const resultElement = document.getElementById('meta-x-Robots-Tag-result');
+          resultElement.classList.add('loading');
+          resultElement.textContent = 'Загрузка...';
 
           fetch(url)
               .then(response => {
-                  // Получаем заголовки X-Robots-Tag
-                  const xRobotsTag = response.headers.get('X-Robots-Tag');
-                  if (xRobotsTag) {
-                      // Ищем директивы
-                      const directives = ['noindex', 'nofollow', 'none', 'noarchive'];
-                      let found = false;
-                      let statusText = '';
-                      let statusClass = '';
-                      let icon = '';
+                  // Получаем все заголовки X-Robots-Tag
+                  const xRobotsTags = response.headers.get('X-Robots-Tag');
 
-                      directives.forEach(directive => {
-                          if (xRobotsTag.toLowerCase().includes(directive)) {
-                              found = true;
-                              statusText = `Обнаружен заголовок X-Robots-Tag с директивой: ${directive}.`;
-                              icon = '<span class="fa fa-times-circle" style="color: red;"></span>';  // Красный крестик
-                              statusClass = 'error';
-                              // Объяснение каждой директивы
-                              let explanation = '';
-                              switch (directive) {
-                                  case 'noindex':
-                                      explanation = 'Этот сайт не должен индексироваться в поисковых системах';
-                                      break;
-                                  case 'nofollow':
-                                      explanation = 'Ссылки на этом сайте не должны быть проиндексированы';
-                                      break;
-                                  case 'none':
-                                      explanation = 'Этот сайт не должен индексироваться и не следует следовать за ссылками';
-                                      break;
-                                  case 'noarchive':
-                                      explanation = 'Поисковая система не должна сохранять кэш этого сайта';
-                                      break;
-                              }
-                              statusText += '\n' + explanation;
+                  if (xRobotsTags) {
+                      const directives = ['noindex', 'nofollow', 'none', 'noarchive', 'nosnippet', 'noodp', 'notranslate', 'noimageindex', 'unavailable_after'];
+                      let statusText = '';
+                      let statusClass = 'success';
+                      let icon = '<span class="fas fa-check-circle" style="color: green;"></span>';
+
+                      const botDirectives = {};
+                      xRobotsTags.split(',').forEach(tag => {
+                          tag = tag.trim();
+                          const parts = tag.split(':');
+                          if (parts.length === 2) {
+                              const botName = parts[0].trim().toLowerCase();
+                              const directive = parts[1].trim().toLowerCase();
+                              botDirectives[botName] = botDirectives[botName] || [];
+                              botDirectives[botName].push(directive);
+                          } else {
+                              directives.forEach(directive => {
+                                  if (tag.toLowerCase().includes(directive)) {
+                                      botDirectives['all'] = botDirectives['all'] || [];
+                                      botDirectives['all'].push(directive);
+                                  }
+                              });
                           }
                       });
 
-                      if (!found) {
-                          statusText = 'Заголовок X-Robots-Tag не содержит нежелательных директив (Индексация разрешена)';
-                          icon = '<span class="fas fa-check-circle" style="color: green;"></span>';  // Зеленая галочка
-                          statusClass = 'success';
+                      if (Object.keys(botDirectives).length > 0) {
+                          statusText = 'Обнаружены заголовки X-Robots-Tag:<br>'; // без символа перед этим текстом
+                          statusClass = 'error';
+                          icon = ''; // Убираем символ перед текстом
+
+                          // Проходим по каждому роботу
+                          for (const bot in botDirectives) {
+                              let botStatus = '';
+                              let botIcon = '';
+                              let botDirectivesText = '';
+
+                              // Если это директива для всех
+                              if (bot === 'all') {
+                                  botStatus = 'Индексация разрешена, но с ограничениями';
+                                  botIcon = '<span class="fa fa-exclamation-circle" style="color: orange;"></span>';
+                                  botDirectivesText = `: ${botDirectives['all'].join(', ')}`;
+                                  statusText += `<br>${botIcon} <b>All:</b> ${botStatus}${botDirectivesText}`;
+                              } else {
+                                  // Проверка на статус индексации для конкретного бота
+                                  if (botDirectives[bot].includes('noindex') || botDirectives[bot].includes('none')) {
+                                      botStatus = 'Индексация запрещена';
+                                      botIcon = '<span class="fa fa-times-circle" style="color: red;"></span>';
+                                  } else if (botDirectives[bot].includes('all')) {
+                                      botStatus = 'Индексация разрешена: index';
+                                      botIcon = '<span class="fas fa-check-circle" style="color: green;"></span>';
+                                  } else {
+                                      botStatus = 'Индексация разрешена, но с ограничениями';
+                                      botIcon = '<span class="fa fa-exclamation-circle" style="color: orange;"></span>';
+                                  }
+
+                                  // Собираем директивы
+                                  const otherDirectives = botDirectives[bot].filter(d => d !== 'noindex' && d !== 'none' && d !== 'all');
+                                  if (otherDirectives.length > 0) {
+                                      botDirectivesText = `: ${otherDirectives.join(', ')}`;
+                                  }
+
+                                  // Добавляем информацию о роботе и его статусе индексации
+                                  statusText += `<br>${botIcon} <b>${bot.charAt(0).toUpperCase() + bot.slice(1)}:</b> ${botStatus}${botDirectivesText}`;
+                              }
+                          }
+                      } else {
+                          statusText = 'Заголовок X-Robots-Tag не содержит запрещающих директив (Индексация разрешена: index)';
+                          icon = '<span class="fas fa-check-circle" style="color: green;"></span>';
                       }
 
                       // Обновляем DOM с результатом
-                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = `${icon} <span>${statusText}</span>`;
-                      document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
-                      document.getElementById('meta-x-Robots-Tag-result').classList.add(statusClass);
+                      resultElement.innerHTML = `${icon} <span>${statusText}</span>`;
+                      resultElement.classList.remove('loading');
+                      resultElement.classList.add(statusClass);
                   } else {
-                      // Если заголовок не найден, считаем, что все в порядке
-                      document.getElementById('meta-x-Robots-Tag-result').innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
-                      document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
-                      document.getElementById('meta-x-Robots-Tag-result').classList.add('success');
+                      // Если заголовок не найден, считаем, что индексация разрешена
+                      resultElement.innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена: index)</span>';
+                      resultElement.classList.remove('loading');
+                      resultElement.classList.add('success');
                   }
               })
               .catch(error => {
-                  //console.error('Ошибка при получении заголовков:', error);
-                  document.getElementById('meta-x-Robots-Tag-result').textContent = 'Ошибка при запросе сайта';
-                  document.getElementById('meta-x-Robots-Tag-result').classList.remove('loading');
-                  document.getElementById('meta-x-Robots-Tag-result').classList.add('error');
+                  resultElement.textContent = 'Ошибка при запросе сайта';
+                  resultElement.classList.remove('loading');
+                  resultElement.classList.add('error');
               });
       });
   }
@@ -2318,8 +2354,6 @@ document.addEventListener('DOMContentLoaded', function () {
   // Запуск проверки при загрузке popup
   checkRobotsTag();
 });
-
-
 
 
 // Функция для обновления URL и количества символов
