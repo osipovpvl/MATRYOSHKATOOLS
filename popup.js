@@ -2125,21 +2125,26 @@ async function checkRobotsTxt(tabUrl, container) {
       };
 
       const isPathAllowed = (rules, path) => {
-          let allowed = true;
-          let ruleMatched = null;
-
-          rules.forEach(({ type, path: rulePath, original }) => {
-              if (type === "Disallow" && rulePath === "") {
-                  return;
-              }
-              if (checkPathAgainstRobotsRegex(rulePath, path)) {
-                  allowed = type === "Allow";
-                  ruleMatched = original;
-              }
-          });
-
-          return { allowed, ruleMatched };
-      };
+        let allowed = true;
+        let ruleMatched = null;
+    
+        rules.forEach(({ type, path: rulePath, original }) => {
+            if (type === "Disallow" && rulePath === "") return;
+    
+            if (checkPathAgainstRobotsRegex(rulePath, path)) {
+                if (type === "Allow") {
+                    allowed = true; // Allow имеет приоритет
+                    ruleMatched = original;
+                } else if (type === "Disallow" && ruleMatched === null) {
+                    allowed = false; // Disallow срабатывает, если нет Allow
+                    ruleMatched = original;
+                }
+            }
+        });
+    
+        return { allowed, ruleMatched };
+    };
+    
 
       let htmlContent = `<p>Файл Robots.txt: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p>`;
       htmlContent += "<p>Список User-Agent и их статус:</p>";
