@@ -146,7 +146,6 @@ if (window.location.hostname === 'wordstat.yandex.ru') {
  */
 
 
-
 function getMetricsData() {
   const metrics = {
     yandexMetrika: new Set(),
@@ -180,8 +179,15 @@ function getMetricsData() {
       const matchMetrika2 = innerContent.match(/'id'\s*:\s*(\d+)/);
       if (matchMetrika2) {
         const metrikaId = matchMetrika2[1];
-        //console.log(`Найден счетчик Ya.Metrika2 с ID: ${metrikaId}`);
-        metrics.yandexMetrika.add(metrikaId);  // Добавляем ID в коллекцию
+        metrics.yandexMetrika.add(metrikaId);
+      }
+    }
+
+    // Новый вариант объявления Ya.Metrika2 (если создаётся через объект)
+    if (innerContent.includes("Ya.Metrika2") || innerContent.includes("window.yandex.metrika")) {
+      const matchMetrika2 = innerContent.match(/id\s*:\s*(\d+)/);
+      if (matchMetrika2) {
+        metrics.yandexMetrika.add(matchMetrika2[1]);
       }
     }
 
@@ -204,15 +210,31 @@ function getMetricsData() {
     if (innerContent.includes("counter.yadro.ru/hit")) {
       metrics.liveInternet.add("Найден счетчик в содержимом script");
     }
-
     if (src.includes("counter.yadro.ru/logo") || innerContent.includes("liveinternet.ru/click")) {
       metrics.liveInternet.add("Найдено изображение или ссылка счетчика");
     }
-
     if (innerContent.includes("counter.yadro.ru/hit") && innerContent.includes("amp-analytics")) {
       metrics.liveInternet.add("Найден счетчик в AMP аналитике");
     }
   });
+
+  // Проверяем динамически загруженные счетчики в window
+  for (const key in window) {
+    if (/yaCounter\d+/.test(key)) {
+      const match = key.match(/yaCounter(\d+)/);
+      if (match) {
+        metrics.yandexMetrika.add(match[1]);
+      }
+    }
+  }
+
+  // Новый способ - проверяем window.yandex.metrika
+  if (window.yandex && window.yandex.metrika && typeof window.yandex.metrika.reachGoal === "function") {
+    const metrikaId = window.yandex.metrika.id;
+    if (metrikaId) {
+      metrics.yandexMetrika.add(metrikaId);
+    }
+  }
 
   // Проверка переменной window.mainMetrikaId
   if (window.mainMetrikaId) {
@@ -237,13 +259,12 @@ function observeDOM() {
   observer.observe(document, { childList: true, subtree: true });
 }
 
-// Обертка для yandex_metrika_callbacks
+// Обертка для yandex_metrika_callbacks2
 function wrapYandexMetrikaCallbacks() {
-  if (!window.yandex_metrika_callbacks) return;
+  if (!window.yandex_metrika_callbacks2) return;
 
-  const originalPush = window.yandex_metrika_callbacks.push;
-  window.yandex_metrika_callbacks.push = function (callback) {
-    //console.log("Яндекс Метрика callback добавлен");
+  const originalPush = window.yandex_metrika_callbacks2.push;
+  window.yandex_metrika_callbacks2.push = function (callback) {
     originalPush.call(this, callback);
 
     setTimeout(() => {
@@ -259,11 +280,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     const metricsData = getMetricsData();
     sendResponse(metricsData);
 
-    // Начинаем отслеживать изменения DOM и перехватываем yandex_metrika_callbacks
+    // Начинаем отслеживать изменения DOM и перехватываем yandex_metrika_callbacks2
     observeDOM();
     wrapYandexMetrikaCallbacks();
   }
 });
+
 
 function getImageSize(url) {
   return new Promise((resolve, reject) => {
