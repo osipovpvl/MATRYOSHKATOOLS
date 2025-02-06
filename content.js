@@ -744,7 +744,7 @@ async function updateSiteInfo() {
     if (domainCache[domain]) {
       const cachedData = domainCache[domain];
       const trustColor = getTrustColor(cachedData.trust);
-      const spamValue = cachedData.spam > 100 ? "N/A" : cachedData.spam;
+      const spamValue = cachedData.spam > 100 ? "100" : cachedData.spam;
       const spamColor = cachedData.spam > 100 ? "red" : getSpamColor(cachedData.spam);
 
       infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${cachedData.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
@@ -755,7 +755,7 @@ async function updateSiteInfo() {
     const data = await fetchDomainData(domain);
     if (data) {
       const trustColor = getTrustColor(data.trust);
-      const spamValue = data.spam > 100 ? "N/A" : data.spam;
+      const spamValue = data.spam > 100 ? "100" : data.spam;
       const spamColor = data.spam > 100 ? "red" : getSpamColor(data.spam);
 
       infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
