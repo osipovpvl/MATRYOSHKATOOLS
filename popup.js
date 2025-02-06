@@ -1472,7 +1472,7 @@ return cmsInfo;
 // Выполняем функцию поиска CMS, когда попап загружается
 document.addEventListener('DOMContentLoaded', function () {
 // Сначала показываем "Загрузка..."
-document.getElementById('cms-data').textContent = 'Загрузка...';
+document.getElementById('cms-data').innerHTML = '<img width="14px" src="img/loading.gif" alt="Загрузка"/>';
 
 // После выполнения поиска CMS обновляем текст
 chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
@@ -2263,7 +2263,7 @@ document.addEventListener('DOMContentLoaded', function () {
           // Меняем статус на "Загрузка"
           const resultElement = document.getElementById('meta-x-Robots-Tag-result');
           resultElement.classList.add('loading');
-          resultElement.textContent = 'Загрузка...';
+          resultElement.innerHTML = '<img width="14px" src="img/loading.gif" alt="Загрузка"/>';
 
           fetch(url)
               .then(response => {

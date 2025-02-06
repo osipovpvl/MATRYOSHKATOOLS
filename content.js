@@ -747,7 +747,7 @@ async function updateSiteInfo() {
       const spamValue = cachedData.spam > 100 ? "100" : cachedData.spam;
       const spamColor = cachedData.spam > 100 ? "red" : getSpamColor(cachedData.spam);
 
-      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${cachedData.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
+      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${cachedData.trust}</span><br> Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
       return;
     }
 
@@ -758,7 +758,7 @@ async function updateSiteInfo() {
       const spamValue = data.spam > 100 ? "100" : data.spam;
       const spamColor = data.spam > 100 ? "red" : getSpamColor(data.spam);
 
-      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span>, Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
+      infoSpan.innerHTML = `Траст: <span style="color: ${trustColor};">${data.trust}</span><br> Спам: <span style="color: ${spamColor};">${spamValue}</span>`;
 
 
       // Сохраняем данные в кэш
