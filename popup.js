@@ -3221,10 +3221,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof count === 'string' && count.includes("Капча")) {
             yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
         } else if (count > 0) {
-          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="https://yandex.ru/search/?text=host:www.${hostnameWithoutWWW} | host:${hostnameWithoutWWW}" target="_blank">Показать</a>`;
+          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="https://yandex.ru/search/?text=host:www.${hostnameWithoutWWW} | host:${hostnameWithoutWWW}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
 
         } else {
-            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank">Проверить</a>`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         }
     }
 
@@ -3234,9 +3234,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof count === 'string' && count.includes("Капча")) {
             googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
         } else if (count > 0) {
-            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="${googleSearchUrl}" target="_blank">Показать</a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="${googleSearchUrl}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         } else {
-            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank">Проверить</a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         }
     }
   

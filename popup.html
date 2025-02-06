@@ -661,9 +661,6 @@ a:hover {
         text-decoration: none;
     }
 
-    .search-input-container {
-  margin-top: 10px;
-}
 
 input[type="text"] {
   margin-top: 15px;
@@ -765,7 +762,7 @@ input[type="text"] {
 
     <div id="tab-content">
       <div id="seo" class="tab active">
-        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="allmeta">Копировать</button></span>
+        <span style="display: flex;align-items: center;"><div class="section-title">МЕТАДАННЫЕ</div><button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="allmeta"><i style="color:#333" class="fa">&#xf0c5;</i></button></span>
         <table>
         <tr>
           <td style="padding: 0">Title: <div id="title-length" class="meta-length">Символов: 0</div><i class="fa fa-question-circle" style="color: gray;font-size: 10px;" title="Оптимально: 30-70. Допустимо: 10-29, 71-90. Некорректно: 0-9,91+"></i></td>
@@ -774,7 +771,7 @@ input[type="text"] {
             </td>
             <td>
                 <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="title">
-                  Копировать
+                  <i style="color:#333" class="fa">&#xf0c5;</i>
                 </button>
             </td>
         </tr>
@@ -785,7 +782,7 @@ input[type="text"] {
             </td>
             <td>
                 <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="description">
-                  Копировать
+                  <i style="color:#333" class="fa">&#xf0c5;</i>
                 </button>
             </td>
         </tr>
@@ -796,7 +793,7 @@ input[type="text"] {
             </td>
             <td>
                 <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="h1">
-                  Копировать
+                  <i style="color:#333" class="fa">&#xf0c5;</i>
                 </button>
             </td>
         </tr>
@@ -807,7 +804,7 @@ input[type="text"] {
             </td>
             <td>
               <button style="padding: 0px 0px 0px 6px;" class="copy-button" data-target="keywords">
-                Копировать
+                <i style="color:#333" class="fa">&#xf0c5;</i>
               </button>
             </td>
           </tr>
@@ -956,6 +953,29 @@ input[type="text"] {
       <div id="search" class="tab">
         <div class="search-panel">
           <div class="search-item">
+            <span>Показать нумерацию результатов в выдаче Яндекс и Google<br>
+              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
+            <button id="toggle-numbers" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
+          </div>
+          <div class="search-item">
+            <span>Искать организацию на картах</span>
+            <div class="search-buttons">
+               <!-- Блок для ввода для Яндекс.Карт -->
+  <div id="yandex-search-input" class="search-input-container" style="display: none;">
+    <input  style="margin-top: 0;" type="text" id="yandex-input" placeholder="Искать в Яндекс" />
+    <button id="yandex-check" class="check-button">Искать</button>
+  </div>
+  
+  <!-- Блок для ввода для Google.Карт -->
+  <div id="google-search-input" class="search-input-container" style="display: none;">
+    <input style="margin-top: 0;" type="text" id="google-input" placeholder="Искать в Google" />
+    <button id="google-check" class="check-button">Искать</button>
+  </div>
+              <button id="search-yandex-maps" class="search-button yandex">Я</button>
+              <button id="search-google-maps" class="search-button google">G</button>
+            </div>
+          </div>
+          <div class="search-item">
             <span>Поиск по оператору<br>
               <span style="color: gray;font-weight: normal;">site:domain.ru</span></span>
             <div class="search-buttons">
@@ -985,29 +1005,6 @@ input[type="text"] {
             <div class="search-buttons">
               <button id="operator-title-yandex" class="search-button yandex">Я</button>
             </div>
-          </div>
-          <div class="search-item">
-            <span>Искать организацию на картах</span>
-            <div class="search-buttons">
-              <button id="search-yandex-maps" class="search-button yandex">Я</button>
-              <button id="search-google-maps" class="search-button google">G</button>
-            </div>
-             <!-- Блок для ввода для Яндекс.Карт -->
-  <div id="yandex-search-input" class="search-input-container" style="display: none;">
-    <input type="text" id="yandex-input" placeholder="Искать в Яндекс" />
-    <button id="yandex-check" class="check-button">Искать</button>
-  </div>
-  
-  <!-- Блок для ввода для Google.Карт -->
-  <div id="google-search-input" class="search-input-container" style="display: none;">
-    <input type="text" id="google-input" placeholder="Искать в Google" />
-    <button id="google-check" class="check-button">Искать</button>
-  </div>
-          </div>
-          <div class="search-item">
-            <span>Показать нумерацию результатов в выдаче Яндекс и Google<br>
-              <span style="color: gray;font-weight: normal;">По умолчанию выключено</span></span>
-            <button id="toggle-numbers" class="page-button action-button"><i class="fa fa-toggle-off" aria-hidden="true"></i></button>
           </div>
         </div>
       </div>
