@@ -219,7 +219,6 @@ function updateMetaLengthStyles(element, length, ranges, isMissing) {
 }
 
 // Функция для заполнения мета-данных
-// Функция для заполнения мета-данных
 function populateMetaData(id, value) {
   const element = document.getElementById(id);
   const lengthElement = document.getElementById(`${id}-length`);
@@ -362,7 +361,13 @@ function scrapeSEOData() {
     title: document.querySelector("title")?.textContent || "Отсутствует", // textContent вместо innerText
     description: document.querySelector('meta[name="description"]')?.content || "Отсутствует",
     keywords: document.querySelector('meta[name="keywords"]')?.content || "Отсутствует",
-    h1: Array.from(document.querySelectorAll("h1")).map(h1 => h1.textContent.trim()) || [], // Собираем все H1
+    h1: Array.from(document.querySelectorAll("h1"))
+    .map(h1 => {
+      // Удаляем все <span class="highlight-label"> внутри h1
+      h1.querySelectorAll(".highlight-label").forEach(span => span.remove());
+      // Возвращаем текстовое содержимое заголовка после удаления
+      return h1.textContent.trim();
+    }) || [],// Собираем все H1
     linksCount: document.querySelectorAll("a[href]").length,  // Количество ссылок на странице
     imagesCount: document.querySelectorAll("img").length,  // Количество изображений на странице
     lang: document.documentElement.lang || "Отсутствует", // Язык страницы
@@ -1019,7 +1024,6 @@ document.addEventListener("DOMContentLoaded", function () {
       const imgPreview = document.createElement("img");
       imgPreview.src = img.src;
       imgPreview.alt = img.alt || "Нет атрибута alt";
-      imgPreview.title = img.title;
       imgPreview.style.maxWidth = "50px";
       imgPreview.style.maxHeight = "50px";
       imgPreview.style.marginRight = "10px";
@@ -1689,24 +1693,35 @@ document.addEventListener("DOMContentLoaded", () => {
     updateButtonState();
   });
 
-  // Функция для извлечения заголовков (выполняется на странице)
-  function extractHeadings() {
-    const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"));
-    const headingsCount = { H1: 0, H2: 0, H3: 0, H4: 0, H5: 0, H6: 0 };
+  
+// Функция для извлечения заголовков (выполняется на странице)
+function extractHeadings() {
+  const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4, h5, h6"));
+  const headingsCount = { H1: 0, H2: 0, H3: 0, H4: 0, H5: 0, H6: 0 };
 
-    const headingsData = headings.map((heading) => {
-      const tagName = heading.tagName;
-      headingsCount[tagName]++;
-      return { tagName, text: heading.textContent.trim() };
-    });
+  const headingsData = headings.map((heading) => {
+    const tagName = heading.tagName;
+    
+    // Удаляем все элементы <span class="highlight-label"> внутри заголовка
+    heading.querySelectorAll(".highlight-label").forEach(span => span.remove());
 
-    const headingsStructure = headings.map((heading) => ({
+    headingsCount[tagName]++;
+    return { tagName, text: heading.textContent.trim() };
+  });
+
+  const headingsStructure = headings.map((heading) => {
+    // Удаляем все элементы <span class="highlight-label"> внутри заголовка
+    heading.querySelectorAll(".highlight-label").forEach(span => span.remove());
+
+    return {
       tagName: heading.tagName,
       text: heading.textContent.trim(),
-    }));
+    };
+  });
 
-    return { headingsCount, headingsData, headingsStructure };
-  }
+  return { headingsCount, headingsData, headingsStructure };
+}
+
 });
 
 
@@ -3114,7 +3129,7 @@ document.addEventListener("DOMContentLoaded", () => {
       
           // Если капча была обнаружена, прекращаем запросы
           if (isCaptchaDetected) {
-            return `<br><br>Капча: <a href="#" style="pointer-events: none; text-decoration: none;">Пройти капчу</a>`;
+            return `<br><br>Капча: <a href="#" style="pointer-events: none; text-decoration: none;"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
           }
       
           const response = await fetch(queryUrl);
@@ -3123,7 +3138,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (response.status === 429) {
             isCaptchaDetected = true; // Устанавливаем флаг капчи
             const captchaUrl = response.url;
-            return `<br><br>Капча: <a href="${captchaUrl}" target="_blank">Пройти капчу</a>`;
+            return `<br><br>Капча: <a href="${captchaUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
           }
       
           const text = await response.text();
@@ -3221,10 +3236,10 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof count === 'string' && count.includes("Капча")) {
             yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
         } else if (count > 0) {
-          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="https://yandex.ru/search/?text=host:www.${hostnameWithoutWWW} | host:${hostnameWithoutWWW}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="https://yandex.ru/search/?text=host:www.${hostnameWithoutWWW} | host:${hostnameWithoutWWW}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
 
         } else {
-            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         }
     }
 
@@ -3234,9 +3249,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (typeof count === 'string' && count.includes("Капча")) {
             googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
         } else if (count > 0) {
-            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="${googleSearchUrl}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="${googleSearchUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         } else {
-            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank"><i style="color:#333;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         }
     }
   

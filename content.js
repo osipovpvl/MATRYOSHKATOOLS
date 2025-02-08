@@ -577,6 +577,7 @@ chrome.storage.sync.get("highlightState", (data) => {
   toggleHighlightHeadings(isHighlightActive); // Применяем подсветку сразу при загрузке
 });
 
+
 // Функция подсветки заголовков
 function toggleHighlightHeadings(isActive) {
   const headings = document.querySelectorAll("h1, h2, h3, h4, h5, h6");
@@ -610,7 +611,6 @@ chrome.runtime.onMessage.addListener((message) => {
     toggleHighlightHeadings(message.isActive);
   }
 });
-
 
 
 // Изначально функции отключены
