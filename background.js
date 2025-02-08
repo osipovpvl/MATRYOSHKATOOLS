@@ -13,47 +13,6 @@
  * ограничения, предусмотренные Лицензией.
  */
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "CHECK_DOMAIN") {
-    const { domain } = message;
-
-    chrome.storage.sync.get('apiKey', (data) => {
-      if (data.apiKey) {
-        const apiKey = data.apiKey;
-        const apiUrl = `https://checktrust.ru/app.php?r=host/app/summary/basic&applicationKey=${apiKey}&host=${domain}&parameterList=trust,spam`;
-
-        fetch(apiUrl)
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`API Error: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then((data) => {
-            if (data && data.success && data.summary) {
-              sendResponse({ 
-                trust: data.summary.trust, 
-                spam: data.summary.spam
-              });
-            } else {
-              sendResponse(null); // Ответ на случай ошибки API
-            }
-          })
-          .catch((error) => {
-            //console.error("Ошибка при запросе API:", error);
-            sendResponse(null); // Ответ при ошибке
-          });
-      } else {
-        //console.error("API ключ не найден");
-        sendResponse(null); // Ответ, если API ключ отсутствует
-      }
-    });
-
-    return true; // Асинхронный запрос
-  }
-});
-
-
 chrome.action.onClicked.addListener(function (tab) {
   // Получаем заголовок страницы
   let pageTitle = tab.title;
