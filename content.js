@@ -14,7 +14,6 @@
  */
 
 
-
 if (window.location.hostname === 'wordstat.yandex.ru') {
   //Панель Вордстат 
   function addSearchButtons() {

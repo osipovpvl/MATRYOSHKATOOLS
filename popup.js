@@ -2075,7 +2075,7 @@ async function checkRobotsTxt(tabUrl, container) {
   try {
       const response = await fetch(robotsUrl, {
           headers: {
-              "User-Agent": "Mozilla/5.0 (compatible; MyBot/1.0; +http://example.com/bot)",
+              "User-Agent": "Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)",
               "Cache-Control": "no-cache"
           }
       });
@@ -3201,3 +3201,73 @@ document.addEventListener("DOMContentLoaded", () => {
         button.textContent = showAlt ? "Не показывать alt" : "Показать alt";
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Запрашиваем активную вкладку
+  chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    // Выполняем скрипт на активной вкладке
+    chrome.scripting.executeScript({
+      target: {tabId: tabs[0].id},
+      function: extractAuthorFromMeta
+    }, (results) => {
+      const authorInfo = document.getElementById('author-info');
+      if (results && results[0] && results[0].result) {
+        authorInfo.textContent = `${results[0].result}`;
+      } else {
+        authorInfo.textContent = 'Отсутствует';
+      }
+    });
+  });
+});
+
+// Функция, которая выполняется на текущей странице браузера
+function extractAuthorFromMeta() {
+  // Ищем мета-тег с именем автора
+  const metaAuthor = document.querySelector('meta[name="author"]');
+  return metaAuthor ? metaAuthor.content : null;
+}
+
+
+// Инициализация переключателя по умолчанию
+chrome.storage.local.get(['wordstatPanel'], function(result) {
+  if (result.wordstatPanel === undefined) {
+    chrome.storage.local.set({ wordstatPanel: true });
+  }
+});
+
+// Обработчик для переключателя
+document.getElementById('toggle-wordstat').addEventListener('click', function() {
+  const isEnabled = this.querySelector('i').classList.contains('fa-toggle-on');
+  const newState = !isEnabled;
+
+  chrome.storage.local.set({ wordstatPanel: newState }, function() {
+    const icon = document.querySelector('#toggle-wordstat i');
+    icon.classList.toggle('fa-toggle-on', newState);
+    icon.classList.toggle('fa-toggle-off', !newState);
+
+    const panel = document.getElementById('wordstat-helper');
+    if (panel) {
+      panel.style.display = newState ? 'block' : 'none';
+    }
+  });
+});
+
+// Загрузка состояния при загрузке страницы
+window.onload = function() {
+  chrome.storage.local.get(['wordstatPanel'], function(result) {
+    const isEnabled = result.wordstatPanel !== false;
+
+    const icon = document.querySelector('#toggle-wordstat i');
+    icon.classList.toggle('fa-toggle-on', isEnabled);
+    icon.classList.toggle('fa-toggle-off', !isEnabled);
+
+    const panel = document.getElementById('wordstat-helper');
+    if (panel) {
+      panel.style.display = isEnabled ? 'block' : 'none';
+    }
+
+    if (isEnabled) {
+      addSearchButtons();
+    }
+  });
+};
