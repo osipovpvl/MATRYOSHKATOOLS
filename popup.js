@@ -204,13 +204,13 @@ function updateMetaLengthStyles(element, length, ranges, isMissing) {
 
   // Если данные присутствуют, вычисляем цвет по диапазонам
   if (length >= ranges.good[0] && length <= ranges.good[1]) {
-    element.style.color = "green";  // Хорошо
+    element.style.color = "#23e923";  // Хорошо
     //element.style.fontWeight = "bold";
   } else if (
     (length >= ranges.acceptable[0] && length <= ranges.acceptable[1]) ||
     (length >= ranges.acceptable[2] && length <= ranges.acceptable[3])
   ) {
-    element.style.color = "orange";  // Приемлемо
+    element.style.color = "#d8d804";  // Приемлемо
     //element.style.fontWeight = "bold";
   } else {
     element.style.color = "red";  // Плохо
@@ -1219,10 +1219,10 @@ function updateMetricStatus(elementId, data) {
 
   if (data.length) {
     element.textContent = data.join(", ");
-    icon.innerHTML = '<i class="fas fa-check-circle" style="color: green;"></i>';
+    icon.innerHTML = '<i class="fas fa-check-circle" style="color: #23e923;"></i>';
   } else {
     element.textContent = "Не найдено";
-    icon.innerHTML = '<i class="fas fa-exclamation-circle" style="color: orange;"></i>';
+    icon.innerHTML = '<i class="fas fa-exclamation-circle" style="color: #d8d804;"></i>';
   }
 
   element.innerHTML = ""; // Очищаем перед обновлением
@@ -1994,38 +1994,54 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 // Проверка каноничного адреса
 function checkCanonical(doc, currentUrl, container) {
-  const canonicalElement = doc.querySelector('link[rel="canonical"]');
+  const canonicalElements = doc.querySelectorAll('link[rel="canonical"]');
 
-  if (canonicalElement) {
-      const canonicalHref = canonicalElement.getAttribute('href');
- const canonicalUrl = canonicalElement.href;
-      // Проверяем, является ли адрес относительным
-      const isRelative = !canonicalHref.startsWith('http://') && !canonicalHref.startsWith('https://');
-
-      if (isRelative) {
+  if (canonicalElements.length > 0) {
+      // Проверяем количество canonical элементов
+      if (canonicalElements.length > 1) {
+          let canonicalList = '';
+          canonicalElements.forEach((element, index) => {
+              const canonicalHref = element.getAttribute('href');
+              canonicalList += `<div>${index + 1}. ${canonicalHref}</div>`;
+          });
+          
           container.innerHTML = `
-              <span class="fa fa-times-circle" style="color:red;"></span>
-              Содержимое тега указано некорректно, но индексирование страницы не запрещено: <span>href="${canonicalHref}"</span>
-          `;
-      } else if (canonicalUrl === currentUrl) {
-          container.innerHTML = `
-              <span class="fas fa-check-circle" style="color: green;"></span>
-              Каноничной страницей является текущая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
+              <span class="fas fa-exclamation-circle" style="color: #d8d804;"></span>
+              Найдено несколько canonical тегов! Это может вызвать проблемы с индексацией:
+              ${canonicalList}
           `;
       } else {
-          container.innerHTML = `
-              <span class="fas fa-exclamation-circle" style="color: orange;"></span>
-              Каноничной является другая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
-          `;
+          const canonicalElement = canonicalElements[0];
+          const canonicalHref = canonicalElement.getAttribute('href');
+          const canonicalUrl = canonicalElement.href;
+          
+          // Проверяем, является ли адрес относительным
+          const isRelative = !canonicalHref.startsWith('http://') && !canonicalHref.startsWith('https://');
+
+          if (isRelative) {
+              container.innerHTML = `
+                  <span class="fa fa-times-circle" style="color:red;"></span>
+                  Содержимое тега указано некорректно, но индексирование страницы не запрещено: <span>href="${canonicalHref}"</span>
+              `;
+          } else if (canonicalUrl === currentUrl) {
+              container.innerHTML = `
+                  <span class="fas fa-check-circle" style="color: #23e923;"></span>
+                  Каноничной страницей является текущая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
+              `;
+          } else {
+              container.innerHTML = `
+                  <span class="fas fa-exclamation-circle" style="color: #d8d804;"></span>
+                  Каноничной является другая страница: <a href="${canonicalHref}" target="_blank">${canonicalHref}</a>
+              `;
+          }
       }
   } else {
       container.innerHTML = `
-          <span class="fas fa-check-circle" style="color: green;"></span>
+          <span class="fas fa-check-circle" style="color: #23e923;"></span>
           Каноничный адрес не указан (Индексация разрешена)
       `;
   }
 }
-
 
 // Проверка Meta Robots
 function checkMetaRobots(doc, container) {
@@ -2044,10 +2060,10 @@ function checkMetaRobots(doc, container) {
           statusIcon = '<span class="fa fa-times-circle" style="color:red;"></span>';
           message = `Индексация запрещена: ${content}`;
       } else if (content.includes("all") || content.includes("index")) {
-          statusIcon = '<span class="fas fa-check-circle" style="color:green;"></span>';
+          statusIcon = '<span class="fas fa-check-circle" style="color:#23e923;"></span>';
           message = `Индексация разрешена: ${content}`;
       } else {
-          statusIcon = '<span class="fas fa-exclamation-circle" style="color: orange;"></span>';
+          statusIcon = '<span class="fas fa-exclamation-circle" style="color: #d8d804;"></span>';
           message = `Индексация разрешена, но с ограничениями: ${content}`;
       }
       
@@ -2061,7 +2077,7 @@ function checkMetaRobots(doc, container) {
       `;
   } else {
       container.innerHTML = `
-          <span class="fas fa-check-circle" style="color:green;"></span>
+          <span class="fas fa-check-circle" style="color:#23e923;"></span>
           Meta Robots не указан (Индексация разрешена)
       `;
   }
@@ -2092,7 +2108,7 @@ async function checkRobotsTxt(tabUrl, container) {
       const robotsText = await response.text();
 
       if (robotsText.trim() === "") {
-          container.innerHTML = `<p><span class="fa fa-exclamation-circle" style="color:orange;"></span> Файл Robots.txt пуст (Индексация разрешена)</p>`;
+          container.innerHTML = `<p><span class="fa fa-exclamation-circle" style="color:#d8d804;"></span> Файл Robots.txt пуст (Индексация разрешена)</p>`;
           return;
       }
 
@@ -2170,14 +2186,14 @@ async function checkRobotsTxt(tabUrl, container) {
       for (const { agent, rules } of userAgents) {
           const { allowed, ruleMatched } = isPathAllowed(rules, currentPath);
           htmlContent += `<li style="list-style:none;"><span class="${allowed ? 'fas fa-check-circle' : 'fa fa-times-circle'}" 
-              style="color: ${allowed ? 'green' : 'red'};"></span> User-Agent: ${agent} 
+              style="color: ${allowed ? '#23e923' : 'red'};"></span> User-Agent: ${agent} 
               ${allowed ? "Разрешено" : `Запрещено правилом: <code>${ruleMatched}</code>`}</li>`;
       }
 
       htmlContent += "</ы>";
       container.innerHTML = htmlContent;
   } catch (error) {
-      container.innerHTML = `<p><span class="fas fa-exclamation-circle" style="color: orange;"></span> Не удалось загрузить файл Robots.txt<p>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
+      container.innerHTML = `<p><span class="fas fa-exclamation-circle" style="color: #d8d804;"></span> Не удалось загрузить файл Robots.txt<p>Проверьте файл вручную: <a href="${robotsUrl}" target="_blank">${robotsUrl}</a></p></p>`;
   }
 }
 
@@ -2213,7 +2229,7 @@ async function checkSitemap(tabUrl, container) {
       try {
         const defaultResponse = await fetch(defaultSitemapUrl);
         if (defaultResponse.status === 200) {
-          resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: green;\"></span> Доступен: <a href=\"${defaultSitemapUrl}\" target=\"_blank\">${defaultSitemapUrl}</a></div>`;
+          resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: #23e923;\"></span> Доступен: <a href=\"${defaultSitemapUrl}\" target=\"_blank\">${defaultSitemapUrl}</a></div>`;
           sitemapsFound = true;
         } else {
           resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Файл Sitemap.xml отсутствует</div>`;
@@ -2227,12 +2243,12 @@ async function checkSitemap(tabUrl, container) {
         try {
           const response = await fetch(sitemapUrl);
           if (response.status === 200) {
-            resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: green;\"></span> Доступен: <a href=\"${sitemapUrl}\" target=\"_blank\">${sitemapUrl}</a></div>`;
+            resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: #23e923;\"></span> Доступен: <a href=\"${sitemapUrl}\" target=\"_blank\">${sitemapUrl}</a></div>`;
             sitemapsFound = true;
           } else if (response.status === 404) {
             resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Недоступен: <a href=\"${sitemapUrl}\" target=\"_blank\">${sitemapUrl}</a></div>`;
           } else {
-            resultHtml += `<div><span class=\"fas fa-exclamation-circle\" style=\"color: orange;\"></span> Неожиданный ответ (${response.status}): <a href=\"${sitemapUrl}\" target=\"_blank\"> ${sitemapUrl}</a></div>`;
+            resultHtml += `<div><span class=\"fas fa-exclamation-circle\" style=\"color: #d8d804;\"></span> Неожиданный ответ (${response.status}): <a href=\"${sitemapUrl}\" target=\"_blank\"> ${sitemapUrl}</a></div>`;
           }
         } catch (error) {
           resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Не удалось проверить: <a href=\"${sitemapUrl}\" target=\"_blank\"> ${sitemapUrl}</a></div>`;
@@ -2245,7 +2261,7 @@ async function checkSitemap(tabUrl, container) {
     try {
       const defaultResponse = await fetch(defaultSitemapUrl);
       if (defaultResponse.status === 200) {
-        resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: green;\"></span> Доступен: <a href=\"${defaultSitemapUrl}\" target=\"_blank\">${defaultSitemapUrl}</a></div>`;
+        resultHtml += `<div><span class=\"fas fa-check-circle\" style=\"color: #23e923;\"></span> Доступен: <a href=\"${defaultSitemapUrl}\" target=\"_blank\">${defaultSitemapUrl}</a></div>`;
         sitemapsFound = true;
       } else {
         resultHtml += `<div><span class=\"fas fa-times-circle\" style=\"color: red;\"></span> Файл Sitemap.xml отсутствует</div>`;
@@ -2289,7 +2305,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       const directives = ['noindex', 'nofollow', 'none', 'noarchive', 'nosnippet', 'noodp', 'notranslate', 'noimageindex', 'unavailable_after'];
                       let statusText = '';
                       let statusClass = 'success';
-                      let icon = '<span class="fas fa-check-circle" style="color: green;"></span>';
+                      let icon = '<span class="fas fa-check-circle" style="color: #23e923;"></span>';
 
                       const botDirectives = {};
                       xRobotsTags.split(',').forEach(tag => {
@@ -2324,7 +2340,7 @@ document.addEventListener('DOMContentLoaded', function () {
                               // Если это директива для всех
                               if (bot === 'all') {
                                   botStatus = 'Индексация разрешена, но с ограничениями';
-                                  botIcon = '<span class="fa fa-exclamation-circle" style="color: orange;"></span>';
+                                  botIcon = '<span class="fa fa-exclamation-circle" style="color: #d8d804;"></span>';
                                   botDirectivesText = `: ${botDirectives['all'].join(', ')}`;
                                   statusText += `<br>${botIcon} <b>All:</b> ${botStatus}${botDirectivesText}`;
                               } else {
@@ -2335,10 +2351,10 @@ document.addEventListener('DOMContentLoaded', function () {
                                       botDirectivesText = botDirectives[bot].includes('noindex') ? 'Индексация запрещена: noindex' : '';
                                   } else if (botDirectives[bot].includes('all')) {
                                       botStatus = 'Индексация разрешена: index';
-                                      botIcon = '<span class="fas fa-check-circle" style="color: green;"></span>';
+                                      botIcon = '<span class="fas fa-check-circle" style="color: #23e923;"></span>';
                                   } else {
                                       botStatus = 'Индексация разрешена, но с ограничениями';
-                                      botIcon = '<span class="fa fa-exclamation-circle" style="color: orange;"></span>';
+                                      botIcon = '<span class="fa fa-exclamation-circle" style="color: #d8d804;"></span>';
                                   }
 
                                   // Собираем другие директивы
@@ -2353,7 +2369,7 @@ document.addEventListener('DOMContentLoaded', function () {
                           }
                       } else {
                           statusText = 'Заголовок X-Robots-Tag не содержит запрещающих директив (Индексация разрешена)';
-                          icon = '<span class="fas fa-check-circle" style="color: green;"></span>';
+                          icon = '<span class="fas fa-check-circle" style="color: #23e923;"></span>';
                       }
 
                       // Обновляем DOM с результатом
@@ -2362,7 +2378,7 @@ document.addEventListener('DOMContentLoaded', function () {
                       resultElement.classList.add(statusClass);
                   } else {
                       // Если заголовок не найден, считаем, что индексация разрешена
-                      resultElement.innerHTML = '<span class="fas fa-check-circle" style="color: green;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
+                      resultElement.innerHTML = '<span class="fas fa-check-circle" style="color: #23e923;"></span> <span>Заголовок X-Robots-Tag не найден (Индексация разрешена)</span>';
                       resultElement.classList.remove('loading');
                       resultElement.classList.add('success');
                   }
@@ -3104,18 +3120,46 @@ document.addEventListener("DOMContentLoaded", () => {
                 resultCount = parseInt(result, 10);
               }
             }
-          } else if (engine === "google") {
-            const match = text.match(/<div id="result-stats">Результатов: примерно ([\d\s,]+(?:тыс\.|млн\.|млрд\.)?)/i);
-            if (match) {
-              let result = match[1]
-                .replace(/,/g, "")
-                .replace(/\s/g, "")
-                .replace("тыс.", "000")
-                .replace("млн.", "000000")
-                .replace("млрд.", "000000000");
-              resultCount = parseInt(result, 10);
-            }
-          }
+         } else if (engine === "google") {
+  // Пробуем разные варианты поиска количества результатов
+  let match = text.match(/Результатов: примерно ([\d\s&;]+)<nobr>/i);
+  
+  if (!match) {
+    match = text.match(/Результатов: примерно ([\d\s&;]+)<\/div>/i);
+  }
+  
+  if (!match) {
+    match = text.match(/id="result-stats">Результатов: примерно ([\d\s&;]+)/i);
+  }
+  
+  if (!match) {
+    match = text.match(/Результатов: примерно ([\d\s&;]+)/i);
+  }
+  
+  if (match) {
+    let result = match[1]
+      .replace(/&nbsp;/g, "")
+      .replace(/\s/g, "")
+      .replace("тыс.", "000")
+      .replace("млн.", "000000")
+      .replace("млрд.", "000000000");
+    resultCount = parseInt(result, 10);
+  }
+  
+  // Если не нашли, попробуем найти просто число в result-stats
+  if (!resultCount) {
+    const statsMatch = text.match(/id="result-stats">[^<]*?([\d\s&;]+)[^<]*?</i);
+    if (statsMatch) {
+      let result = statsMatch[1]
+        .replace(/&nbsp;/g, "")
+        .replace(/\s/g, "")
+        .replace("тыс.", "000")
+        .replace("млн.", "000000")
+        .replace("млрд.", "000000000");
+      resultCount = parseInt(result, 10);
+    }
+  }
+}
       
           // Если запрос успешен и не является капчей или 0, сохраняем данные в кэш
           if (resultCount > 0 && resultCount !== 'Капча') {
@@ -3136,12 +3180,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const count = await fetchIndexedPages("yandex", yandexSearchUrlFull);
 
         if (typeof count === 'string' && count.includes("Капча")) {
-            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #d8d804;"></i> ${count}`;
         } else if (count > 0) {
-          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="https://yandex.ru/search/?text=host:www.${hostnameWithoutWWW} | host:${hostnameWithoutWWW}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+          yandexResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: #23e923;"></i> ${count.toLocaleString()} <a href="https://yandex.ru/search/?text=host:www.${hostnameWithoutWWW} | host:${hostnameWithoutWWW}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
 
         } else {
-            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+            yandexResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #d8d804;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${yandexSearchUrlFull}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         }
     }
 
@@ -3149,11 +3193,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const count = await fetchIndexedPages("google", googleSearchUrl);
 
         if (typeof count === 'string' && count.includes("Капча")) {
-            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> ${count}`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #d8d804;"></i> ${count}`;
         } else if (count > 0) {
-            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: green;"></i> ${count.toLocaleString()} <a href="${googleSearchUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-check-circle" style="color: #23e923;"></i> ${count.toLocaleString()} <a href="${googleSearchUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         } else {
-            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: orange;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
+            googleResultElement.innerHTML = `<i class="fas fa-exclamation-circle" style="color: #d8d804;"></i> 0<br><br>Попробуйте проверить вручную: <a href="${googleSearchUrl}" target="_blank"><i style="color:#333; font-weight: 100 !important;" class="fa fa-share-square" aria-hidden="true"></i></a>`;
         }
     }
   

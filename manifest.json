@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "MATRYOSHKA TOOLS",
-  "description": "Полезные инструменты и сервисы для анализа и оптимизации сайта.",
-  "version": "1.0.6",
+  "name": "MATRYOSHKA SEO TOOLS",
+  "description": "Полезные инструменты и сервисы для анализа и оптимизации сайтов.",
+  "version": "1.0.7",
   "permissions": ["activeTab", "tabs", "contentSettings", "scripting", "storage"],
   "background": {
     "service_worker": "background.js"
@@ -16,7 +16,7 @@
   "48": "img/icon48.png",
   "128": "img/icon128.png"
   },
-  "default_title": "MATRYOSHKA TOOLS"
+  "default_title": "MATRYOSHKA SEO TOOLS"
 },
 "icons": {
     "16": "img/icon16.png",
