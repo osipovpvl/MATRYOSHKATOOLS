@@ -740,10 +740,55 @@ input[type="text"] {
 .text-marketinginfo {
   font-size: 14px; /* Размер текста */
 }
+body {
+  font-family: Noto Sans, sans-serif;
+  margin: 0;
+  padding: 0;
+  width: 750px;
+  overflow: hidden;
+  background-color: #ffffff;
+  position: relative; /* Добавьте это */
+}
 
+.animated-circle {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px; /* Уменьшил размер */
+  height: 300px; /* Уменьшил размер */
+  border-radius: 50%;
+  filter: blur(40px); /* Уменьшил размытие */
+  animation: colorChange 8s infinite alternate;
+  opacity: 0.2; /* Сделал более прозрачным */
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes colorChange {
+  0% {
+    background-color: rgba(255, 94, 94, 0.2); /* Уменьшил прозрачность */
+    transform: translate(-50%, -50%) scale(1);
+  }
+  25% {
+    background-color: rgba(94, 94, 255, 0.2); /* Уменьшил прозрачность */
+  }
+  50% {
+    background-color: rgba(94, 255, 94, 0.2); /* Уменьшил прозрачность */
+    transform: translate(-50%, -50%) scale(1.05); /* Уменьшил масштаб */
+  }
+  75% {
+    background-color: rgba(255, 255, 94, 0.2); /* Уменьшил прозрачность */
+  }
+  100% {
+    background-color: rgba(255, 94, 255, 0.2); /* Уменьшил прозрачность */
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
   </style>
 </head>
 <body>
+  <div class="animated-circle"></div>
   <div id="container">
     <!-- Навигационное меню -->
     <div id="tabs">
@@ -1251,11 +1296,15 @@ input[type="text"] {
             </ul>
             <ul class="service-list">
               <div class="section-title">ИИ</div>
+              <li class="hiddenli"><a href="https://alice.yandex.ru/prompthub" target="_blank">Prompt Hub</a></li>
               <li class="hiddenli"><a href="https://a.ya.ru/" target="_blank">Yandex Gpt</a></li>
+                <li class="hiddenli"><a href="https://gemini.google.com/" target="_blank">Gemini</a></li>
+               <li class="hiddenli"><a href="https://copilot.microsoft.com/" target="_blank">Microsoft Copilot</a></li>
               <li class="hiddenli"><a href="https://chatgpt.com/" target="_blank">Chat Gpt</a></li>
               <li class="hiddenli"><a href="https://giga.chat/" target="_blank">Giga Chat</a></li>
-              <li class="hiddenli"><a href="https://gemini.google.com/" target="_blank">Gemini</a></li>
               <li class="hiddenli"><a href="https://www.deepseek.com/" target="_blank">Deep Seek</a></li>
+              <li class="hiddenli"><a href="https://www.perplexity.ai/" target="_blank">Perplexity</a></li>
+              <li class="hiddenli"><a href="https://grok.com/" target="_blank">Grok</a></li>
             </ul>
             </div>
             <div class="service-container">
@@ -1354,8 +1403,16 @@ input[type="text"] {
     <footer>
 
     <div class="marketing">
+<div class="marketinginfo">
+        <a target="_blank" href="https://music.yandex.ru/artist/24997294">
+          <div class="text-marketinginfo" style=" display: flex; /* Для выравнивания содержимого внутри */
+          align-items: center; /* Центрируем по вертикали */
+          justify-content: center;"><img style="padding-right: 5px;" src="/img/music.png" alt="webrevisor">Оптимизируйте сайты с pavlodarcev music</div>
+        </a>
+      </div>
+
             <div class="marketinginfo">
-        <a target="_blank" href="https://webrevisor.com/">
+        <a target="_blank" href="https://webrevisor.com/?utm_source=matryoshkaseotools&utm_medium=extensions&utm_campaign=matryoshkaseotools">
           <div class="text-marketinginfo" style=" display: flex; /* Для выравнивания содержимого внутри */
           align-items: center; /* Центрируем по вертикали */
           justify-content: center;"><img src="/img/webrevisoricon.png" alt="webrevisor">&nbspВЕБРЕВИЗОР - Инструменты для анализа и продвижения сайтов №1</div>
@@ -1363,7 +1420,7 @@ input[type="text"] {
       </div>
       
       <div class="marketinginfo">
-        <a target="_blank" href="https://ipos.digital/">
+        <a target="_blank" href="https://ipos.digital/?utm_source=matryoshkaseotools&utm_medium=extensions&utm_campaign=matryoshkaseotools">
           <div class="text-marketinginfo" style=" display: flex; /* Для выравнивания содержимого внутри */
           align-items: center; /* Центрируем по вертикали */
           justify-content: center;">Разработано в  &nbsp<img src="/img/logo-ipos.svg" alt="ipos.digital"></div>
