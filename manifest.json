@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "MATRYOSHKA SEO TOOLS",
   "description": "Полезные инструменты и сервисы для анализа и оптимизации сайтов.",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "permissions": ["activeTab", "tabs", "contentSettings", "scripting", "storage"],
   "background": {
     "service_worker": "background.js"
