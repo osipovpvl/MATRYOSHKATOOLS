@@ -785,6 +785,37 @@ body {
     transform: translate(-50%, -50%) scale(1);
   }
 }
+
+/* Шапка с прозрачным стеклянным эффектом */
+#tabs {    
+    /* Прозрачный стеклянный эффект */
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+}
+
+/* Футер с прозрачным стеклянным эффектом */
+.marketing {    
+    /* Прозрачный стеклянный эффект */
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(25px) saturate(180%);
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+}
+
+/* Делаем кнопки в шапке также полупрозрачными */
+.tab-button {
+    border-radius: 0px;
+    margin-top: 0px;
+    flex: 1;
+    padding: 10px;
+    cursor: pointer;
+    background: transparent;
+    color: rgb(0, 0, 0);
+    border: none;
+    text-align: center;
+    font-size: 0.9em;
+    transition: background 0.3s ease;
+}
   </style>
 </head>
 <body>
@@ -1403,8 +1434,9 @@ body {
     <footer>
 
     <div class="marketing">
+      
 <div class="marketinginfo">
-        <a target="_blank" href="https://music.yandex.ru/artist/24997294">
+        <a target="_blank" href="https://band.link/pavlodarcev">
           <div class="text-marketinginfo" style=" display: flex; /* Для выравнивания содержимого внутри */
           align-items: center; /* Центрируем по вертикали */
           justify-content: center;"><img style="padding-right: 5px;" src="/img/music.png" alt="webrevisor">Оптимизируйте сайты с pavlodarcev music</div>
